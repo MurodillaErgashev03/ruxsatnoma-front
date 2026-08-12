@@ -3,7 +3,6 @@ import {
   Building2,
   Plus,
   Search,
-  Filter,
   MapPin,
   Users,
   Trees,
@@ -11,10 +10,8 @@ import {
   Edit,
   ChevronRight,
   ChevronDown,
-  FileText,
   Layers,
   Phone,
-  Mail,
   X,
   SlidersHorizontal,
 } from 'lucide-react';

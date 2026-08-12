@@ -3,9 +3,7 @@ import {
   Users,
   UserPlus,
   Search,
-  Filter,
   Shield,
-  MoreVertical,
   CheckCircle2,
   XCircle,
   Edit,
@@ -28,7 +26,6 @@ export const AdminUsersPage: React.FC<AdminUsersPageProps> = () => {
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
 
   // 10 Mock Users from TZ tz/21-mock-users.md
   const [usersList, setUsersList] = useState([

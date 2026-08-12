@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Settings,
   ShieldCheck,
   Server,
   Lock,
@@ -10,12 +9,8 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
-  KeyRound,
   Sliders,
   RefreshCw,
-  Clock,
-  Smartphone,
-  Cpu,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';

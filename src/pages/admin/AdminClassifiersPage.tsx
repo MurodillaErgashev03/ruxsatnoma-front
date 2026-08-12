@@ -6,14 +6,10 @@ import {
   RefreshCw,
   CheckCircle2,
   Archive,
-  Edit,
-  ExternalLink,
   ChevronRight,
   Database,
   Layers,
-  ShieldAlert,
   X,
-  FileText,
   SlidersHorizontal,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -27,7 +23,8 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
-  const [activeClassifierDetail, setActiveClassifierDetail] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_activeClassifierDetail, setActiveClassifierDetail] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // 14 Classifiers from TZ 14-errors-classifiers.md (p. 4.1.10)

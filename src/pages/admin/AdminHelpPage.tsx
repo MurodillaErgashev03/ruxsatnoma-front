@@ -7,20 +7,15 @@ import {
   Search,
   MessageSquare,
   ShieldCheck,
-  Download,
   ExternalLink,
   ChevronDown,
   ChevronUp,
   Database,
   Lock,
-  Cpu,
   Phone,
-  Mail,
-  Send,
   LifeBuoy,
   X,
   Play,
-  FileCheck,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';

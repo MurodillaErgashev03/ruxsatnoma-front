@@ -3,23 +3,14 @@ import {
   Key,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
   FileCheck,
   RefreshCw,
-  Download,
   Lock,
   Calendar,
-  Building2,
-  User,
-  Check,
-  X,
-  FileText,
-  Smartphone,
   Cpu,
   Zap,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/FormControls';
 
 export interface EimzoProfilePageProps {
   onNavigate?: (page: string, params?: any) => void;

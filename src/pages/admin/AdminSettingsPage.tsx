@@ -6,12 +6,9 @@ import {
   Users,
   Activity,
   CheckCircle2,
-  AlertTriangle,
   Building2,
-  Sliders,
   Database,
   Lock,
-  Search,
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -23,7 +20,6 @@ export interface AdminSettingsPageProps {
 
 export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
   const [activeTab, setActiveTab] = useState('roles');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const systemMetrics = [
     { label: 'Tizim Serverlari Holati', value: '100% Onlayn', change: 'API, DB, GIS, E-IMZO faol', icon: <Server className="w-5 h-5 text-[#2E7D4F]" /> },
