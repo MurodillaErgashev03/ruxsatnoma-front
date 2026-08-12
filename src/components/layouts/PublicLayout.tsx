@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Trees, Search, QrCode, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
+import { Trees, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Input } from '../ui/FormControls';
 import landingBg from '../../assets/img/landingbackgraund2.png';
 
 export interface PublicLayoutProps {
@@ -13,11 +12,9 @@ export interface PublicLayoutProps {
 
 export const PublicLayout: React.FC<PublicLayoutProps> = ({
   children,
-  onCheckPermit,
   onNavigate,
   activeNav = 'home',
 }) => {
-  const [permitInput, setPermitInput] = useState('');
   const [lang, setLang] = useState<'uz' | 'ru'>('uz');
 
   const navLinks = [

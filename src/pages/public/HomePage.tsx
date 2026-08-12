@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import landingBg from '../../assets/img/landingbackgraund2.png';
 import {
   Search,
   QrCode,
