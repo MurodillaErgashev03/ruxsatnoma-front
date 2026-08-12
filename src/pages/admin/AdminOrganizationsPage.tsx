@@ -14,15 +14,21 @@ import {
   Phone,
   X,
   SlidersHorizontal,
+  Download,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';
 
 export interface AdminOrganizationsPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
-export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = () => {
+export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ userRole = '' }) => {
+  const isCentralAdmin =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('Центральный');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [viewMode, setViewMode] = useState<'hierarchy' | 'table'>('hierarchy');
@@ -197,15 +203,27 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = () 
               Jadval
             </button>
           </div>
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold"
-          >
-            Tashkilot Qoʻshish
-          </Button>
+          {isCentralAdmin ? (
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Download className="w-4 h-4 text-[#15803D]" />}
+              onClick={() => alert('Tashkilotlar va DЎXlar kontaktlari maʼlumotnomasi Excel formatida yuklab olindi!')}
+              className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold text-xs h-9 cursor-pointer"
+            >
+              Vigruzka XLSX
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold"
+            >
+              Tashkilot Qoʻshish
+            </Button>
+          )}
         </div>
       </div>
 

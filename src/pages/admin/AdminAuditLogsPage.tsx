@@ -237,7 +237,7 @@ export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = () => {
         <div className="space-y-1 text-xs">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-emerald-400 uppercase tracking-wider text-[11px]">
-              🚨 XAVFSIZLIK VA DAXLSISLIK REGLAMENTI (TZ С24, 24.2-BAND)
+              XAVFSIZLIK VA DAXLSISLIK REGLAMENTI (TZ С24, 24.2-BAND)
             </span>
             <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
               STRICT IMMUTABLE

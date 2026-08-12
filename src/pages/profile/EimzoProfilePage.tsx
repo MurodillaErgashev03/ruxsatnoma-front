@@ -24,9 +24,9 @@ export const EimzoProfilePage: React.FC<EimzoProfilePageProps> = () => {
   // E-IMZO Certificate Details (TZ Compliant)
   const activeCertificate = {
     serialNumber: '1A2B3C4D5E6F7890',
-    ownerFio: 'Ergashov Sardor Anvarovich',
-    pinfl: '11111111111111',
-    organization: '"Oʻzmon texno" DUK / Bosh administrator',
+    ownerFio: 'Karimov Jamshid Botirovich',
+    pinfl: '22222222222222',
+    organization: 'Oʻrmon xoʻjaligi agentligi / Boʻlim boshligʻi',
     inn: '200891234',
     validFrom: '2025-06-15',
     validTo: '2027-06-15',
@@ -110,7 +110,7 @@ export const EimzoProfilePage: React.FC<EimzoProfilePageProps> = () => {
           <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-3 py-1 rounded-full border border-[#D9EBDC]">
             MODUL 10.7 — ELEKTRON RAQAMLI IMZO
           </span>
-          <h1 className="text-2xl font-black text-[#1A1F24] tracking-tight mt-2">Elektron Raqamli Imzo (E-IMZO) Kaliti</h1>
+          <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] tracking-tight mt-1.5">Elektron Raqamli Imzo (E-IMZO) Kaliti</h1>
           <p className="text-xs text-[#5A646D] mt-0.5">
             Soliq Qoʻmitasi E-IMZO sertifikatlari, Oʻz DSt 1092:2009 standarti va hujjatlarni 4 bosqichli imzolash
           </p>
@@ -144,7 +144,7 @@ export const EimzoProfilePage: React.FC<EimzoProfilePageProps> = () => {
         <div className="space-y-1 text-xs">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-emerald-400 uppercase tracking-wider text-[11px]">
-              ⚖️ HUQUQIY RUKN (TZ п. 10.7 & VMQ 679-SON)
+              HUQUQIY RUKN (TZ п. 10.7 & VMQ 679-SON)
             </span>
             <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
               OʻZ DST 1092:2009

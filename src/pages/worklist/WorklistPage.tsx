@@ -9,11 +9,17 @@ import { WorklistEmptyState } from './components/WorklistEmptyState';
 
 export interface WorklistPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
-export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate }) => {
+export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole }) => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const isCentralAdmin =
+    Boolean(userRole?.includes('central_admin')) ||
+    Boolean(userRole?.includes('Markaziy')) ||
+    Boolean(userRole?.includes('Центральный'));
+
   const [filters, setFilters] = useState<WorklistFilterValues>({
     status: 'under_review',
     activity: 'all',
@@ -21,6 +27,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate }) => {
     endDate: '2026-08-10',
     slaDeadline: 'all',
     preset: 'all_assigned',
+    region: 'all',
   });
 
   const initialRows: WorklistApplicationRow[] = [
@@ -189,6 +196,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate }) => {
         totalAssigned={24}
         overdueCount={2}
         onNavigate={onNavigate}
+        userRole={userRole}
       />
 
       {/* Slicing Tabs */}
@@ -204,6 +212,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate }) => {
         onResetFilters={handleResetFilters}
         onApplyFilters={() => alert('Filtrlar qoʻllandi!')}
         onSelectPreset={handleSelectPreset}
+        isCentralAdmin={isCentralAdmin}
       />
 
       {/* Applied Filters & Results Bar */}

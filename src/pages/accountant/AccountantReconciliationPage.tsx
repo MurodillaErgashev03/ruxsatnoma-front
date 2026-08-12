@@ -64,7 +64,7 @@ export const AccountantReconciliationPage: React.FC<AccountantReconciliationPage
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded">
             Buxgalteriya Subtizimi (Phase 6)
           </span>
-          <h1 className="text-2xl font-bold text-[#1A1F24] mt-1">Bank Koʻchirmalari Sverkasi va 50/50 Taqsimot</h1>
+          <h1 className="text-lg font-bold text-[#1A1F24] mt-1.5">Hisobotlar Boshqaruvi va 50/50 Taqsimot Sverkasi</h1>
           <p className="text-xs text-[#5A646D]">
             Tushgan tushumlarni avtomatik solishtirish va Oʻrmon jamgʻarmasi hamda Byudjet oʻrtasida 50 ga 50 taqsimlash.
           </p>

@@ -7,6 +7,9 @@ import {
   Upload,
   Plus,
   Compass,
+  Download,
+  Printer,
+  Maximize2,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Select } from '../../components/ui/FormControls';
@@ -14,6 +17,7 @@ import { DataTable, type Column } from '../../components/ui/DataTable';
 
 export interface GisEditorPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
 interface ContourItem {
@@ -28,8 +32,14 @@ interface ContourItem {
   lastUpdated: string;
 }
 
-export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate }) => {
+export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRole = '' }) => {
+  const isCentralAdmin =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('Центральный');
+
   const [activeTool, setActiveTool] = useState<'select' | 'polygon' | 'measure' | 'vertex'>('select');
+  const [selectedRegion, setSelectedRegion] = useState('all');
 
   // 13 GIS Layers List
   const gisLayers = [
@@ -87,35 +97,79 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* Top Header */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 font-sans pb-16">
+      {/* Top Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded">
-            GIS Subtizimi (Phase 3)
+          <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC]">
+            {isCentralAdmin ? 'RESPUBLIKA GIS MONITORINGI (П. 4.2.5)' : 'GIS Subtizimi (Phase 3)'}
           </span>
-          <h1 className="text-2xl font-bold text-[#1A1F24] mt-1">GIS Xarita Muharriri va Konturlar Muhiti</h1>
-          <p className="text-xs text-[#5A646D]">
-            Oʻrmon zonasi poligonlarini chizish, 13 ta GIS qatlamini boshqarish va topologik konfliktlarni tahlil qilish.
+          <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] mt-1.5">
+            {isCentralAdmin ? 'Respublika GIS Monitoring Xaritasi' : 'GIS Xarita Muharriri va Konturlar Muhiti'}
+          </h1>
+          <p className="text-xs text-[#5A646D] mt-0.5">
+            {isCentralAdmin
+              ? 'Oʻrmon fondi konturlari bandligi (occupancy), 13 ta GIS qatlami va respublika boʻyicha yer uchastkalari monitoringi'
+              : 'Oʻrmon zonasi poligonlarini chizish, 13 ta GIS qatlamini boshqarish va topologik konfliktlarni tahlil qilish'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Upload className="w-4 h-4" />}
-            onClick={() => onNavigate?.('gis_import')}
-          >
-            Fayl Import (GeoJSON/SHP)
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setActiveTool('polygon')}
-          >
-            Yangi Kontur Chizish
-          </Button>
+
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 shrink-0">
+          {isCentralAdmin ? (
+            <>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="h-9 px-3 text-xs bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24] font-medium focus:ring-2 focus:ring-[#2E7D4F] focus:outline-none shrink-0"
+              >
+                <option value="all">Respublika (14 viloyat)</option>
+                <option value="tashkent">Toshkent v. (Boʻstonliq DЎX)</option>
+                <option value="kashkadarya">Qashqadaryo v. (Kitob DЎX)</option>
+                <option value="jizzakh">Jizzax v. (Zomin DЎX)</option>
+                <option value="namangan">Namangan v. (Pop DЎX)</option>
+                <option value="samarkand">Samarqand v. (Oqdaryo DЎX)</option>
+              </select>
+
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Download className="w-4 h-4 text-[#15803D]" />}
+                onClick={() => alert('GIS Qatlamlari GeoJSON formatida yuklab olindi!')}
+                className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold text-xs h-9 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                GeoJSON / KML
+              </Button>
+
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Printer className="w-4 h-4" />}
+                onClick={() => alert('Xarita kadri PDF formatida chop etishga tayyorlandi!')}
+                className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer shadow-xs whitespace-nowrap shrink-0"
+              >
+                PDF Xarita Kadr
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Upload className="w-4 h-4" />}
+                onClick={() => onNavigate?.('gis_import')}
+              >
+                Fayl Import (GeoJSON/SHP)
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Plus className="w-4 h-4" />}
+                onClick={() => setActiveTool('polygon')}
+              >
+                Yangi Kontur Chizish
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -123,13 +177,16 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate }) => {
       <div className="bg-white border border-[#E4E7EA] rounded-2xl shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[550px]">
         {/* Left Toolbar & Layers Selector */}
         <div className="lg:col-span-3 border-r border-[#E4E7EA] p-4 space-y-6 bg-[#F8F9FA]">
-          {/* Drawing Tools */}
+          {/* Drawing & Navigation Tools */}
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#767F87] block">Xarita Asboblari</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#767F87] block">
+              {isCentralAdmin ? 'Monitoring Asboblari (Read-Only)' : 'Xarita Asboblari'}
+            </span>
             <div className="grid grid-cols-2 gap-2">
               <button
+                type="button"
                 onClick={() => setActiveTool('select')}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
+                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTool === 'select'
                     ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
                     : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
@@ -137,19 +194,11 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate }) => {
               >
                 <Compass className="w-4 h-4" /> Tanlash
               </button>
+
               <button
-                onClick={() => setActiveTool('polygon')}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
-                  activeTool === 'polygon'
-                    ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
-                    : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
-                }`}
-              >
-                <Square className="w-4 h-4" /> Poligon
-              </button>
-              <button
+                type="button"
                 onClick={() => setActiveTool('measure')}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
+                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTool === 'measure'
                     ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
                     : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
@@ -157,16 +206,50 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate }) => {
               >
                 <Ruler className="w-4 h-4" /> Masofa
               </button>
-              <button
-                onClick={() => setActiveTool('vertex')}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
-                  activeTool === 'vertex'
-                    ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
-                    : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
-                }`}
-              >
-                <Edit3 className="w-4 h-4" /> Tahrir
-              </button>
+
+              {isCentralAdmin ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => alert('Maydon va kontur oʻlchami tahlil qilindi!')}
+                    className="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50 cursor-pointer"
+                  >
+                    <Square className="w-4 h-4" /> Maydon
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alert('Xarita kadri toʻliq ekranga moslashtirildi!')}
+                    className="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50 cursor-pointer"
+                  >
+                    <Maximize2 className="w-4 h-4" /> Zoom Kadr
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTool('polygon')}
+                    className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
+                      activeTool === 'polygon'
+                        ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
+                        : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
+                    }`}
+                  >
+                    <Square className="w-4 h-4" /> Poligon
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTool('vertex')}
+                    className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
+                      activeTool === 'vertex'
+                        ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
+                        : 'bg-white text-[#1A1F24] border-[#E4E7EA] hover:bg-gray-50'
+                    }`}
+                  >
+                    <Edit3 className="w-4 h-4" /> Tahrir
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

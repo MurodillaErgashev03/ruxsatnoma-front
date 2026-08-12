@@ -5,11 +5,11 @@ export const KpiGridSection: React.FC = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 font-sans">
       {/* KPI 1: Applications Submitted */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-[#5A646D]">
           Topshirilgan arizalar
         </div>
-        <div className="text-3xl font-extrabold text-[#1A1F24] tracking-tight font-mono">
+        <div className="text-xl font-bold text-[#1A1F24] tracking-tight font-mono">
           22 318
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[#15803D] font-bold">
@@ -31,11 +31,11 @@ export const KpiGridSection: React.FC = () => {
       </div>
 
       {/* KPI 2: Permits Issued */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-[#5A646D]">
           Berilgan ruxsatnomalar
         </div>
-        <div className="text-3xl font-extrabold text-[#1A1F24] tracking-tight font-mono">
+        <div className="text-xl font-bold text-[#1A1F24] tracking-tight font-mono">
           17 972
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[#15803D] font-bold">
@@ -57,12 +57,12 @@ export const KpiGridSection: React.FC = () => {
       </div>
 
       {/* KPI 3: Revenue Collected */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-[#5A646D]">
           Jamlangan toʻlovlar
         </div>
-        <div className="text-3xl font-extrabold text-[#123522] tracking-tight font-mono">
-          6,28 <span className="text-sm font-sans font-semibold text-[#5A646D]">mlrd soʻm</span>
+        <div className="text-xl font-bold text-[#123522] tracking-tight font-mono">
+          6,28 <span className="text-xs font-sans font-semibold text-[#5A646D]">mlrd soʻm</span>
         </div>
         <div className="text-[11px] font-mono text-[#5A646D]">
           6 284 910 000 soʻm
@@ -83,12 +83,12 @@ export const KpiGridSection: React.FC = () => {
       </div>
 
       {/* KPI 4: Average Processing Time */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-[#5A646D]">
           Oʻrtacha koʻrib chiqish
         </div>
-        <div className="text-3xl font-extrabold text-[#1A1F24] tracking-tight font-mono">
-          8,4 <span className="text-sm font-sans font-semibold text-[#5A646D]">kun</span>
+        <div className="text-xl font-bold text-[#1A1F24] tracking-tight font-mono">
+          8,4 <span className="text-xs font-sans font-semibold text-[#5A646D]">kun</span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[#15803D] font-bold">
           <ArrowDownRight className="w-4 h-4 text-[#15803D]" />
@@ -109,12 +109,12 @@ export const KpiGridSection: React.FC = () => {
       </div>
 
       {/* KPI 5: Overdue Applications */}
-      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-[#5A646D]">
           Muddati oʻtganlar ulushi
         </div>
-        <div className="text-3xl font-extrabold text-[#B91C1C] tracking-tight font-mono">
-          3,1 <span className="text-sm font-sans font-semibold text-[#5A646D]">%</span>
+        <div className="text-xl font-bold text-[#B91C1C] tracking-tight font-mono">
+          3,1 <span className="text-xs font-sans font-semibold text-[#5A646D]">%</span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[#B91C1C] font-bold">
           <ArrowUpRight className="w-4 h-4 text-[#B91C1C]" />

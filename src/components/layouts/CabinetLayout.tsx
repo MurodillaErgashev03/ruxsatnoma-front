@@ -21,6 +21,7 @@ import {
   Shield,
   Sliders,
   Database,
+  FileBarChart,
 } from 'lucide-react';
 
 export interface CabinetLayoutProps {
@@ -70,14 +71,18 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
     userRole?.includes('sys_admin') ||
     userRole?.includes('Tizim administrator');
 
+  const isCentralAdmin =
+    userRole?.includes('central_admin') ||
+    userRole?.includes('Markaziy') ||
+    userRole?.includes('Центральный');
+
   const isLeskhozStaff =
-    userRole?.includes('Ijrochi') ||
+    !isCentralAdmin &&
+    (userRole?.includes('Ijrochi') ||
     userRole?.includes('Сотрудник') ||
     userRole?.includes('Руководитель') ||
-    userRole?.includes('Markaziy') ||
-    userRole?.includes('Центральный') ||
     userRole?.includes('inspektor') ||
-    userRole?.includes('Inspektor');
+    userRole?.includes('Inspektor'));
 
   let navItems: { group: string; items: { id: string; label: string; page: string; icon: React.ReactNode; count?: number; isWarning?: boolean }[] }[] = [];
 
@@ -98,6 +103,39 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
           { id: 'admin_system_settings', label: 'Tizim sozlamalari', page: 'admin_system_settings', icon: <Settings className="w-5 h-5" />, count: undefined },
           { id: 'admin_audit', label: 'Audit va loglar', page: 'admin_audit_logs', icon: <Shield className="w-5 h-5" />, count: undefined },
           { id: 'admin_backups', label: 'Zahiraviy nusxalar', page: 'admin_backups', icon: <Database className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Mening profilim',
+        items: [
+          { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'profile_eimzo', icon: <KeyRound className="w-5 h-5" />, count: undefined },
+          { id: 'notifications', label: 'Bildirishnomalar', page: 'profile_notifications', icon: <Bell className="w-5 h-5" />, count: 3 },
+        ],
+      },
+      {
+        group: 'Yordam',
+        items: [
+          { id: 'help', label: 'Yordam va savollar', page: 'admin_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
+        ],
+      },
+    ];
+  } else if (isCentralAdmin) {
+    navItems = [
+      {
+        group: '',
+        items: [
+          { id: 'dashboard', label: 'Bosh sahifa (Monitoring)', page: 'manager_decision', icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Respublika monitoringi',
+        items: [
+          { id: 'applications', label: 'Arizalar reyestri', page: 'leskhoz_inbox', icon: <Mail className="w-5 h-5" />, count: 24 },
+          { id: 'permits', label: 'Ruxsatnomalar reyestri', page: 'applicant_permits', icon: <FileText className="w-5 h-5" />, count: 18 },
+          { id: 'reports', label: 'Hisobotlar boshqaruvi', page: 'reports', icon: <FileBarChart className="w-5 h-5" />, count: 5 },
+          { id: 'map', label: 'Uchastkalar xaritasi (GIS)', page: 'gis_editor', icon: <Map className="w-5 h-5" />, count: undefined },
+          { id: 'admin_orgs', label: 'Tashkilotlar ierarxiyasi', page: 'admin_orgs', icon: <Building2 className="w-5 h-5" />, count: 84 },
+          { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className="w-5 h-5" />, count: 14 },
         ],
       },
       {
@@ -200,6 +238,7 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
           <button
             onClick={() => {
               if (isSysAdmin) onNavSelect?.('admin_settings');
+              else if (isCentralAdmin) onNavSelect?.('manager_decision');
               else if (isLeskhozStaff) onNavSelect?.('leskhoz_inbox');
               else onNavSelect?.('applicant_dashboard');
             }}
@@ -324,24 +363,24 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                 {/* Menu Items */}
                 <div className="space-y-1 text-xs">
                   <button
-                    onClick={() => { onNavSelect?.('admin_settings'); setIsUserMenuOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left"
+                    onClick={() => { onNavSelect?.('user_profile'); setIsUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left cursor-pointer"
                   >
                     <Settings className="w-4 h-4 text-[#5A646D]" />
                     <span>Profil va Sozlamalar</span>
                   </button>
 
                   <button
-                    onClick={() => { onNavSelect?.('applicant_wizard'); setIsUserMenuOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left"
+                    onClick={() => { onNavSelect?.('profile_eimzo'); setIsUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left cursor-pointer"
                   >
                     <KeyRound className="w-4 h-4 text-[#5A646D]" />
                     <span>E-IMZO Kalitlari</span>
                   </button>
 
                   <button
-                    onClick={() => { onNavSelect?.('applicant_help'); setIsUserMenuOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left"
+                    onClick={() => { onNavSelect?.('admin_help'); setIsUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#1A1F24] hover:bg-[#F8F9FA] hover:text-[#2E7D4F] transition-colors text-left cursor-pointer"
                   >
                     <HelpCircle className="w-4 h-4 text-[#5A646D]" />
                     <span>Yordam va Yoʻriqnoma</span>

@@ -24,7 +24,7 @@ export const WorklistTabs: React.FC<WorklistTabsProps> = ({
     { id: 'new', label: 'Yangi (Новые)', count: counts.new, isLate: false },
     { id: 'in_progress', label: 'Koʻrib chiqilmoqda (В работе)', count: counts.inProgress, isLate: false },
     { id: 'waiting_info', label: "Ma'lumot kutilmoqda (Ожидают)", count: counts.waitingInfo, isLate: false },
-    { id: 'overdue', label: '▲ Muddati oʻtgan (Просрочены)', count: counts.overdue, isLate: true },
+    { id: 'overdue', label: 'Muddati oʻtgan (Просрочены)', count: counts.overdue, isLate: true },
   ];
 
   return (

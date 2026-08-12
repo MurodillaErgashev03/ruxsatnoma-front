@@ -31,7 +31,9 @@ import { AdminClassifiersPage } from './pages/admin/AdminClassifiersPage';
 import { AdminSystemSettingsPage } from './pages/admin/AdminSystemSettingsPage';
 import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
 import { AdminBackupsPage } from './pages/admin/AdminBackupsPage';
+import { AdminReportsPage } from './pages/admin/AdminReportsPage';
 import { EimzoProfilePage } from './pages/profile/EimzoProfilePage';
+import { UserProfileSettingsPage } from './pages/profile/UserProfileSettingsPage';
 import { AdminNotificationsPage } from './pages/profile/AdminNotificationsPage';
 import { AdminHelpPage } from './pages/admin/AdminHelpPage';
 import { ProsecutorPortalPage } from './pages/prosecutor/ProsecutorPortalPage';
@@ -111,7 +113,9 @@ export function App() {
       currentPage.startsWith('field_') ||
       currentPage.startsWith('accountant_') ||
       currentPage.startsWith('admin_') ||
+      currentPage.startsWith('reports') ||
       currentPage.startsWith('profile_') ||
+      currentPage.startsWith('user_profile') ||
       currentPage.startsWith('prosecutor_'));
 
   return (
@@ -139,13 +143,13 @@ export function App() {
             <ApplicationDetailPage applicationId={pageParams?.id || 1} onNavigate={handleNavigate} />
           )}
           {currentPage === 'applicant_permits' && (
-            <MyPermitsPage onNavigate={handleNavigate} />
+            <MyPermitsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'applicant_help' && (
             <ApplicantHelpPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'gis_editor' && (
-            <GisEditorPage onNavigate={handleNavigate} />
+            <GisEditorPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'gis_import' && (
             <GisImportPage onNavigate={handleNavigate} />
@@ -154,10 +158,10 @@ export function App() {
             <GeobotanicNormsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'leskhoz_inbox' && (
-            <WorklistPage onNavigate={handleNavigate} />
+            <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {(currentPage === 'worklist' || currentPage === 'leskhoz_worklist') && (
-            <WorklistPage onNavigate={handleNavigate} />
+            <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'leskhoz_review' && (
             <LeskhozReviewPage onNavigate={handleNavigate} />
@@ -180,6 +184,9 @@ export function App() {
           {(currentPage === 'field_inspection' || currentPage === 'inspection_act') && (
             <InspectorInspectionPage permitNo={pageParams?.permitNo || 'RX-2026-0089'} onNavigate={handleNavigate} />
           )}
+          {(currentPage === 'reports' || currentPage === 'reports_management') && (
+            <AdminReportsPage onNavigate={handleNavigate} />
+          )}
           {currentPage === 'accountant_reconciliation' && (
             <AccountantReconciliationPage onNavigate={handleNavigate} />
           )}
@@ -190,10 +197,10 @@ export function App() {
             <AdminUsersPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'admin_orgs' && (
-            <AdminOrganizationsPage onNavigate={handleNavigate} />
+            <AdminOrganizationsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'admin_classifiers' && (
-            <AdminClassifiersPage onNavigate={handleNavigate} />
+            <AdminClassifiersPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'admin_system_settings' && (
             <AdminSystemSettingsPage onNavigate={handleNavigate} />
@@ -204,13 +211,16 @@ export function App() {
           {currentPage === 'admin_backups' && (
             <AdminBackupsPage onNavigate={handleNavigate} />
           )}
-          {currentPage === 'profile_eimzo' && (
+          {(currentPage === 'user_profile' || currentPage === 'profile_settings') && (
+            <UserProfileSettingsPage onNavigate={handleNavigate} userName={currentUser?.fullName} userRole={currentUser?.roleNameUz || currentUser?.role} />
+          )}
+          {(currentPage === 'profile_eimzo' || currentPage === 'applicant_eimzo') && (
             <EimzoProfilePage onNavigate={handleNavigate} />
           )}
           {currentPage === 'profile_notifications' && (
             <AdminNotificationsPage onNavigate={handleNavigate} />
           )}
-          {currentPage === 'admin_help' && (
+          {(currentPage === 'admin_help' || currentPage === 'applicant_help') && (
             <AdminHelpPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'prosecutor_portal' && (

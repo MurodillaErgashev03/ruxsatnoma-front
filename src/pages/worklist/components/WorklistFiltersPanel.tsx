@@ -9,6 +9,7 @@ export interface WorklistFilterValues {
   endDate: string;
   slaDeadline: string;
   preset: string;
+  region?: string;
 }
 
 export interface WorklistFiltersPanelProps {
@@ -17,6 +18,7 @@ export interface WorklistFiltersPanelProps {
   onResetFilters: () => void;
   onApplyFilters: () => void;
   onSelectPreset: (presetId: string) => void;
+  isCentralAdmin?: boolean;
 }
 
 export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
@@ -29,7 +31,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
   const presets = [
     { id: 'all_assigned', label: 'Barcha biriktirilganlar', count: 24 },
     { id: 'urgent_sla', label: 'Muddati oʻtayotganlar (SLA)', count: 4 },
-    { id: 'grazing_bostonliq', label: 'Chorva mollarini boqish (Boʻstonliq)', count: 9 },
+    { id: 'grazing_bostonliq', label: 'Chorva mollarini boqish (Yaylov)', count: 9 },
     { id: 'waiting_applicant', label: 'Arizachi javobi kutilmoqda', count: 3 },
   ];
 
@@ -99,6 +101,30 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
           </div>
         </div>
 
+        {/* Region Filter for Central Admin / Republic View */}
+        <div className="space-y-1 min-w-[180px] flex-1">
+          <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
+            Hudud (Вилоят / ДЎХ)
+          </label>
+          <select
+            value={filters.region || 'all'}
+            onChange={(e) => onFilterChange('region', e.target.value)}
+            className="w-full h-10 px-3 text-xs bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24] focus:ring-2 focus:ring-[#2E7D4F] focus:outline-none truncate font-medium"
+          >
+            <option value="all">Respublika — barcha 14 viloyat</option>
+            <option value="tashkent">Toshkent viloyati (Boʻstonliq DЎX)</option>
+            <option value="samarkand">Samarqand viloyati</option>
+            <option value="fergana">Fargʻona viloyati</option>
+            <option value="namangan">Namangan viloyati</option>
+            <option value="andijan">Andijon viloyati</option>
+            <option value="surkhandarya">Surxondaryo viloyati</option>
+            <option value="kashkadarya">Qashqadaryo viloyati</option>
+            <option value="bukhara">Buxoro viloyati</option>
+            <option value="khorezm">Xorazm viloyati</option>
+            <option value="karakalpakstan">Qoraqalpogʻiston Resp.</option>
+          </select>
+        </div>
+
         {/* SLA Urgency Filter */}
         <div className="space-y-1 min-w-[160px] flex-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
@@ -110,8 +136,8 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
             className="w-full h-10 px-3 text-xs bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24] focus:ring-2 focus:ring-[#2E7D4F] focus:outline-none truncate"
           >
             <option value="all">Barchasi (Любой)</option>
-            <option value="overdue">⚠️ Muddati oʻtgan (Просрочено)</option>
-            <option value="due_today">▲ Bugun tugaydi (Истекает сегодня)</option>
+            <option value="overdue">Muddati oʻtgan (Просрочено)</option>
+            <option value="due_today">Bugun tugaydi (Истекает сегодня)</option>
             <option value="within_3days">3 kundan kam vaqt qoldi</option>
             <option value="paused">Timer toʻxtatilgan</option>
           </select>

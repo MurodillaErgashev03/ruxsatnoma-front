@@ -14,7 +14,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '17,2',
       oldestDays: 34,
       status: 'critical',
-      statusLabel: '✕ Критично',
+      statusLabel: 'Критично',
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '16,4',
       oldestDays: 29,
       status: 'critical',
-      statusLabel: '✕ Критично',
+      statusLabel: 'Критично',
     },
     {
       id: 3,
@@ -40,7 +40,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '15,8',
       oldestDays: 26,
       status: 'critical',
-      statusLabel: '✕ Критично',
+      statusLabel: 'Критично',
     },
     {
       id: 4,
@@ -53,7 +53,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '14,6',
       oldestDays: 22,
       status: 'warning',
-      statusLabel: '⚠ Требует внимания',
+      statusLabel: 'Требует внимания',
     },
     {
       id: 5,
@@ -66,7 +66,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '13,9',
       oldestDays: 19,
       status: 'warning',
-      statusLabel: '⚠ Требует внимания',
+      statusLabel: 'Требует внимания',
     },
     {
       id: 6,
@@ -79,7 +79,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '12,7',
       oldestDays: 17,
       status: 'warning',
-      statusLabel: '⚠ Требует внимания',
+      statusLabel: 'Требует внимания',
     },
     {
       id: 7,
@@ -92,7 +92,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '12,1',
       oldestDays: 16,
       status: 'warning',
-      statusLabel: '⚠ Требует внимания',
+      statusLabel: 'Требует внимания',
     },
     {
       id: 8,
@@ -105,7 +105,7 @@ export const OverdueLeskhozSection: React.FC = () => {
       avgDays: '11,8',
       oldestDays: 16,
       status: 'warning',
-      statusLabel: '⚠ Требует внимания',
+      statusLabel: 'Требует внимания',
     },
   ];
 

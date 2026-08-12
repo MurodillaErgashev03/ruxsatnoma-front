@@ -28,10 +28,10 @@ export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = () 
             <span className="text-[#1A1F24] font-bold">Dashboard (S21 ssenariysi)</span>
           </nav>
 
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#1A1F24] tracking-tight">
+          <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] tracking-tight">
             Dashboard (Markaziy apparat va Rahbariyat)
           </h1>
-          <p className="text-xs md:text-sm text-[#5A646D] mt-1">
+          <p className="text-xs text-[#5A646D] mt-0.5">
             Respublika Oʻzbekiston · 2026 yil boshidan · Ma'lumotlar holati: 10.08.2026, 09:15 · Har 15 daqiqada yangilanadi
           </p>
         </div>

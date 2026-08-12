@@ -11,15 +11,21 @@ import {
   Layers,
   X,
   SlidersHorizontal,
+  Download,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';
 
 export interface AdminClassifiersPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
-export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = () => {
+export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ userRole = '' }) => {
+  const isCentralAdmin =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('Центральный');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
@@ -286,18 +292,32 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
-            cs.egov.uz Sinxronlash
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold"
-          >
-            Klassifikator Qoʻshish
-          </Button>
+          {isCentralAdmin ? (
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Download className="w-4 h-4 text-[#15803D]" />}
+              onClick={() => alert('14 ta Davlat klassifikatori va maʼlumotnomalari Excel formatida yuklab olindi!')}
+              className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold text-xs h-9 cursor-pointer"
+            >
+              Vigruzka XLSX
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
+                cs.egov.uz Sinxronlash
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Plus className="w-4 h-4" />}
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold"
+              >
+                Klassifikator Qoʻshish
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

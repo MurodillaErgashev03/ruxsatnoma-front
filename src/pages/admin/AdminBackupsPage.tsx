@@ -262,7 +262,7 @@ export const AdminBackupsPage: React.FC<AdminBackupsPageProps> = () => {
         <div className="space-y-1 text-xs">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-emerald-400 uppercase tracking-wider text-[11px]">
-              🚨 TIKLASH XAVFSIZLIGI REGLAMENTI (TZ С24, 660-SATR & п. 4.2.1.5)
+              TIKLASH XAVFSIZLIGI REGLAMENTI (TZ С24, 660-SATR & п. 4.2.1.5)
             </span>
             <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
               AUTO SAFETY SNAPSHOT
@@ -473,7 +473,7 @@ export const AdminBackupsPage: React.FC<AdminBackupsPageProps> = () => {
 
             <div className="space-y-3 text-xs text-[#1A1F24]">
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1">
-                <span className="font-extrabold text-rose-800 block">⚠️ DIQQAT! OʻRMON TIZIMI TIKLANMOQDA:</span>
+                <span className="font-extrabold text-rose-800 block">DIQQAT! OʻRMON TIZIMI TIKLANMOQDA:</span>
                 <p className="text-rose-700 leading-relaxed">
                   Tizim <b>{selectedBackupForRestore.name}</b> ({selectedBackupForRestore.timestamp}) holatiga qaytariladi.
                 </p>
