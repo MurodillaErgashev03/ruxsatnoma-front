@@ -25,6 +25,15 @@ import { InspectorScanPage } from './pages/field/InspectorScanPage';
 import { InspectorInspectionPage } from './pages/field/InspectorInspectionPage';
 import { AccountantReconciliationPage } from './pages/accountant/AccountantReconciliationPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
+import { AdminClassifiersPage } from './pages/admin/AdminClassifiersPage';
+import { AdminSystemSettingsPage } from './pages/admin/AdminSystemSettingsPage';
+import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
+import { AdminBackupsPage } from './pages/admin/AdminBackupsPage';
+import { EimzoProfilePage } from './pages/profile/EimzoProfilePage';
+import { AdminNotificationsPage } from './pages/profile/AdminNotificationsPage';
+import { AdminHelpPage } from './pages/admin/AdminHelpPage';
 import { ProsecutorPortalPage } from './pages/prosecutor/ProsecutorPortalPage';
 import { ApplicationCardPage } from './pages/application-card/ApplicationCardPage';
 import { PermitDocumentPage } from './pages/permit/PermitDocumentPage';
@@ -102,6 +111,7 @@ export function App() {
       currentPage.startsWith('field_') ||
       currentPage.startsWith('accountant_') ||
       currentPage.startsWith('admin_') ||
+      currentPage.startsWith('profile_') ||
       currentPage.startsWith('prosecutor_'));
 
   return (
@@ -113,21 +123,7 @@ export function App() {
           userRole={currentUser?.roleNameUz || 'Tuman inspektori'}
           onNavSelect={(page) => handleNavigate(page)}
           onLogout={handleLogout}
-          activeNavId={
-            currentPage === 'applicant_permits' || currentPage === 'permit_detail' || currentPage === 'permit'
-              ? 'permits'
-              : currentPage === 'application_card' || currentPage === 'applicant_application_detail'
-              ? 'applications'
-              : currentPage === 'applicant_help'
-              ? 'help'
-              : currentPage.startsWith('gis_')
-              ? 'map'
-              : currentPage.startsWith('field_')
-              ? 'inspections'
-              : currentPage.startsWith('admin_')
-              ? 'users'
-              : 'dashboard'
-          }
+          activeNavId={currentPage}
         >
           {currentPage === 'applicant_dashboard' && (
             <ApplicantDashboard
@@ -189,6 +185,33 @@ export function App() {
           )}
           {currentPage === 'admin_settings' && (
             <AdminSettingsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_users' && (
+            <AdminUsersPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_orgs' && (
+            <AdminOrganizationsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_classifiers' && (
+            <AdminClassifiersPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_system_settings' && (
+            <AdminSystemSettingsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_audit_logs' && (
+            <AdminAuditLogsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_backups' && (
+            <AdminBackupsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'profile_eimzo' && (
+            <EimzoProfilePage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'profile_notifications' && (
+            <AdminNotificationsPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'admin_help' && (
+            <AdminHelpPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'prosecutor_portal' && (
             <ProsecutorPortalPage onNavigate={handleNavigate} />

@@ -17,6 +17,10 @@ import {
   CreditCard,
   Map,
   Building2,
+  Users,
+  Shield,
+  Sliders,
+  Database,
 } from 'lucide-react';
 
 export interface CabinetLayoutProps {
@@ -61,6 +65,11 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const isSysAdmin =
+    userRole?.includes('administrator') ||
+    userRole?.includes('sys_admin') ||
+    userRole?.includes('Tizim administrator');
+
   const isLeskhozStaff =
     userRole?.includes('Ijrochi') ||
     userRole?.includes('Сотрудник') ||
@@ -70,46 +79,104 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
     userRole?.includes('inspektor') ||
     userRole?.includes('Inspektor');
 
-  const dashboardPage =
-    userRole?.includes('Rahbariyat') || userRole?.includes('Markaziy') || userRole?.includes('administrator')
-      ? 'manager_decision'
-      : isLeskhozStaff
-      ? 'leskhoz_inbox'
-      : 'applicant_dashboard';
+  let navItems: { group: string; items: { id: string; label: string; page: string; icon: React.ReactNode; count?: number; isWarning?: boolean }[] }[] = [];
 
-  const applicationsPage = isLeskhozStaff ? 'leskhoz_inbox' : 'application_card';
-
-  const navItems = [
-    {
-      group: '',
-      items: [
-        { id: 'dashboard', label: 'Bosh sahifa', page: dashboardPage, icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
-      ],
-    },
-    {
-      group: 'Mening ishlarim',
-      items: [
-        { id: 'applications', label: 'Mening arizalarim', page: applicationsPage, icon: <Mail className="w-5 h-5" />, count: isLeskhozStaff ? 24 : 4 },
-        { id: 'permits', label: 'Mening ruxsatnomalarim', page: 'applicant_permits', icon: <FileText className="w-5 h-5" />, count: 2 },
-        { id: 'payments', label: 'Hisoblar va toʻlov', page: 'applicant_dashboard', icon: <CreditCard className="w-5 h-5" />, count: 1, isWarning: true },
-        { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className="w-5 h-5" />, count: undefined },
-      ],
-    },
-    {
-      group: 'Mening profilim',
-      items: [
-        { id: 'farm_info', label: "Xoʻjalik ma'lumotlari", page: 'admin_settings', icon: <Building2 className="w-5 h-5" />, count: undefined },
-        { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'admin_settings', icon: <KeyRound className="w-5 h-5" />, count: undefined },
-        { id: 'notifications', label: 'Bildirishnomalar', page: 'applicant_dashboard', icon: <Bell className="w-5 h-5" />, count: 4 },
-      ],
-    },
-    {
-      group: 'Yordam',
-      items: [
-        { id: 'help', label: 'Yordam va savollar', page: 'applicant_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
-      ],
-    },
-  ];
+  if (isSysAdmin) {
+    navItems = [
+      {
+        group: '',
+        items: [
+          { id: 'admin_settings', label: 'Bosh sahifa (Maʻmurlash)', page: 'admin_settings', icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Tizim maʻmurlash',
+        items: [
+          { id: 'admin_users', label: 'Foydalanuvchilar va rollar', page: 'admin_users', icon: <Users className="w-5 h-5" />, count: 10 },
+          { id: 'admin_orgs', label: 'Tashkilotlar ierarxiyasi', page: 'admin_orgs', icon: <Building2 className="w-5 h-5" />, count: 84 },
+          { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className="w-5 h-5" />, count: 14 },
+          { id: 'admin_system_settings', label: 'Tizim sozlamalari', page: 'admin_system_settings', icon: <Settings className="w-5 h-5" />, count: undefined },
+          { id: 'admin_audit', label: 'Audit va loglar', page: 'admin_audit_logs', icon: <Shield className="w-5 h-5" />, count: undefined },
+          { id: 'admin_backups', label: 'Zahiraviy nusxalar', page: 'admin_backups', icon: <Database className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Mening profilim',
+        items: [
+          { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'profile_eimzo', icon: <KeyRound className="w-5 h-5" />, count: undefined },
+          { id: 'notifications', label: 'Bildirishnomalar', page: 'profile_notifications', icon: <Bell className="w-5 h-5" />, count: 3 },
+        ],
+      },
+      {
+        group: 'Yordam',
+        items: [
+          { id: 'help', label: 'Yordam va savollar', page: 'admin_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
+        ],
+      },
+    ];
+  } else if (isLeskhozStaff) {
+    navItems = [
+      {
+        group: '',
+        items: [
+          { id: 'dashboard', label: 'Bosh sahifa', page: 'leskhoz_inbox', icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Hujjatlar va amallar',
+        items: [
+          { id: 'applications', label: 'Kelib tushgan arizalar', page: 'leskhoz_inbox', icon: <Mail className="w-5 h-5" />, count: 24 },
+          { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Mening profilim',
+        items: [
+          { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'profile_eimzo', icon: <KeyRound className="w-5 h-5" />, count: undefined },
+          { id: 'notifications', label: 'Bildirishnomalar', page: 'profile_notifications', icon: <Bell className="w-5 h-5" />, count: 3 },
+        ],
+      },
+      {
+        group: 'Yordam',
+        items: [
+          { id: 'help', label: 'Yordam va savollar', page: 'applicant_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
+        ],
+      },
+    ];
+  } else {
+    // Applicant (Ariza beruvchi)
+    navItems = [
+      {
+        group: '',
+        items: [
+          { id: 'dashboard', label: 'Bosh sahifa', page: 'applicant_dashboard', icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Mening ishlarim',
+        items: [
+          { id: 'applications', label: 'Mening arizalarim', page: 'application_card', icon: <Mail className="w-5 h-5" />, count: 4 },
+          { id: 'permits', label: 'Mening ruxsatnomalarim', page: 'applicant_permits', icon: <FileText className="w-5 h-5" />, count: 2 },
+          { id: 'payments', label: 'Hisoblar va toʻlov', page: 'applicant_dashboard', icon: <CreditCard className="w-5 h-5" />, count: 1, isWarning: true },
+          { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className="w-5 h-5" />, count: undefined },
+        ],
+      },
+      {
+        group: 'Mening profilim',
+        items: [
+          { id: 'farm_info', label: "Xoʻjalik ma'lumotlari", page: 'admin_settings', icon: <Building2 className="w-5 h-5" />, count: undefined },
+          { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'profile_eimzo', icon: <KeyRound className="w-5 h-5" />, count: undefined },
+          { id: 'notifications', label: 'Bildirishnomalar', page: 'profile_notifications', icon: <Bell className="w-5 h-5" />, count: 3 },
+        ],
+      },
+      {
+        group: 'Yordam',
+        items: [
+          { id: 'help', label: 'Yordam va savollar', page: 'applicant_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
+        ],
+      },
+    ];
+  }
 
   const notifications = [
     { id: 1, title: 'Yangi ariza keldi №RX-2026-0094', time: '5 daqiqa oldin', unread: true },
@@ -122,7 +189,7 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
       {/* Top Header Bar */}
       <header className="h-16 bg-white border-b border-[#E4E7EA] sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 shadow-xs">
         {/* Brand & Sidebar Toggle */}
-        <div className="flex items-center gap-3 w-64 shrink-0">
+        <div className="flex items-center gap-3 w-72 shrink-0">
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className="p-2 rounded-md hover:bg-[#F8F9FA] text-[#5A646D] md:hidden"
@@ -131,7 +198,11 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
           </button>
 
           <button
-            onClick={() => onNavSelect?.('applicant_dashboard')}
+            onClick={() => {
+              if (isSysAdmin) onNavSelect?.('admin_settings');
+              else if (isLeskhozStaff) onNavSelect?.('leskhoz_inbox');
+              else onNavSelect?.('applicant_dashboard');
+            }}
             className="flex items-center gap-2.5 focus:outline-none text-left"
           >
             <div className="w-9 h-9 rounded-lg bg-[#2E7D4F] text-white flex items-center justify-center font-bold shadow-xs">
@@ -301,8 +372,8 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
       <div className="flex flex-1">
         {/* Left Sidebar */}
         <aside
-          className={`bg-white border-r border-[#E4E7EA] transition-all duration-200 flex flex-col justify-between ${
-            isSidebarCollapsed ? 'w-16' : 'w-64'
+          className={`bg-white border-r border-[#E4E7EA] transition-all duration-200 flex flex-col justify-between shrink-0 ${
+            isSidebarCollapsed ? 'w-16' : 'w-72'
           }`}
         >
           <div className="p-3 space-y-4">
@@ -315,14 +386,15 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                 )}
                 <div className="space-y-1">
                   {group.items.map((item) => {
-                    const isActive = item.id === activeNavId;
+                    const isActive = item.id === activeNavId || item.page === activeNavId;
                     return (
                       <button
                         key={item.id}
                         onClick={() => onNavSelect?.(item.page)}
-                        className={`w-full flex items-center gap-3 h-10 px-3 rounded-md text-sm font-medium transition-all ${
+                        title={item.label}
+                        className={`w-full flex items-center gap-3 h-10 px-3 rounded-md text-xs font-semibold transition-all ${
                           isActive
-                            ? 'bg-[#F0F7F1] text-[#2E7D4F] font-semibold border-l-4 border-[#2E7D4F]'
+                            ? 'bg-[#F0F7F1] text-[#2E7D4F] font-bold border-l-4 border-[#2E7D4F]'
                             : 'text-[#1A1F24] hover:bg-[#F8F9FA]'
                         }`}
                       >
@@ -331,10 +403,10 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                         </span>
                         {!isSidebarCollapsed && (
                           <>
-                            <span className="flex-1 text-left truncate">{item.label}</span>
+                            <span className="flex-1 text-left truncate leading-tight">{item.label}</span>
                             {item.count !== undefined && (
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                                className={`text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
                                   item.isWarning
                                     ? 'bg-[#B45309] text-white'
                                     : isActive
