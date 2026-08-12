@@ -206,46 +206,69 @@ export const Stepper: React.FC<StepperProps> = ({
   onStepClick,
   className = '',
 }) => {
+  const activePercent = steps.length > 1 ? ((currentStep - 1) / (steps.length - 1)) * 100 : 0;
+
   return (
-    <div className={`w-full py-4 ${className}`}>
-      <ol className="flex items-center w-full text-xs font-medium text-center text-gray-500 sm:text-base">
-        {steps.map((step, index) => {
+    <div className={`w-full py-2 px-1 font-sans ${className}`}>
+      <div className="relative flex items-start justify-between w-full min-w-[640px]">
+        {/* Background Connecting Line */}
+        <div className="absolute top-5 left-8 right-8 h-1 bg-[#E4E7EA] rounded-full z-0 transform -translate-y-1/2">
+          <div
+            className="h-full bg-[#2E7D4F] rounded-full transition-all duration-300"
+            style={{ width: `${Math.min(100, Math.max(0, activePercent))}%` }}
+          />
+        </div>
+
+        {/* Steps Nodes */}
+        {steps.map((step) => {
           const isCompleted = step.id < currentStep;
           const isActive = step.id === currentStep;
 
           return (
-            <li
+            <div
               key={step.id}
               onClick={() => onStepClick?.(step.id)}
-              className={`flex md:w-full items-center ${
-                index !== steps.length - 1 ? 'after:w-full after:h-0.5 after:border-b after:border-gray-200 after:border-1 after:inline-block md:after:inline-block' : ''
-              } ${onStepClick ? 'cursor-pointer' : ''}`}
+              className={`relative z-10 flex flex-col items-center group ${
+                onStepClick && step.id <= currentStep ? 'cursor-pointer' : 'cursor-default'
+              }`}
+              style={{ width: `${100 / steps.length}%` }}
             >
-              <span className="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200">
+              {/* Step Circle Badge */}
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200 shadow-2xs ${
+                  isCompleted
+                    ? 'bg-[#2E7D4F] text-white ring-4 ring-white'
+                    : isActive
+                    ? 'bg-white border-2 border-[#2E7D4F] text-[#2E7D4F] ring-4 ring-[#F0F7F1] scale-110 shadow-md'
+                    : 'bg-[#F8F9FA] border-2 border-[#E4E7EA] text-[#5A646D]'
+                }`}
+              >
+                {isCompleted ? <Check className="w-5 h-5 stroke-[2.5]" /> : step.id}
+              </div>
+
+              {/* Title and Description below Circle Node */}
+              <div className="mt-2.5 text-center px-1">
                 <span
-                  className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${
-                    isCompleted
-                      ? 'bg-[#2E7D4F] text-white'
-                      : isActive
-                      ? 'bg-[#F0F7F1] border-2 border-[#2E7D4F] text-[#2E7D4F] font-bold'
-                      : 'bg-[#E4E7EA] text-[#5A646D]'
+                  className={`block text-xs font-bold leading-snug transition-colors ${
+                    isActive
+                      ? 'text-[#2E7D4F]'
+                      : isCompleted
+                      ? 'text-[#1A1F24]'
+                      : 'text-[#767F87]'
                   }`}
                 >
-                  {isCompleted ? <Check className="w-4 h-4" /> : step.id}
+                  {step.title}
                 </span>
-                <span className="ml-2 hidden sm:inline-block text-left">
-                  <span className={`block text-xs font-semibold ${isActive ? 'text-[#2E7D4F]' : 'text-[#1A1F24]'}`}>
-                    {step.title}
+                {step.description && (
+                  <span className="block text-[11px] text-[#5A646D] leading-snug mt-0.5 font-normal">
+                    {step.description}
                   </span>
-                  {step.description && (
-                    <span className="block text-[11px] text-[#5A646D]">{step.description}</span>
-                  )}
-                </span>
-              </span>
-            </li>
+                )}
+              </div>
+            </div>
           );
         })}
-      </ol>
+      </div>
     </div>
   );
 };

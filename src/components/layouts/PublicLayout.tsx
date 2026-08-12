@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Trees, Search, QrCode, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/FormControls';
+import landingBg from '../../assets/img/landingbackgraund2.png';
 
 export interface PublicLayoutProps {
   children?: React.ReactNode;
@@ -42,19 +43,27 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans text-[#1A1F24]">
       {/* ── Top Header ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E4E7EA] shadow-xs">
+      <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${
+        activeNav === 'home'
+          ? 'bg-[#0A1C0E]/90 border-b border-white/10 text-white shadow-xl'
+          : 'bg-[#0A1C0E] border-b border-white/10 text-white shadow-md'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <button
             onClick={() => onNavigate?.('home')}
             className="flex items-center gap-3 text-left focus:outline-none shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#2E7D4F] text-white flex items-center justify-center font-bold shadow-xs">
-              <Trees className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-[#237443] text-white flex items-center justify-center font-bold shadow-md border border-white/20">
+              <Trees className="w-5.5 h-5.5" />
             </div>
             <div>
-              <span className="block text-base font-bold text-[#1A1F24] leading-tight tracking-tight">ruxsatnoma-urmon.uz</span>
-              <span className="block text-[11px] text-[#5A646D]">Oʻrmon xoʻjaligi davlat portali</span>
+              <span className="block text-base font-bold text-white leading-tight tracking-tight">
+                ruxsatnoma-urmon.uz
+              </span>
+              <span className="block text-[11px] text-gray-300">
+                Oʻrmon xoʻjaligi davlat portali
+              </span>
             </div>
           </button>
 
@@ -66,10 +75,10 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
                 <button
                   key={link.id}
                   onClick={() => handleNavClick(link.page)}
-                  className={`px-3.5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                     isActive
-                      ? 'text-[#2E7D4F] bg-[#F0F7F1] border border-[#D9EBDC]'
-                      : 'text-[#5A646D] hover:bg-[#F8F9FA] hover:text-[#1A1F24]'
+                      ? 'text-white bg-[#284435] border border-white/20 shadow-sm'
+                      : 'text-gray-200 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -80,19 +89,19 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
 
           {/* Language Switcher & Auth Buttons */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="flex border border-[#E4E7EA] rounded-lg overflow-hidden bg-[#F8F9FA] text-xs p-0.5">
+            <div className="flex rounded-xl overflow-hidden text-xs p-1 bg-[#12271C] border border-white/20">
               <button
                 onClick={() => setLang('uz')}
-                className={`px-2.5 py-1 font-bold rounded-md transition-all ${
-                  lang === 'uz' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-[#5A646D] hover:text-[#1A1F24]'
+                className={`px-3 py-1 font-bold rounded-lg transition-all ${
+                  lang === 'uz' ? 'bg-[#237443] text-white shadow-xs' : 'text-gray-300 hover:text-white'
                 }`}
               >
                 UZ
               </button>
               <button
                 onClick={() => setLang('ru')}
-                className={`px-2.5 py-1 font-bold rounded-md transition-all ${
-                  lang === 'ru' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-[#5A646D] hover:text-[#1A1F24]'
+                className={`px-3 py-1 font-bold rounded-lg transition-all ${
+                  lang === 'ru' ? 'bg-[#237443] text-white shadow-xs' : 'text-gray-300 hover:text-white'
                 }`}
               >
                 RU
@@ -103,13 +112,15 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onNavigate?.('auth_login')}
+              className="bg-[#173022] border-white/25 text-white hover:bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2"
             >
               Kirish (OneID)
             </Button>
             <Button
-              variant="primary"
+              variant="success"
               size="sm"
               onClick={() => onNavigate?.('auth_login')}
+              className="bg-[#237443] hover:bg-[#1B5E36] text-white shadow-md font-bold rounded-xl px-4 py-2"
             >
               Ariza topshirish
             </Button>
@@ -119,72 +130,65 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
 
       {/* ── Hero Banner Section (Only on Home Page) ──────────────── */}
       {activeNav === 'home' && (
-        <section className="bg-gradient-to-b from-[#F0F7F1] to-white py-12 sm:py-16 border-b border-[#E4E7EA]">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <span className="inline-block px-3 py-1 bg-[#D9EBDC] text-[#123522] font-semibold text-xs rounded-full">
-                Rasmiy Davlat Portali
+        <section className="relative overflow-hidden border-b border-[#E4E7EA] text-white min-h-[calc(100vh-4rem)] flex items-center py-12 sm:py-16">
+          {/* Background image container - Cropped to remove top & bottom black letterbox bars */}
+          <div 
+            className="absolute -inset-y-16 inset-x-0 z-0 bg-cover bg-center transform scale-115" 
+            style={{ backgroundImage: `url(${landingBg})` }}
+          />
+          {/* Soft left gradient for text contrast matching header color #0A1C0E */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0A1C0E]/95 via-[#0A1C0E]/60 to-[#0A1C0E]/20" />
+
+          <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+            <div className="max-w-3xl space-y-6">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/40 backdrop-blur-md text-white font-semibold text-xs rounded-full border border-white/30 shadow-lg">
+                <Trees className="w-4 h-4 text-[#7FB98A]" />
+                Oʻzbekiston Respublikasi Oʻrmon Xoʻjaligi Davlat Tizimi
               </span>
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1F24] leading-tight">
-                Oʻrmon xoʻjaligi hududlarida chorva mollarini boqish boʻyicha ruxsatnomalar
+
+              <h1 className="text-3xl sm:text-6xl font-extrabold text-white leading-tight [text-shadow:_0_3px_14px_rgba(0,0,0,0.85)] tracking-tight">
+                Oʻrmon fondi yerlaridan foydalanish uchun <span className="text-[#64D88C]">Elektron Ruxsatnoma</span>
               </h1>
-              <p className="text-base text-[#5A646D] leading-relaxed max-w-xl">
-                Tizim orqali elektron ruxsatnomalarni rasmiylashtirish, QR-kodli hujjat haqiqiyligini tekshirish va arizalar holatini onlayn kuzatish imkoniyati.
+
+              <p className="text-base sm:text-xl text-gray-100 leading-relaxed max-w-2xl font-medium [text-shadow:_0_2px_8px_rgba(0,0,0,0.8)]">
+                Chorva mollarini boqish, pichan oʻrish, asalarichilik va dorivor oʻsimliklar yigʻish uchun ariza topshirish, QR-kodli hujjat olish va haqiqiyligini tekshirish yagona davlat portali.
               </p>
-              <div className="flex flex-wrap gap-3 pt-2">
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-3">
                 <Button
-                  variant="primary"
+                  variant="success"
                   size="lg"
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                  onClick={() => onNavigate?.('applicant_wizard')}
+                  rightIcon={<ArrowRight className="w-5 h-5" />}
+                  onClick={() => onNavigate?.('auth_login')}
+                  className="shadow-2xl hover:scale-105 active:scale-95 transition-transform bg-[#2E7D4F] hover:bg-[#23653F] px-8 py-4 text-base sm:text-lg font-bold rounded-xl"
                 >
-                  Yangi ariza topshirish
+                  Ariza topshirish (OneID)
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   size="lg"
                   onClick={() => onNavigate?.('tariffs')}
+                  className="bg-black/40 border-white/40 text-white hover:bg-black/60 backdrop-blur-md shadow-xl transition-all font-semibold rounded-xl px-7 py-4 text-base"
                 >
                   Tariflar va kalkulyator
                 </Button>
               </div>
-            </div>
 
-            {/* Quick QR Permit Checker Box */}
-            <div className="lg:col-span-5">
-              <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-md space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-[#F0F7F1] text-[#2E7D4F] rounded-xl">
-                    <QrCode className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-[#1A1F24]">Ruxsatnomani tekshirish</h3>
-                    <p className="text-xs text-[#5A646D]">QR-kod yoki ruxsatnoma raqami boʻyicha</p>
-                  </div>
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center gap-6 pt-6 text-xs sm:text-sm text-gray-200 font-medium border-t border-white/20 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#64D88C] animate-pulse" />
+                  <span>Tezkor avtomatik koʻrib chiqish</span>
                 </div>
-
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Input
-                      placeholder="Masalan: RX-2026-0089"
-                      value={permitInput}
-                      onChange={(e) => setPermitInput(e.target.value)}
-                      leftIcon={<Search className="w-4 h-4" />}
-                      touchSize
-                    />
-                  </div>
-                  <Button
-                    variant="success"
-                    fullWidth
-                    onClick={() => onCheckPermit?.(permitInput)}
-                  >
-                    Haqiqiyligini tekshirish
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#64D88C]" />
+                  <span>QR-kodli rasmiy hujjat</span>
                 </div>
-
-                <p className="text-[11px] text-[#767F87] text-center">
-                  * Tekshiruv davlat reyestri maʼlumotlar bazasiga muvofiq onlayn tarzda amalga oshiriladi.
-                </p>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#64D88C]" />
+                  <span>100% Onlayn va xavfsiz</span>
+                </div>
               </div>
             </div>
           </div>

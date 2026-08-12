@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {
   QrCode,
   Download,
-  RefreshCw,
   Search,
+  FileText,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';
@@ -147,24 +147,15 @@ export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate }) => {
                 </Button>
               </div>
 
-              {p.status === 'warning' ? (
-                <Button
-                  variant="success"
-                  size="sm"
-                  leftIcon={<RefreshCw className="w-4 h-4" />}
-                  onClick={() => onNavigate?.('applicant_wizard')}
-                >
-                  Muddati uzaytirish
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onNavigate?.('applicant_application_detail', { id: p.id })}
-                >
-                  Tafsilotlar
-                </Button>
-              )}
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<FileText className="w-4 h-4" />}
+                onClick={() => onNavigate?.('permit_detail', { id: p.id })}
+                className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold"
+              >
+                Ruxsatnomani koʻrish (A № 004182)
+              </Button>
             </div>
           </div>
         ))}

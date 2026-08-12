@@ -1,0 +1,1097 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Мастер подачи заявки — шаг ② «Участок»</title>
+<style>
+:root{
+/* Tokens copied verbatim from ../tokens.css. Nothing here is invented:
+   change design-system.md first, then tokens.css, then this copy. */
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;--text-base:16px;--leading-base:24px;
+--text-lg:18px;--leading-lg:28px;--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;
+--space-12:48px;--space-16:64px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--control-height:40px;--control-height-touch:48px;--row-height:48px;--touch-target:44px;
+--header-height:64px;--sidebar-width:260px;--content-max:1440px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--shadow-lg:0 12px 32px rgba(26,31,36,.16);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+
+/* Semantic surfaces are mixed from the semantic tokens above, so no new hex
+   value enters the page layer. Same approach as feedback.html. */
+--surface-danger:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0));
+--border-danger:color-mix(in srgb,var(--color-danger-600) 26%,var(--color-neutral-0));
+--surface-warning:color-mix(in srgb,var(--color-warning-600) 8%,var(--color-neutral-0));
+--border-warning:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0));
+--surface-success:color-mix(in srgb,var(--color-success-600) 8%,var(--color-neutral-0));
+--border-success:color-mix(in srgb,var(--color-success-600) 26%,var(--color-neutral-0));
+--surface-info:color-mix(in srgb,var(--color-info-600) 7%,var(--color-neutral-0));
+--border-info:color-mix(in srgb,var(--color-info-600) 26%,var(--color-neutral-0));
+
+/* Map palette. Derived from the same tokens: the map is part of the system,
+   not a picture pasted into it. */
+--map-bg:color-mix(in srgb,var(--color-primary-600) 11%,var(--color-neutral-200));
+--map-grid:color-mix(in srgb,var(--color-primary-900) 13%,transparent);
+--map-grid-strong:color-mix(in srgb,var(--color-primary-900) 26%,transparent);
+--map-free-fill:color-mix(in srgb,var(--color-primary-300) 34%,transparent);
+--map-free-line:color-mix(in srgb,var(--color-primary-900) 42%,transparent);
+--map-selected-fill:color-mix(in srgb,var(--color-primary-600) 26%,transparent);
+--map-busy-wash:color-mix(in srgb,var(--color-danger-600) 13%,transparent);
+--map-water:color-mix(in srgb,var(--color-info-600) 70%,transparent);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50)}
+
+/* Focus is never removed anywhere on this page: WCAG 2.4.7. */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,
+textarea:focus-visible,[tabindex]:focus-visible{
+outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+
+.note{max-width:var(--content-max);margin:0 auto var(--space-6);padding:var(--space-4) var(--space-6);
+background:var(--color-primary-50);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-md);font-size:var(--text-sm);line-height:var(--leading-sm);
+color:var(--color-primary-900)}
+.note-foot{margin-top:var(--space-6);background:var(--color-neutral-0);
+border-left-color:var(--color-accent-600);color:var(--color-neutral-900)}
+.note ul{margin:var(--space-2) 0 0 var(--space-4)}
+.note li{margin-top:var(--space-1)}
+
+/* ══ Shell: identical to layouts/cabinet.html ══════════════ */
+.shell{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:var(--header-height) 1fr;
+grid-template-areas:"brand header" "sidebar main";min-height:100vh}
+
+.brand{grid-area:brand;background:var(--color-primary-700);color:#fff;display:flex;align-items:center;
+gap:var(--space-3);padding:0 var(--space-4)}
+.brand-mark{width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-primary-300);
+display:grid;place-items:center;font-weight:600;color:var(--color-primary-900);flex:none}
+.brand-name{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-size:12px;line-height:14px;opacity:.75;font-weight:400}
+
+.header{grid-area:header;background:var(--color-neutral-0);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6)}
+.search{flex:1;max-width:420px;position:relative}
+.search input{width:100%;height:var(--control-height);padding:0 var(--space-3) 0 36px;font-size:16px;
+font-family:inherit;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+background:var(--color-neutral-50);color:var(--color-neutral-900)}
+.search input::placeholder{color:var(--color-neutral-400)}
+.search .ico{position:absolute;left:10px;top:11px;color:var(--color-neutral-400)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-2)}
+
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:none;background:none;
+cursor:pointer;border-radius:var(--radius-md);color:var(--color-neutral-600);position:relative}
+.icon-btn:hover{background:var(--color-neutral-50)}
+.badge-dot{position:absolute;top:9px;right:9px;min-width:16px;height:16px;padding:0 4px;
+background:var(--color-danger-600);color:#fff;border-radius:8px;font-size:11px;line-height:16px;font-weight:600}
+
+.lang{display:flex;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);overflow:hidden}
+.lang button{border:none;background:var(--color-neutral-0);color:var(--color-neutral-600);
+padding:0 10px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.lang button[aria-pressed="true"]{background:var(--color-primary-600);color:#fff}
+
+.user{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);
+border-radius:var(--radius-md);cursor:pointer;border:none;background:none;font-family:inherit;text-align:left}
+.user:hover{background:var(--color-neutral-50)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--color-primary-100);
+color:var(--color-primary-900);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.user-name{font-size:13px;line-height:16px;font-weight:500}
+.user-role{font-size:12px;line-height:14px;color:var(--color-neutral-600)}
+
+.sidebar{grid-area:sidebar;background:var(--color-neutral-0);border-right:1px solid var(--color-neutral-200);
+padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);overflow-y:auto}
+.nav-group{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+color:var(--color-neutral-400);padding:var(--space-4) var(--space-3) var(--space-2)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);height:var(--control-height);
+padding:0 var(--space-3);border-radius:var(--radius-md);color:var(--color-neutral-900);
+text-decoration:none;font-size:14px;font-weight:500}
+.nav-item:hover{background:var(--color-neutral-50)}
+.nav-item .ico{width:20px;text-align:center;flex:none;color:var(--color-neutral-600)}
+.nav-item[aria-current="page"]{background:var(--color-primary-50);color:var(--color-primary-900);
+font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.nav-item[aria-current="page"] .ico{color:var(--color-primary-600)}
+.nav-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--color-neutral-600);
+background:var(--color-neutral-50);border-radius:10px;padding:2px 8px}
+.nav-item[aria-current="page"] .nav-count{background:var(--color-primary-100);color:var(--color-primary-900)}
+.sidebar-foot{margin-top:auto;padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+
+.main{grid-area:main;padding:var(--space-6);overflow-y:auto}
+.page-head{display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap}
+.page-title{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold)}
+.page-sub{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+margin-top:var(--space-1)}
+.page-actions{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+
+/* ══ Buttons ═══════════════════════════════════════════════
+   Every control border is neutral-500: WCAG 1.4.11 needs 3:1 and
+   neutral-200 gives 1.24. neutral-200 stays on decorative dividers. */
+.btn{height:var(--control-height);padding:0 var(--space-4);border-radius:var(--radius-md);
+font-family:inherit;font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;
+border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;
+gap:var(--space-2);white-space:nowrap}
+.btn-primary{background:var(--color-primary-600);color:var(--color-neutral-0)}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);
+border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+.btn-ghost{background:none;color:var(--color-primary-600);border-color:transparent}
+.btn-ghost:hover{background:var(--color-primary-50)}
+.btn-danger{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.btn-danger:hover{background:var(--color-danger-700)}
+.btn[aria-disabled="true"]{cursor:not-allowed;opacity:.55}
+.btn-primary[aria-disabled="true"]:hover{background:var(--color-primary-600)}
+.btn-sm{height:36px;padding:0 var(--space-3);font-size:var(--text-xs)}
+
+code,.mono{font-family:var(--font-family-mono);font-size:var(--text-xs)}
+
+/* ══ Wizard frame: taken from components/navigation.html ═══ */
+.wizard{border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);
+background:var(--color-neutral-0);overflow:hidden}
+.wizard-top{padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap}
+.wizard-count{font-size:var(--text-sm);font-weight:var(--weight-semibold)}
+.progress{flex:1;min-width:160px;height:6px;border-radius:3px;background:var(--color-neutral-200);
+overflow:hidden}
+.progress i{display:block;height:100%;background:var(--color-primary-600);border-radius:3px}
+.autosave{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);color:var(--color-success-600);font-weight:var(--weight-medium)}
+.draft-chip{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+background:var(--color-neutral-50);border:1px solid var(--color-neutral-200);
+border-radius:10px;padding:2px var(--space-2);color:var(--color-neutral-600)}
+
+.steps{display:flex;padding:var(--space-6) var(--space-6) var(--space-4);gap:var(--space-2);
+overflow-x:auto}
+.step{flex:1;min-width:132px;display:flex;flex-direction:column;gap:var(--space-2);
+background:none;border:none;font-family:inherit;text-align:left;padding:0;position:relative}
+.step-bar{height:4px;border-radius:2px;background:var(--color-neutral-200)}
+.step-body{display:flex;align-items:flex-start;gap:var(--space-2);
+padding:var(--space-1) var(--space-2) var(--space-2) 0}
+.step-num{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;
+font-size:var(--text-sm);font-weight:var(--weight-semibold);border:1px solid var(--color-neutral-500);
+background:var(--color-neutral-0);color:var(--color-neutral-600)}
+.step-name{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium);
+color:var(--color-neutral-600)}
+.step-state{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:2px;display:block}
+.step.done{cursor:pointer}
+.step.done .step-bar{background:var(--color-primary-600)}
+.step.done .step-num{background:var(--color-primary-600);border-color:var(--color-primary-600);
+color:var(--color-neutral-0)}
+.step.done .step-name{color:var(--color-neutral-900)}
+.step.done .step-state{color:var(--color-primary-600)}
+.step.done:hover .step-name{text-decoration:underline}
+.step.current .step-bar{background:var(--color-primary-600)}
+.step.current .step-num{background:var(--color-neutral-0);border:2px solid var(--color-primary-600);
+color:var(--color-primary-900)}
+.step.current .step-name{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+.step.current .step-state{color:var(--color-primary-600);font-weight:var(--weight-semibold)}
+.step.todo{cursor:not-allowed}
+.step.todo .step-num{color:var(--color-neutral-400);border-color:var(--color-neutral-500)}
+.step.todo .step-name,.step.todo .step-state{color:var(--color-neutral-400)}
+
+.wizard-body{padding:var(--space-6);border-top:1px solid var(--color-neutral-200);
+background:var(--color-neutral-50)}
+.wizard-foot{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-4) var(--space-6);
+border-top:1px solid var(--color-neutral-200);background:var(--color-neutral-0);flex-wrap:wrap;
+position:sticky;bottom:0}
+.wizard-foot .right{margin-left:auto;display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap}
+.foot-hint{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+max-width:36ch}
+
+/* ══ Alert: four mandatory parts, feedback.html ════════════ */
+.alert{display:grid;grid-template-columns:24px 1fr;gap:var(--space-3);
+padding:var(--space-4) var(--space-6);border-radius:var(--radius-md);border:1px solid;
+font-size:var(--text-sm);line-height:var(--leading-sm);margin-bottom:var(--space-6)}
+.alert .ico{font-size:var(--text-lg);line-height:var(--leading-sm);text-align:center}
+.alert-danger{background:var(--surface-danger);border-color:var(--border-danger)}
+.alert-danger .ico{color:var(--color-danger-600)}
+.alert h2{font-size:var(--text-base);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.alert p{margin-top:var(--space-2)}
+.alert .support{margin-top:var(--space-3);padding-top:var(--space-3);
+border-top:1px solid var(--color-neutral-200);color:var(--color-neutral-600)}
+.alert .support b{color:var(--color-neutral-900);font-family:var(--font-family-mono);
+font-weight:var(--weight-semibold);white-space:nowrap}
+.alert-actions{display:flex;gap:var(--space-2);margin-top:var(--space-4);flex-wrap:wrap}
+
+/* ══ Two-column working area: map and the choice panel ═════ */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:var(--space-4);align-items:start}
+.map-col{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.card{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);overflow:hidden}
+.card-head{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);
+border-bottom:1px solid var(--color-neutral-200);flex-wrap:wrap}
+.card-title{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-semibold)}
+.card-meta{margin-left:auto;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-family:var(--font-family-mono)}
+.card-body{padding:var(--space-4)}
+.card-split{border-top:1px solid var(--color-neutral-200)}
+.card-sub{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-600);
+margin-bottom:var(--space-2)}
+.panel-stack{display:flex;flex-direction:column;gap:var(--space-4)}
+
+/* ══ Map ═══════════════════════════════════════════════════
+   A real basemap cannot live in a static kit page, so the surface is drawn:
+   a grey-green field with a coordinate grid and SVG polygons on top. The
+   geometry is what matters here, not the imagery. */
+/* The ratio matches the viewBox exactly (920 / 560), so the drawing never
+   letterboxes and never crops, whatever the column width turns out to be. */
+.map-figure{position:relative;background:var(--map-bg);aspect-ratio:23 / 14;min-height:320px}
+.map-svg{display:block;width:100%;height:100%}
+.map-controls{position:absolute;top:var(--space-3);right:var(--space-3);display:flex;
+flex-direction:column;gap:var(--space-1)}
+.map-ctl{width:var(--touch-target);height:var(--touch-target);display:grid;place-items:center;
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-500);
+border-radius:var(--radius-md);cursor:pointer;font-family:inherit;font-size:var(--text-base);
+font-weight:var(--weight-semibold);color:var(--color-neutral-900);box-shadow:var(--shadow-sm)}
+.map-ctl:hover{background:var(--color-neutral-50)}
+.map-coords{position:absolute;right:var(--space-3);bottom:var(--space-3);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-sm);padding:var(--space-1) var(--space-2);
+font-family:var(--font-family-mono);font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600)}
+.map-legend{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-6);
+padding:var(--space-3) var(--space-4);border-top:1px solid var(--color-neutral-200);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-900)}
+.legend-item{display:inline-flex;align-items:center;gap:var(--space-2)}
+.legend-item svg{flex:none}
+
+/* ══ Panel: selected contour ═══════════════════════════════ */
+.contour-id{font-family:var(--font-family-mono);font-size:var(--text-xl);
+line-height:var(--leading-xl);font-weight:var(--weight-semibold);letter-spacing:.02em}
+.chip{display:inline-flex;align-items:center;gap:var(--space-1);font-size:var(--text-xs);
+line-height:var(--leading-xs);font-weight:var(--weight-semibold);border-radius:10px;
+padding:2px var(--space-2);background:var(--surface-success);color:var(--color-success-600);
+border:1px solid var(--border-success)}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:var(--space-1) var(--space-3);
+font-size:var(--text-sm);line-height:var(--leading-sm);margin-top:var(--space-3)}
+dl.kv dt{color:var(--color-neutral-600)}
+dl.kv dd{font-weight:var(--weight-medium);text-align:right}
+
+table.area{width:100%;border-collapse:collapse;font-size:var(--text-sm);line-height:var(--leading-sm)}
+table.area td{padding:var(--space-1) 0}
+table.area td:last-child{text-align:right;font-family:var(--font-family-mono);white-space:nowrap}
+table.area tr.busy td{color:var(--color-danger-600);font-weight:var(--weight-medium)}
+table.area tr.free td{border-top:1px solid var(--color-neutral-200);padding-top:var(--space-2);
+font-weight:var(--weight-semibold);font-size:var(--text-base)}
+table.area tr.free td:last-child{color:var(--color-primary-900)}
+
+/* ══ Layer switches ════════════════════════════════════════ */
+.switch{display:flex;align-items:center;gap:var(--space-3);cursor:pointer;
+min-height:var(--touch-target)}
+.switch input{appearance:none;-webkit-appearance:none;width:44px;height:24px;flex:none;border:none;
+border-radius:12px;background:var(--color-neutral-500);position:relative;cursor:pointer;
+transition:background .12s linear}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;
+border-radius:50%;background:var(--color-neutral-0);box-shadow:var(--shadow-sm);
+transition:left .12s linear}
+.switch input:checked{background:var(--color-primary-600)}
+.switch input:checked::after{left:22px}
+.switch input:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+/* The state is spelled out in words, never carried by the pill colour alone. */
+.switch-txt{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.switch-txt small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+@media (prefers-reduced-motion:reduce){.switch input,.switch input::after{transition:none}}
+
+/* ══ Tools ═════════════════════════════════════════════════ */
+.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-2)}
+.tools-foot{display:flex;align-items:center;gap:var(--space-4);margin-top:var(--space-3);
+flex-wrap:wrap}
+.tools-foot .hint{flex:1;min-width:280px}
+.tool{display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+min-height:var(--touch-target);padding:var(--space-2) var(--space-3);font-family:inherit;
+font-size:var(--text-sm);font-weight:var(--weight-medium);text-align:left;cursor:pointer;
+background:var(--color-neutral-0);color:var(--color-neutral-900);
+border:1px solid var(--color-neutral-500);border-radius:var(--radius-md)}
+.tool:hover{background:var(--color-neutral-50)}
+.tool small{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+/* The active tool is marked by fill, a left bar and aria-pressed — not colour alone. */
+.tool[aria-pressed="true"]{background:var(--color-primary-50);border-color:var(--color-primary-600);
+color:var(--color-primary-900);font-weight:var(--weight-semibold);
+box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.tool[aria-pressed="true"] small{color:var(--color-primary-900)}
+
+/* ══ Field ═════════════════════════════════════════════════ */
+.field{display:flex;flex-direction:column;gap:var(--space-1)}
+.label{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.star{color:var(--color-danger-600);margin-left:2px;font-weight:var(--weight-semibold)}
+.wrap{position:relative}
+.control{height:var(--control-height);width:100%;padding:0 var(--space-3);font-family:inherit;
+font-size:var(--text-base);line-height:var(--leading-base);color:var(--color-neutral-900);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-500);
+border-radius:var(--radius-md)}
+.control.num{text-align:right;font-family:var(--font-family-mono);padding-right:52px}
+.control:focus{outline:none;border-color:var(--color-primary-600);box-shadow:var(--focus-ring)}
+.suffix{position:absolute;right:var(--space-3);top:0;height:var(--control-height);display:flex;
+align-items:center;font-size:var(--text-sm);color:var(--color-neutral-600);pointer-events:none}
+.hint{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.err{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-danger-600);
+font-weight:var(--weight-medium);display:flex;gap:var(--space-1);align-items:flex-start}
+.err svg{width:14px;height:14px;flex:none;margin-top:1px}
+
+/* ══ Norm calculation, the transparency block ══════════════ */
+.calc{margin-top:var(--space-4);border:1px solid var(--border-info);background:var(--surface-info);
+border-radius:var(--radius-lg);padding:var(--space-6)}
+.calc h2{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.calc-lead{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+margin-top:var(--space-1);max-width:88ch}
+.calc-cols{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:var(--space-4);
+margin-top:var(--space-4);align-items:start}
+.formula{font-family:var(--font-family-mono);font-size:13px;line-height:26px;
+background:var(--color-neutral-0);border:1px solid var(--border-info);border-radius:var(--radius-md);
+padding:var(--space-4);overflow-x:auto;white-space:pre;color:var(--color-neutral-900)}
+.formula b{font-weight:var(--weight-semibold);color:var(--color-primary-900);
+background:var(--color-primary-50);border-radius:var(--radius-sm);padding:1px 4px}
+.formula .cmt{color:var(--color-neutral-600)}
+table.src{width:100%;border-collapse:collapse;font-size:var(--text-sm);
+background:var(--color-neutral-0);border:1px solid var(--border-info);border-radius:var(--radius-md)}
+table.src th,table.src td{text-align:left;padding:var(--space-2) var(--space-3);
+border-bottom:1px solid var(--color-neutral-200);vertical-align:top;line-height:var(--leading-sm)}
+table.src tr:last-child th,table.src tr:last-child td{border-bottom:none}
+table.src th{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+font-weight:var(--weight-medium);width:38%}
+table.src td{font-weight:var(--weight-medium)}
+table.src td small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular);margin-top:2px}
+.calc-out{display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;
+margin-top:var(--space-4);padding:var(--space-3) var(--space-4);background:var(--color-neutral-0);
+border:1px solid var(--border-info);border-radius:var(--radius-md)}
+.calc-out b{font-size:var(--text-xl);line-height:var(--leading-xl);
+font-family:var(--font-family-mono);color:var(--color-primary-900)}
+.calc-out span{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.calc-foot{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:var(--space-3)}
+.calc-foot code{background:var(--color-neutral-0);border:1px solid var(--border-info);
+border-radius:var(--radius-sm);padding:1px 5px}
+
+/* ══ Map paints ════════════════════════════════════════════
+   Everything token-driven inside the SVG lives here, not in presentation
+   attributes: var() is reliably substituted in CSS declarations and is not
+   in every engine's presentation-attribute path. */
+.m-bg{fill:var(--map-bg)}
+.m-grid-sm{fill:url(#grid-sm)}
+.m-grid-lg{fill:url(#grid-lg)}
+.m-grid-ln{fill:none;stroke:var(--map-grid);stroke-width:1px}
+.m-grid-ln-lg{fill:none;stroke:var(--map-grid-strong);stroke-width:1.4px}
+.p-busy-bg{fill:var(--map-busy-wash)}
+.p-busy-ln{stroke:var(--color-danger-600);stroke-width:3.6px}
+.p-zone-ln{stroke:var(--color-warning-600);stroke-width:2.2px}
+.m-tick{font-family:var(--font-family-mono);font-size:11px;fill:var(--color-neutral-600);
+paint-order:stroke;stroke:var(--map-bg);stroke-width:3px;stroke-linejoin:round}
+.m-zone{fill:none;stroke:url(#hatch-zone);stroke-width:36px}
+.m-water{fill:none;stroke:var(--map-water);stroke-width:4px}
+.m-border{fill:none;stroke:var(--color-neutral-900);stroke-width:2px;
+stroke-dasharray:12 7;opacity:.55}
+.m-cap{font-size:12px;fill:var(--color-neutral-900);paint-order:stroke;
+stroke:var(--map-bg);stroke-width:3.5px;stroke-linejoin:round}
+.m-free{fill:var(--map-free-fill);stroke:var(--map-free-line);stroke-width:1.6px}
+.m-id{font-family:var(--font-family-mono);font-size:12px;fill:var(--color-neutral-900);
+paint-order:stroke;stroke:var(--map-bg);stroke-width:3.5px;stroke-linejoin:round}
+.m-sel{fill:var(--map-selected-fill);stroke:var(--color-primary-600);stroke-width:3.5px;
+stroke-linejoin:round}
+.m-other{fill:none;stroke:var(--color-danger-600);stroke-width:2px;stroke-dasharray:9 6;opacity:.85}
+.m-busy{fill:url(#hatch-busy);stroke:var(--color-danger-600);stroke-width:3px}
+.m-vertex{fill:var(--color-neutral-0);stroke:var(--color-primary-600);stroke-width:2px}
+.m-sel-id{font-family:var(--font-family-mono);font-size:17px;font-weight:600;
+fill:var(--color-primary-900);paint-order:stroke;stroke:var(--color-neutral-0);
+stroke-width:4px;stroke-linejoin:round}
+.m-sel-sub{font-size:12.5px;fill:var(--color-primary-900);paint-order:stroke;
+stroke:var(--color-neutral-0);stroke-width:4px;stroke-linejoin:round}
+.m-leader{fill:none;stroke:var(--color-danger-600);stroke-width:1.6px;stroke-dasharray:4 3}
+.m-dot{fill:var(--color-danger-600)}
+.m-callout{fill:var(--color-neutral-0);stroke:var(--color-danger-600);stroke-width:1.6px}
+.m-callout-t{font-size:13.5px;font-weight:600;fill:var(--color-danger-600)}
+.m-callout-s{font-size:12px;fill:var(--color-neutral-900);font-family:var(--font-family-mono)}
+.m-scale{fill:none;stroke:var(--color-neutral-900);stroke-width:2px;opacity:.8}
+.m-scale-t{font-size:11px;fill:var(--color-neutral-900);font-family:var(--font-family-mono);
+paint-order:stroke;stroke:var(--map-bg);stroke-width:3px}
+.m-north{fill:var(--color-neutral-900);opacity:.8}
+.m-north-t{font-size:12px;fill:var(--color-neutral-900);text-anchor:middle;paint-order:stroke;
+stroke:var(--map-bg);stroke-width:3px}
+.lg-sel{fill:var(--map-selected-fill);stroke:var(--color-primary-600);stroke-width:2.5px}
+.lg-free{fill:var(--map-free-fill);stroke:var(--map-free-line);stroke-width:1.5px}
+.lg-busy{fill:url(#lgp-busy);stroke:var(--color-danger-600);stroke-width:2px}
+.lg-zone{fill:url(#lgp-zone);stroke:var(--color-warning-600);stroke-width:1.5px}
+.lg-line{fill:none;stroke:var(--color-neutral-900);stroke-width:2px;stroke-dasharray:6 4;opacity:.6}
+
+@media (max-width:1180px){
+.work{grid-template-columns:1fr}
+.calc-cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="note">
+    <strong>Мастер подачи заявки, шаг ② «Участок».</strong>
+    Самый ответственный экран системы: здесь сходятся карта, проверка занятости и расчёт нормы.
+    Показано ключевое состояние — <b>выбранный участок пересекается с действующим разрешением</b>.
+    Каркас, шаги и сообщение об ошибке взяты без изменений из <code>layouts/cabinet.html</code>,
+    <code>components/navigation.html</code> и <code>components/feedback.html</code>.
+</div>
+
+<div class="shell">
+
+    <div class="brand">
+        <div class="brand-mark">Р</div>
+        <div>
+            <div class="brand-name">RUXSATNOMA</div>
+            <div class="brand-sub">Агентство по лесам</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="search">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Поиск по номеру, ЖШШИР, СТИР" aria-label="Поиск">
+        </div>
+
+        <div class="header-right">
+            <div class="lang" role="group" aria-label="Язык интерфейса">
+                <button aria-pressed="true">Ўз</button>
+                <button aria-pressed="false">Uz</button>
+                <button aria-pressed="false">Ру</button>
+            </div>
+
+            <button class="icon-btn" aria-label="Уведомления, 3 непрочитанных">
+                <span aria-hidden="true">🔔</span>
+                <span class="badge-dot">3</span>
+            </button>
+
+            <button class="user">
+                <span class="avatar">АК</span>
+                <span>
+                    <span class="user-name">Азиз Каримов</span><br>
+                    <span class="user-role">Сотрудник · Тошкент ДЎХ</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="sidebar" aria-label="Основное меню">
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▤</span>Обзор</a>
+
+        <div class="nav-group">Процесс</div>
+        <a class="nav-item" href="#" aria-current="page">
+            <span class="ico" aria-hidden="true">✉</span>Заявки<span class="nav-count">12</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◆</span>Разрешения</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◉</span>Карта</a>
+
+        <div class="nav-group">Контроль</div>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">◈</span>Инспекции<span class="nav-count">4</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">₴</span>Платежи</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▥</span>Отчёты</a>
+
+        <div class="nav-group">Справочники</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">☰</span>Классификаторы</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">⚙</span>Администрирование</a>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" href="#"><span class="ico" aria-hidden="true">?</span>Помощь</a>
+        </div>
+    </nav>
+
+    <main class="main">
+
+        <!-- No breadcrumbs inside the wizard: the steps carry the navigation.
+             Rule from components/navigation.html, section 01. -->
+        <div class="page-head">
+            <div>
+                <h1 class="page-title">Новая заявка</h1>
+                <div class="page-sub">
+                    Выпас скота (чорва боқиш) · черновик № RX-2026-004903 ·
+                    Зангиота ўрмон хўжалиги, Тошкент ДЎХ
+                </div>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-ghost">Выйти из мастера</button>
+            </div>
+        </div>
+
+        <div class="wizard">
+
+            <div class="wizard-top">
+                <span class="wizard-count">Шаг 2 из 6</span>
+                <div class="progress" role="progressbar" aria-valuenow="2" aria-valuemin="1"
+                     aria-valuemax="6" aria-label="Прогресс подачи заявки">
+                    <i style="width:33.3%"></i>
+                </div>
+                <span class="autosave"><span aria-hidden="true">✓</span>Сохранено 14:32</span>
+                <span class="draft-chip">Черновик № RX-2026-004903</span>
+            </div>
+
+            <nav class="steps" aria-label="Шаги подачи заявки">
+                <button class="step done">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num" aria-hidden="true">✓</span>
+                        <span>
+                            <span class="step-name">Вид деятельности</span>
+                            <span class="step-state">Выпас скота · изменить</span>
+                        </span>
+                    </span>
+                </button>
+
+                <button class="step current" aria-current="step">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num">2</span>
+                        <span>
+                            <span class="step-name">Участок</span>
+                            <span class="step-state">Текущий шаг</span>
+                        </span>
+                    </span>
+                </button>
+
+                <button class="step todo" aria-disabled="true">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num">3</span>
+                        <span>
+                            <span class="step-name">Параметры</span>
+                            <span class="step-state">Период и поголовье</span>
+                        </span>
+                    </span>
+                </button>
+
+                <button class="step todo" aria-disabled="true">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num">4</span>
+                        <span>
+                            <span class="step-name">Документы</span>
+                            <span class="step-state">Ещё не заполнен</span>
+                        </span>
+                    </span>
+                </button>
+
+                <button class="step todo" aria-disabled="true">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num">5</span>
+                        <span>
+                            <span class="step-name">Проверка</span>
+                            <span class="step-state">Пропустить нельзя</span>
+                        </span>
+                    </span>
+                </button>
+
+                <button class="step todo" aria-disabled="true">
+                    <span class="step-bar"></span>
+                    <span class="step-body">
+                        <span class="step-num">6</span>
+                        <span>
+                            <span class="step-name">Подпись</span>
+                            <span class="step-state">Требуется ЭЦП</span>
+                        </span>
+                    </span>
+                </button>
+            </nav>
+
+            <div class="wizard-body">
+
+                <!-- Occupancy conflict. Four parts required by 4.1.7:
+                     what happened, which data, how to fix, where to ask. -->
+                <div class="alert alert-danger" role="alert">
+                    <span class="ico" aria-hidden="true">⚠</span>
+                    <div>
+                        <h2>Участок пересекается с уже занятым</h2>
+                        <p>
+                            Выбранный контур <b>04-12-007</b> (Зангиота ўрмон хўжалиги,
+                            Чиноз ўрмон бўлими, квартал 12) площадью <b>21,7 га</b> пересекается
+                            на <b>3,2 га</b> с участком действующего разрешения
+                            <b>№ RX-2026-004112</b> — выпас скота, срок до <b>31.10.2026</b>.
+                            Пересечение показано на карте красной штриховкой.
+                        </p>
+                        <p>
+                            Исключите пересечение — в заявке останется свободная часть
+                            <b>18,5 га</b>, — либо подвиньте границу инструментом «Нарисовать»
+                            или выберите другой контур. После правки проверка занятости
+                            выполнится заново автоматически.
+                        </p>
+                        <p class="support">
+                            Считаете, что участок свободен? Техническая поддержка:
+                            <b>71-207-07-70</b>, будни 9:00–18:00.
+                        </p>
+                        <div class="alert-actions">
+                            <button class="btn btn-primary">Исключить пересечение — оставить 18,5 га</button>
+                            <button class="btn btn-secondary">Показать пересечение на карте</button>
+                            <button class="btn btn-ghost">Выбрать другой контур</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work">
+
+                  <div class="map-col">
+
+                    <!-- ── Map ──────────────────────────────────────── -->
+                    <section class="card" aria-labelledby="map-t">
+                        <div class="card-head">
+                            <span class="card-title" id="map-t">Карта участка</span>
+                            <span class="card-meta">
+                                Проверка занятости 14:31 · 2,4 с · регламент ≤ 5 с
+                            </span>
+                        </div>
+
+                        <div class="map-figure">
+                            <svg class="map-svg" viewBox="0 0 920 560" role="img"
+                                 aria-label="Схема лесного квартала 12. В центре выбранный контур 04-12-007 площадью 21,7 гектара, залитый зелёным. Его правая часть площадью 3,2 гектара заштрихована красным: она занята действующим разрешением № RX-2026-004112 до 31 октября 2026 года. Вокруг четыре свободных контура: 04-12-005, 04-12-006, 04-12-009 и 04-12-011. По левой части проходит водоток с охранной зоной, отмеченной жёлтой штриховкой, и пунктирная граница между Чиноз и Зангиота ўрмон бўлими.">
+                                <defs>
+                                    <pattern id="grid-sm" width="46" height="46" patternUnits="userSpaceOnUse">
+                                        <path d="M46 0H0v46" class="m-grid-ln"/>
+                                    </pattern>
+                                    <pattern id="grid-lg" width="230" height="230" patternUnits="userSpaceOnUse">
+                                        <path d="M230 0H0v230" class="m-grid-ln-lg"/>
+                                    </pattern>
+                                    <!-- Busy overlap: red hatch over the green fill, so the area
+                                         reads as "mine, but taken" rather than as a separate patch. -->
+                                    <pattern id="hatch-busy" width="10" height="10"
+                                             patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                                        <rect width="10" height="10" class="p-busy-bg"/>
+                                        <line x1="0" y1="0" x2="0" y2="10" class="p-busy-ln"/>
+                                    </pattern>
+                                    <pattern id="hatch-zone" width="9" height="9"
+                                             patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+                                        <line x1="0" y1="0" x2="0" y2="9" class="p-zone-ln"/>
+                                    </pattern>
+                                    <!-- The intersection is not drawn by hand: the neighbouring
+                                         permit polygon is clipped by the selected contour, exactly
+                                         as ST_Intersection would do it on the server. -->
+                                    <clipPath id="clip-selected">
+                                        <polygon points="298,148 468,116 552,214 534,352 392,424 286,338"/>
+                                    </clipPath>
+                                </defs>
+
+                                <!-- Basemap surface and coordinate grid -->
+                                <rect width="920" height="560" class="m-bg"/>
+                                <rect width="920" height="560" class="m-grid-sm"/>
+                                <rect width="920" height="560" class="m-grid-lg"/>
+
+                                <g class="m-tick">
+                                    <text x="96" y="15">69°12′</text>
+                                    <text x="326" y="15">69°13′</text>
+                                    <text x="556" y="15">69°14′</text>
+                                    <text x="786" y="15">69°15′</text>
+                                    <text x="6" y="104">41°26′</text>
+                                    <text x="6" y="334">41°25′</text>
+                                    <text x="6" y="551">41°24′</text>
+                                </g>
+
+                                <!-- Layer: watercourse and its protection zone -->
+                                <path class="m-zone"
+                                      d="M-10,96 C90,142 152,214 168,300 C184,388 138,470 176,570"/>
+                                <path class="m-water"
+                                      d="M-10,96 C90,142 152,214 168,300 C184,388 138,470 176,570"/>
+
+                                <!-- Layer: boundary between two forest districts -->
+                                <path class="m-border"
+                                      d="M270,0 C284,110 258,200 272,300 C286,398 258,470 274,560"/>
+                                <!-- District names sit in open ground on either side of the
+                                     boundary, clear of the scale bar and of the contours -->
+                                <g class="m-cap">
+                                    <text x="14" y="252">Чиноз ўрмон бўлими</text>
+                                    <text x="700" y="252">Зангиота ўрмон бўлими</text>
+                                </g>
+
+                                <!-- Layer: free contours -->
+                                <g class="m-free">
+                                    <polygon points="62,64 214,44 268,132 196,208 78,182"/>
+                                    <polygon points="640,34 812,44 862,116 780,172 656,142"/>
+                                    <polygon points="66,336 226,306 272,404 186,486 82,452"/>
+                                    <polygon points="622,378 806,352 856,452 706,510 620,452"/>
+                                    <polygon points="312,462 452,452 486,516 356,538"/>
+                                </g>
+                                <g class="m-id">
+                                    <text x="112" y="126">04-12-005</text>
+                                    <text x="700" y="98">04-12-006</text>
+                                    <text x="118" y="400">04-12-009</text>
+                                    <text x="676" y="436">04-12-011</text>
+                                    <text x="344" y="500">04-12-014</text>
+                                </g>
+
+                                <!-- Selected contour -->
+                                <polygon class="m-sel"
+                                         points="298,148 468,116 552,214 534,352 392,424 286,338"/>
+
+                                <!-- Neighbouring permit: full footprint, dashed -->
+                                <polygon class="m-other"
+                                         points="496,166 660,192 676,316 540,372 480,302"/>
+
+                                <!-- The overlap itself: the same polygon clipped by the contour -->
+                                <g clip-path="url(#clip-selected)">
+                                    <polygon class="m-busy"
+                                             points="496,166 660,192 676,316 540,372 480,302"/>
+                                </g>
+
+                                <!-- Editable vertices of the selected geometry -->
+                                <g class="m-vertex">
+                                    <rect x="293" y="143" width="10" height="10"/>
+                                    <rect x="463" y="111" width="10" height="10"/>
+                                    <rect x="547" y="209" width="10" height="10"/>
+                                    <rect x="529" y="347" width="10" height="10"/>
+                                    <rect x="387" y="419" width="10" height="10"/>
+                                    <rect x="281" y="333" width="10" height="10"/>
+                                </g>
+
+                                <text class="m-sel-id" x="316" y="252">04-12-007</text>
+                                <text class="m-sel-sub" x="316" y="274">свободно 18,5 га</text>
+
+                                <!-- Callout on the conflict -->
+                                <path class="m-leader" d="M470,96 L508,250"/>
+                                <circle class="m-dot" cx="508" cy="250" r="4"/>
+                                <rect class="m-callout" x="306" y="38" width="296" height="58" rx="8"/>
+                                <text class="m-callout-t" x="320" y="60">Занято: пересечение 3,2 га</text>
+                                <text class="m-callout-s" x="320" y="80">RX-2026-004112 · до 31.10.2026</text>
+
+                                <!-- Scale bar and north arrow -->
+                                <g class="m-scale">
+                                    <path d="M28,524 H148"/>
+                                    <path d="M28,518 V530"/><path d="M88,520 V528"/><path d="M148,518 V530"/>
+                                </g>
+                                <text class="m-scale-t" x="28" y="514">0 — 500 м</text>
+                                <!-- Placed low on the right: the zoom controls own the top-right -->
+                                <g transform="translate(878,472)">
+                                    <polygon class="m-north" points="0,-18 7,8 0,2 -7,8"/>
+                                    <text class="m-north-t" x="0" y="26">С</text>
+                                </g>
+                            </svg>
+
+                            <div class="map-controls">
+                                <button class="map-ctl" type="button" aria-label="Приблизить">+</button>
+                                <button class="map-ctl" type="button" aria-label="Отдалить">−</button>
+                                <button class="map-ctl" type="button"
+                                        aria-label="Показать участок целиком">⤢</button>
+                            </div>
+
+                            <div class="map-coords">41°25′17″ с. ш. · 69°13′42″ в. д. · 1 : 25 000</div>
+                        </div>
+
+                        <!-- Legend: shape and words, never colour alone (WCAG 1.4.1).
+                             Each swatch carries its own pattern: paint servers are not
+                             borrowed across separate inline SVG roots. -->
+                        <div class="map-legend">
+                            <span class="legend-item">
+                                <svg width="22" height="14" aria-hidden="true">
+                                    <rect class="lg-sel" x="1" y="1" width="20" height="12"/>
+                                </svg>Выбранный контур
+                            </span>
+                            <span class="legend-item">
+                                <svg width="22" height="14" aria-hidden="true">
+                                    <rect class="lg-free" x="1" y="1" width="20" height="12"/>
+                                </svg>Свободные контуры
+                            </span>
+                            <span class="legend-item">
+                                <svg width="22" height="14" aria-hidden="true">
+                                    <defs>
+                                        <pattern id="lgp-busy" width="10" height="10"
+                                                 patternUnits="userSpaceOnUse"
+                                                 patternTransform="rotate(45)">
+                                            <rect width="10" height="10" class="p-busy-bg"/>
+                                            <line x1="0" y1="0" x2="0" y2="10" class="p-busy-ln"/>
+                                        </pattern>
+                                    </defs>
+                                    <rect class="lg-busy" x="1" y="1" width="20" height="12"/>
+                                </svg>Занято действующим разрешением
+                            </span>
+                            <span class="legend-item">
+                                <svg width="22" height="14" aria-hidden="true">
+                                    <defs>
+                                        <pattern id="lgp-zone" width="9" height="9"
+                                                 patternUnits="userSpaceOnUse"
+                                                 patternTransform="rotate(-45)">
+                                            <line x1="0" y1="0" x2="0" y2="9" class="p-zone-ln"/>
+                                        </pattern>
+                                    </defs>
+                                    <rect class="lg-zone" x="1" y="1" width="20" height="12"/>
+                                </svg>Охранная зона водотока
+                            </span>
+                            <span class="legend-item">
+                                <svg width="22" height="14" aria-hidden="true">
+                                    <path class="lg-line" d="M1,7 H21"/>
+                                </svg>Граница лесничества
+                            </span>
+                        </div>
+                    </section>
+
+                    <!-- Tools sit under the map, on the surface they act on -->
+                    <section class="card" aria-labelledby="tool-t">
+                        <div class="card-head">
+                            <span class="card-title" id="tool-t">Инструменты</span>
+                            <span class="card-meta">Активен: выбрать</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="tools" role="group" aria-label="Инструменты работы с геометрией">
+                                <button class="tool" type="button" aria-pressed="true">
+                                    <span aria-hidden="true">⊹</span>Выбрать
+                                    <small>Клик по контуру</small>
+                                </button>
+                                <button class="tool" type="button" aria-pressed="false">
+                                    <span aria-hidden="true">◇</span>Нарисовать
+                                    <small>Свой полигон</small>
+                                </button>
+                                <button class="tool" type="button" aria-pressed="false">
+                                    <span aria-hidden="true">⟺</span>Измерить
+                                    <small>Длину и площадь</small>
+                                </button>
+                                <button class="tool" type="button" aria-pressed="false">
+                                    <span aria-hidden="true">⇪</span>Импортировать
+                                    <small>SHP, GeoJSON, KML</small>
+                                </button>
+                            </div>
+                            <div class="tools-foot">
+                                <span class="hint">
+                                    Геометрия проверяется на сервере: корректность, нахождение
+                                    внутри лесного фонда, пересечения и слои ограничений.
+                                </span>
+                                <button class="btn btn-danger btn-sm" type="button">
+                                    Сбросить нарисованный участок
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                  </div>
+
+                    <!-- ── Choice panel ─────────────────────────────── -->
+                    <div class="panel-stack">
+
+                        <section class="card" aria-labelledby="cont-t">
+                            <div class="card-head">
+                                <span class="card-title" id="cont-t">Выбранный контур</span>
+                            </div>
+                            <div class="card-body">
+                                <div style="display:flex;align-items:center;gap:var(--space-2);
+                                            flex-wrap:wrap">
+                                    <span class="contour-id">04-12-007</span>
+                                    <span class="chip"><span aria-hidden="true">✓</span>Published</span>
+                                </div>
+                                <dl class="kv">
+                                    <dt>Лесхоз</dt><dd>Зангиота ўрмон хўжалиги</dd>
+                                    <dt>Лесничество</dt><dd>Чиноз ўрмон бўлими</dd>
+                                    <dt>Обход</dt><dd>3-айланма</dd>
+                                    <dt>Квартал</dt><dd>12</dd>
+                                    <dt>Субконтур</dt><dd>007-б</dd>
+                                    <dt>Общая площадь</dt><dd>21,7 га</dd>
+                                    <dt>Норма</dt><dd>№ 2026-НРМ-114</dd>
+                                </dl>
+                            </div>
+
+                            <div class="card-body card-split">
+                                <div class="card-sub">Свободная площадь</div>
+                                <table class="area">
+                                    <tbody>
+                                        <tr><td>Общая площадь контура</td><td>21,7 га</td></tr>
+                                        <tr class="busy">
+                                            <td>− Занято № RX-2026-004112 до 31.10.2026</td>
+                                            <td>3,2 га</td>
+                                        </tr>
+                                        <tr class="free">
+                                            <td>Свободно для заявки</td><td>18,5 га</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="hint" style="margin-top:var(--space-2)">
+                                    <code>S_available = S_total − S_active_overlap</code>.
+                                    Учитывается геометрия только тех разрешений, период которых
+                                    пересекается с вашим. Двойной учёт исключён.
+                                </p>
+
+                                <div class="field" style="margin-top:var(--space-4)">
+                                    <label class="label" for="ap-area">
+                                        Площадь заявки<span class="star" aria-hidden="true">*</span>
+                                    </label>
+                                    <div class="wrap">
+                                        <input class="control num" id="ap-area" type="text"
+                                               inputmode="decimal" value="21,7" aria-required="true"
+                                               aria-invalid="true"
+                                               aria-describedby="ap-area-e ap-area-h">
+                                        <span class="suffix" aria-hidden="true">га</span>
+                                    </div>
+                                    <span class="err" id="ap-area-e" role="alert">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                             stroke-width="2" stroke-linecap="round"
+                                             stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M12 4l9 16H3l9-16z"/><path d="M12 10v4M12 17h.01"/>
+                                        </svg>
+                                        Больше свободной площади на 3,2 га. Уменьшите до 18,5 или
+                                        исключите пересечение кнопкой выше
+                                    </span>
+                                    <span class="hint" id="ap-area-h">
+                                        Ўндан бир қисмигача, масалан 18,5. Допустимо от 0,1 до 18,5
+                                    </span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="card" aria-labelledby="lay-t">
+                            <div class="card-head">
+                                <span class="card-title" id="lay-t">Слои карты</span>
+                                <span class="card-meta">5 из 13</span>
+                            </div>
+                            <div class="card-body">
+                                <label class="switch">
+                                    <input type="checkbox" role="switch" checked>
+                                    <span class="switch-txt">Лесной фонд<small>Показан</small></span>
+                                </label>
+                                <label class="switch">
+                                    <input type="checkbox" role="switch" checked>
+                                    <span class="switch-txt">Границы организаций<small>Показаны</small></span>
+                                </label>
+                                <label class="switch">
+                                    <input type="checkbox" role="switch" checked>
+                                    <span class="switch-txt">Контуры и субконтуры<small>Показаны</small></span>
+                                </label>
+                                <label class="switch">
+                                    <input type="checkbox" role="switch">
+                                    <span class="switch-txt">Ограничения<small>Скрыты · пожарный запрет ВМҚ 506-сон</small></span>
+                                </label>
+                                <label class="switch">
+                                    <input type="checkbox" role="switch" checked>
+                                    <span class="switch-txt">Охранные зоны<small>Показаны</small></span>
+                                </label>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+
+                <!-- ── Norm calculation ─────────────────────────────── -->
+                <section class="calc" aria-labelledby="calc-t">
+                    <h2 id="calc-t">Расчёт нормы по свободной части участка</h2>
+                    <p class="calc-lead">
+                        Пункт 4.2.15 ТЗ требует воспроизводимости и объяснимости: при одинаковых
+                        входных данных результат обязан совпадать, и каждое число обязано иметь
+                        источник. Поэтому показан не итог, а вся цепочка — формулы ВМҚ 689-сон.
+                    </p>
+
+                    <div class="calc-cols">
+<pre class="formula">Площадь 18,5 га = 21,7 га − 3,2 га   <span class="cmt">(двойной учёт исключён)</span>
+
+Урожайность 4,2 ц/га × Площадь 18,5 га × Доля сезона 0,58 = Oz <b>45,1 ц</b>
+
+Oz_eff = 45,1 × 0,85 = <b>38,3 ц</b>   <span class="cmt">(минус 15 % страховой фонд)</span>
+
+MaxSB  = floor(38,3 / 3,74) = <b>10 условных голов</b></pre>
+
+                        <table class="src">
+                            <caption class="hint" style="text-align:left;padding-bottom:var(--space-2)">
+                                Откуда взялось каждое число
+                            </caption>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Урожайность, 4,2 ц/га</th>
+                                    <td>Геоботаническое исследование
+                                        <small>Акт № 114/ГБ от 14.04.2026, Зангиота ЎХ</small></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Площадь, 18,5 га</th>
+                                    <td>GIS-контур 04-12-007
+                                        <small>Геометрия за вычетом активных пересечений</small></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Доля сезона, 0,58</th>
+                                    <td>Календарь сезона и ротации
+                                        <small>ВМҚ 689-сон, 212 дней из 365</small></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Коэффициент 0,85</th>
+                                    <td>Страховой фонд 15 %
+                                        <small>ВМҚ 689-сон, пункт 12</small></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Норма корма, 3,74 ц</th>
+                                    <td>На одну условную голову за сезон
+                                        <small>ВМҚ 689-сон, приложение 4</small></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Версия нормы</th>
+                                    <td>№ 2026-НРМ-114, статус Published
+                                        <small>Утверждена 12.03.2026, действует до 01.03.2027</small></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="calc-out">
+                        <b>10</b>
+                        <span>
+                            условных голов — максимум по контуру после исключения занятой части.
+                            Состав стада и поголовье вводятся на шаге ③ «Параметры»;
+                            там же проверяется условие <code>UsedSB ≤ RemainingSB</code>.
+                        </span>
+                    </div>
+
+                    <p class="calc-foot">
+                        Расчёт сохраняется вместе с <code>rule_version = 2026.04.3</code>
+                        и <code>input_snapshot</code>. Если норму изменят после подачи заявки,
+                        ваш расчёт не пересчитывается — он держится за свою версию.
+                        Расчёт предварительный: он станет частью заявки после того,
+                        как пересечение будет устранено.
+                    </p>
+                </section>
+
+            </div>
+
+            <div class="wizard-foot">
+                <button class="btn btn-secondary"><span aria-hidden="true">←</span>Назад</button>
+                <button class="btn btn-ghost">Сохранить черновик</button>
+                <!-- The autosave mark is repeated here on purpose: the wizard header
+                     scrolls out of sight on this screen, and the footer is sticky. -->
+                <span class="autosave"><span aria-hidden="true">✓</span>Сохранено 14:32</span>
+
+                <div class="right">
+                    <span class="foot-hint" id="next-why">
+                        Уберите пересечение 3,2 га — тогда шаг можно завершить
+                    </span>
+                    <button class="btn btn-primary" aria-disabled="true" aria-describedby="next-why">
+                        Далее<span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<div class="note note-foot">
+    <strong>Решения, принятые на этом экране.</strong>
+    <ul>
+        <li><b>Карта занимает основную площадь, панель — 360px справа.</b> Участок выбирают глазами,
+            а не из выпадающего списка: иерархия область → район → лесхоз → лесничество → обход →
+            квартал → контур остаётся доступной, но она вторична.</li>
+        <li><b>Пересечение вычислено, а не нарисовано.</b> Полигон соседнего разрешения обрезан
+            контуром через <code>clipPath</code> — так же, как <code>ST_Intersection</code> сделает это
+            на сервере. Рядом сказано, какое разрешение занимает участок и до какой даты.</li>
+        <li><b>Занятость читается без цвета.</b> Штриховка, сплошная красная граница, подпись
+            на карте, строка «− Занято 3,2 га» в панели и текст ошибки — пять носителей одного
+            смысла, WCAG 1.4.1.</li>
+        <li><b>Расчёт показан цепочкой.</b> Пользователь видит урожайность, площадь, долю сезона,
+            страховой фонд и норму корма со ссылкой на источник каждого значения — требование
+            воспроизводимости п. 4.2.15 ТЗ. Число без расшифровки порождает обращение в поддержку.</li>
+        <li><b>«Далее» заблокировано, но объяснено.</b> Кнопка помечена <code>aria-disabled</code>
+            и связана через <code>aria-describedby</code> с причиной; главное действие вынесено
+            в сообщение об ошибке.</li>
+        <li><b>Границы всех элементов управления — <code>neutral-500</code>.</b>
+            <code>neutral-200</code> остаётся только на декоративных разделителях: его контраст
+            1,24 при требуемых 3,0 по WCAG 1.4.11.</li>
+    </ul>
+</div>
+
+</body>
+</html>

@@ -6,8 +6,6 @@ import {
   ChevronDown,
   LayoutDashboard,
   FileText,
-  UserCheck,
-  FolderTree,
   Settings,
   HelpCircle,
   LogOut,
@@ -15,6 +13,10 @@ import {
   KeyRound,
   CheckCircle2,
   X,
+  Mail,
+  CreditCard,
+  Map,
+  Building2,
 } from 'lucide-react';
 
 export interface CabinetLayoutProps {
@@ -24,6 +26,7 @@ export interface CabinetLayoutProps {
   userRole?: string;
   notificationCount?: number;
   onNavSelect?: (id: string) => void;
+  onLogout?: () => void;
 }
 
 export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
@@ -33,6 +36,7 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
   userRole = 'Tuman inspektori',
   notificationCount = 3,
   onNavSelect,
+  onLogout,
 }) => {
   const [lang, setLang] = useState<'uz' | 'ru'>('uz');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -57,21 +61,52 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const isLeskhozStaff =
+    userRole?.includes('Ijrochi') ||
+    userRole?.includes('Сотрудник') ||
+    userRole?.includes('Руководитель') ||
+    userRole?.includes('Markaziy') ||
+    userRole?.includes('Центральный') ||
+    userRole?.includes('inspektor') ||
+    userRole?.includes('Inspektor');
+
+  const dashboardPage =
+    userRole?.includes('Rahbariyat') || userRole?.includes('Markaziy') || userRole?.includes('administrator')
+      ? 'manager_decision'
+      : isLeskhozStaff
+      ? 'leskhoz_inbox'
+      : 'applicant_dashboard';
+
+  const applicationsPage = isLeskhozStaff ? 'leskhoz_inbox' : 'application_card';
+
   const navItems = [
     {
-      group: 'Asosiy',
+      group: '',
       items: [
-        { id: 'dashboard', label: 'Boshqaruv paneli', page: 'applicant_dashboard', icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
-        { id: 'permits', label: 'Ruxsatnomalar', page: 'applicant_permits', icon: <FileText className="w-5 h-5" />, count: 42 },
-        { id: 'inspections', label: 'Inspeksiya aʼzolari', page: 'field_tasks', icon: <UserCheck className="w-5 h-5" />, count: undefined },
-        { id: 'gis', label: 'Oʻrmon zonalari (GIS)', page: 'gis_editor', icon: <FolderTree className="w-5 h-5" />, count: undefined },
+        { id: 'dashboard', label: 'Bosh sahifa', page: dashboardPage, icon: <LayoutDashboard className="w-5 h-5" />, count: undefined },
       ],
     },
     {
-      group: 'Tizim',
+      group: 'Mening ishlarim',
       items: [
-        { id: 'users', label: 'Admin & Sozlamalar', page: 'admin_settings', icon: <Settings className="w-5 h-5" />, count: undefined },
-        { id: 'help', label: 'Yordam va Yoʻriqnoma', page: 'applicant_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
+        { id: 'applications', label: 'Mening arizalarim', page: applicationsPage, icon: <Mail className="w-5 h-5" />, count: isLeskhozStaff ? 24 : 4 },
+        { id: 'permits', label: 'Mening ruxsatnomalarim', page: 'applicant_permits', icon: <FileText className="w-5 h-5" />, count: 2 },
+        { id: 'payments', label: 'Hisoblar va toʻlov', page: 'applicant_dashboard', icon: <CreditCard className="w-5 h-5" />, count: 1, isWarning: true },
+        { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className="w-5 h-5" />, count: undefined },
+      ],
+    },
+    {
+      group: 'Mening profilim',
+      items: [
+        { id: 'farm_info', label: "Xoʻjalik ma'lumotlari", page: 'admin_settings', icon: <Building2 className="w-5 h-5" />, count: undefined },
+        { id: 'e_imzo', label: 'Elektron raqamli imzo', page: 'admin_settings', icon: <KeyRound className="w-5 h-5" />, count: undefined },
+        { id: 'notifications', label: 'Bildirishnomalar', page: 'applicant_dashboard', icon: <Bell className="w-5 h-5" />, count: 4 },
+      ],
+    },
+    {
+      group: 'Yordam',
+      items: [
+        { id: 'help', label: 'Yordam va savollar', page: 'applicant_help', icon: <HelpCircle className="w-5 h-5" />, count: undefined },
       ],
     },
   ];
@@ -188,8 +223,8 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
               onClick={() => { setIsUserMenuOpen(!isUserMenuOpen); setIsNotifOpen(false); }}
               className="flex items-center gap-2.5 pl-2 border-l border-[#E4E7EA] py-1 px-2 rounded-lg hover:bg-[#F8F9FA] transition-all text-left focus:outline-none"
             >
-              <div className="w-8 h-8 rounded-full bg-[#D9EBDC] text-[#123522] font-bold flex items-center justify-center text-xs shadow-xs">
-                AA
+              <div className="w-8 h-8 rounded-full bg-[#D9EBDC] text-[#123522] font-bold flex items-center justify-center text-xs shadow-xs uppercase">
+                {userName ? userName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
               </div>
               <div className="hidden lg:block">
                 <span className="block text-xs font-semibold text-[#1A1F24] leading-tight">{userName}</span>
@@ -203,8 +238,8 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
               <div className="absolute right-0 mt-2 w-72 bg-white border border-[#E4E7EA] rounded-2xl shadow-xl z-50 p-4 space-y-4 animate-in fade-in duration-150">
                 {/* User Header Summary */}
                 <div className="flex items-center gap-3 p-3 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-[#2E7D4F] text-white font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
-                    AA
+                  <div className="w-10 h-10 rounded-full bg-[#2E7D4F] text-white font-bold flex items-center justify-center text-sm shadow-xs shrink-0 uppercase">
+                    {userName ? userName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
                   </div>
                   <div className="truncate">
                     <div className="font-bold text-xs text-[#1A1F24] truncate">{userName}</div>
@@ -245,7 +280,11 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                 {/* Logout Divider & Button */}
                 <div className="pt-2 border-t border-[#E4E7EA]">
                   <button
-                    onClick={() => { onNavSelect?.('home'); setIsUserMenuOpen(false); }}
+                    onClick={() => {
+                      if (onLogout) onLogout();
+                      else onNavSelect?.('home');
+                      setIsUserMenuOpen(false);
+                    }}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors font-bold text-xs text-left"
                   >
                     <LogOut className="w-4 h-4 text-[#B91C1C]" />
@@ -296,7 +335,11 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                             {item.count !== undefined && (
                               <span
                                 className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                                  isActive ? 'bg-[#D9EBDC] text-[#123522]' : 'bg-[#E4E7EA] text-[#5A646D]'
+                                  item.isWarning
+                                    ? 'bg-[#B45309] text-white'
+                                    : isActive
+                                    ? 'bg-[#D9EBDC] text-[#123522]'
+                                    : 'bg-[#E4E7EA] text-[#5A646D]'
                                 }`}
                               >
                                 {item.count}

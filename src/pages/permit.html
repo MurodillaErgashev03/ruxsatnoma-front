@@ -1,0 +1,1099 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Разрешение — готовый документ</title>
+<style>
+:root{
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;
+--text-base:16px;--leading-base:24px;--text-lg:18px;--leading-lg:28px;
+--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;--text-3xl:36px;--leading-3xl:44px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--space-16:64px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--header-height:64px;--sidebar-width:260px;
+--control-height:40px;--control-height-touch:48px;
+--row-height:48px;--row-height-compact:36px;--touch-target:44px;--content-max:1440px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--shadow-lg:0 12px 32px rgba(26,31,36,.16);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50)}
+
+/* Every interactive element must show focus: WCAG 2.4.7 */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:none;
+box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Off-screen container for the QR symbol reused by screen and paper views */
+.svg-defs{position:absolute;width:0;height:0;overflow:hidden}
+
+.note{max-width:var(--content-max);margin:0 auto var(--space-6);padding:var(--space-4) var(--space-6);
+background:var(--color-primary-50);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-md);font-size:var(--text-sm);line-height:var(--leading-sm);
+color:var(--color-primary-900)}
+.note strong{font-weight:var(--weight-semibold)}
+.note p+p{margin-top:var(--space-2)}
+.note .code{font-family:var(--font-family-mono);font-size:var(--text-xs)}
+
+/* ══ Shell: identical to layouts/cabinet.html ═════════════ */
+.shell{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:var(--header-height) 1fr;
+grid-template-areas:"brand header" "sidebar main";min-height:100vh}
+
+.brand{grid-area:brand;background:var(--color-primary-700);color:#fff;display:flex;align-items:center;
+gap:var(--space-3);padding:0 var(--space-4)}
+.brand-mark{width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-primary-300);
+display:grid;place-items:center;font-weight:600;color:var(--color-primary-900);flex:none}
+.brand-name{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-size:12px;line-height:14px;opacity:.75;font-weight:400}
+
+.header{grid-area:header;background:var(--color-neutral-0);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6)}
+.search{flex:1;max-width:420px;position:relative}
+.search input{width:100%;height:var(--control-height);padding:0 var(--space-3) 0 36px;font-size:16px;
+font-family:inherit;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+background:var(--color-neutral-50);color:var(--color-neutral-900)}
+.search input::placeholder{color:var(--color-neutral-400)}
+.search .ico{position:absolute;left:10px;top:11px;color:var(--color-neutral-400)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-2)}
+
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:none;background:none;
+cursor:pointer;border-radius:var(--radius-md);color:var(--color-neutral-600);position:relative}
+.icon-btn:hover{background:var(--color-neutral-50)}
+.badge-dot{position:absolute;top:9px;right:9px;min-width:16px;height:16px;padding:0 4px;
+background:var(--color-danger-600);color:#fff;border-radius:8px;font-size:11px;line-height:16px;font-weight:600}
+
+.lang{display:flex;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);overflow:hidden}
+.lang button{border:none;background:var(--color-neutral-0);color:var(--color-neutral-600);
+padding:0 10px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.lang button[aria-pressed="true"]{background:var(--color-primary-600);color:#fff}
+
+.user{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);
+border-radius:var(--radius-md);cursor:pointer;border:none;background:none;font-family:inherit;text-align:left}
+.user:hover{background:var(--color-neutral-50)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--color-primary-100);
+color:var(--color-primary-900);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.user-name{font-size:13px;line-height:16px;font-weight:500}
+.user-role{font-size:12px;line-height:14px;color:var(--color-neutral-600)}
+
+.sidebar{grid-area:sidebar;background:var(--color-neutral-0);border-right:1px solid var(--color-neutral-200);
+padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);overflow-y:auto}
+.nav-group{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+color:var(--color-neutral-400);padding:var(--space-4) var(--space-3) var(--space-2)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);height:var(--control-height);
+padding:0 var(--space-3);border-radius:var(--radius-md);color:var(--color-neutral-900);
+text-decoration:none;font-size:14px;font-weight:500}
+.nav-item:hover{background:var(--color-neutral-50)}
+.nav-item .ico{width:20px;text-align:center;flex:none;color:var(--color-neutral-600)}
+.nav-item[aria-current="page"]{background:var(--color-primary-50);color:var(--color-primary-900);
+font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.nav-item[aria-current="page"] .ico{color:var(--color-primary-600)}
+.nav-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--color-neutral-600);
+background:var(--color-neutral-50);border-radius:10px;padding:2px 8px}
+.nav-item[aria-current="page"] .nav-count{background:var(--color-primary-100);color:var(--color-primary-900)}
+.sidebar-foot{margin-top:auto;padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+
+.main{grid-area:main;padding:var(--space-6);overflow-y:auto}
+.crumbs{display:flex;align-items:center;gap:var(--space-2);font-size:13px;
+color:var(--color-neutral-600);margin-bottom:var(--space-3);flex-wrap:wrap}
+.crumbs a{color:var(--color-neutral-600);text-decoration:none}
+.crumbs a:hover{color:var(--color-primary-600);text-decoration:underline}
+.crumbs span[aria-current]{color:var(--color-neutral-900);font-weight:500}
+
+.page-head{display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap}
+.page-title{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold)}
+.page-sub{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);margin-top:var(--space-1)}
+.page-actions{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+
+/* ══ Buttons ══════════════════════════════════════════════ */
+.btn{height:var(--control-height);padding:0 var(--space-4);border-radius:var(--radius-md);
+font-family:inherit;font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;
+border:1px solid transparent;display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap}
+.btn-primary{background:var(--color-primary-600);color:var(--color-neutral-0)}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+/* Danger is outlined, never filled by default: revoking a permit is irreversible */
+.btn-danger{background:var(--color-neutral-0);color:var(--color-danger-700);border-color:var(--color-danger-600)}
+.btn-danger:hover{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.btn-sm{height:32px;padding:0 var(--space-3);font-size:var(--text-xs)}
+
+/* ══ Status chip: dot + icon + text, see components/status.html ══ */
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);
+padding:var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+border-radius:var(--radius-sm);border:1px solid;background:var(--color-neutral-0);
+font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium);white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.chip .ic{font-size:var(--text-sm);line-height:1;flex:none;width:14px;text-align:center}
+.chip .uz{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-regular);opacity:.85}
+.chip-lg{font-size:var(--text-lg);line-height:var(--leading-lg);padding:var(--space-2) var(--space-4)}
+.chip-lg .dot{width:12px;height:12px}
+.chip-lg .ic{font-size:var(--text-lg);width:20px}
+.tone-neutral{color:var(--color-neutral-600);border-color:var(--color-neutral-200);background:var(--color-neutral-50)}
+.tone-info{color:var(--color-info-600);
+border-color:color-mix(in srgb,var(--color-info-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-info-600) 7%,var(--color-neutral-0))}
+.tone-success{color:var(--color-success-600);
+border-color:color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))}
+.tone-warning{color:var(--color-warning-600);
+border-color:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0))}
+.tone-danger{color:var(--color-danger-600);
+border-color:color-mix(in srgb,var(--color-danger-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+
+/* ══ Document header ══════════════════════════════════════
+   The serial number is the identity of the document, so it is set in
+   mono at 36px: it gets read aloud over the phone and copied by hand. */
+.doc-head{display:grid;grid-template-columns:1fr auto;gap:var(--space-8);align-items:start;
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-top:3px solid var(--color-primary-600);
+border-radius:var(--radius-lg);padding:var(--space-6);margin-bottom:var(--space-4)}
+.doc-kicker{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-2)}
+.doc-id{font-family:var(--font-family-mono);font-size:var(--text-3xl);line-height:var(--leading-3xl);
+font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.doc-id .ser{color:var(--color-neutral-600)}
+.doc-row{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-3)}
+.doc-issued{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.doc-issued b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+
+/* Validity: dates, a bar, and the remaining days spelled out.
+   The bar is decoration — the wording carries the meaning on its own. */
+.validity{margin-top:var(--space-6);max-width:520px}
+.val-line{display:flex;align-items:baseline;gap:var(--space-2);flex-wrap:wrap;
+font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.val-dates{font-family:var(--font-family-mono);font-size:var(--text-base);
+font-weight:var(--weight-semibold);color:var(--color-neutral-900);font-variant-numeric:tabular-nums}
+.val-left{margin-left:auto;font-weight:var(--weight-semibold);color:var(--color-primary-900)}
+.val-bar{margin-top:var(--space-2);height:8px;border-radius:4px;background:var(--color-neutral-200);
+overflow:hidden;border:1px solid var(--color-neutral-500)}
+.val-bar i{display:block;height:100%;background:var(--color-primary-600)}
+.val-scale{display:flex;justify-content:space-between;margin-top:var(--space-1);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+font-family:var(--font-family-mono)}
+
+/* ══ QR ═══════════════════════════════════════════════════
+   A drawn stand-in, not a scannable symbol: the production PDF/A carries
+   a real one. Scenario С12 — anyone verifies the permit without signing in. */
+.qr-box{width:260px;text-align:center;border-left:1px dashed var(--color-neutral-200);
+padding-left:var(--space-6)}
+.qr{width:160px;height:160px;display:block;margin:0 auto;color:var(--color-neutral-900);
+fill:currentColor;background:var(--color-neutral-0);
+border:1px solid var(--color-neutral-500);border-radius:var(--radius-sm);padding:8px}
+.qr-cap{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:var(--space-3)}
+.qr-cap b{color:var(--color-neutral-900);font-weight:var(--weight-semibold);display:block;margin-bottom:2px}
+.qr-code{font-family:var(--font-family-mono);font-size:11px;color:var(--color-neutral-600);
+margin-top:var(--space-2);word-break:break-all}
+
+/* ══ Panels ═══════════════════════════════════════════════ */
+.panel{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);margin-bottom:var(--space-4)}
+.panel-head{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--color-neutral-200)}
+.panel-head h2{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.panel-head .hint{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-left:auto;text-align:right}
+.panel-body{padding:var(--space-6)}
+
+/* ══ Requisites ═══════════════════════════════════════════ */
+.dl{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4) var(--space-6)}
+.dl>div{min-width:0}
+.dl dt{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-medium);
+color:var(--color-neutral-600);margin-bottom:var(--space-1)}
+.dl dd{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.dl dd small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular);margin-top:2px}
+.dl .wide{grid-column:span 2}
+.mono{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.id-num{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;
+letter-spacing:.04em;font-weight:var(--weight-semibold)}
+
+/* ══ Herd and calculation tables ══════════════════════════ */
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{text-align:left;font-size:var(--text-xs);line-height:var(--leading-xs);
+font-weight:var(--weight-semibold);letter-spacing:.04em;text-transform:uppercase;
+color:var(--color-neutral-600);background:var(--color-neutral-50);
+height:var(--row-height-compact);padding:0 var(--space-3);white-space:nowrap;
+border-bottom:1px solid var(--color-neutral-200)}
+tbody td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-neutral-200);
+font-size:var(--text-sm);line-height:var(--leading-sm);vertical-align:middle}
+tfoot td{padding:var(--space-3);font-size:var(--text-sm);line-height:var(--leading-sm);
+font-weight:var(--weight-semibold);background:var(--color-neutral-50)}
+.num{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.num{text-align:right}
+.tbl-wrap{border:1px solid var(--color-neutral-200);border-radius:var(--radius-md);overflow:hidden}
+.tbl-cap{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-2)}
+.tbl-wrap+.tbl-cap{margin-top:var(--space-6)}
+.formula{font-family:var(--font-family-mono);font-size:var(--text-xs);color:var(--color-neutral-600)}
+.limit-ok{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-4);
+padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0));
+border:1px solid color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0));
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+.limit-ok .ic{color:var(--color-success-600);font-weight:var(--weight-semibold)}
+.paid{display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4);
+padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+.paid-sum{font-family:var(--font-family-mono);font-size:var(--text-xl);line-height:var(--leading-xl);
+font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
+.paid-note{font-size:var(--text-sm);color:var(--color-neutral-600)}
+
+/* ══ Signatures ═══════════════════════════════════════════ */
+.sig-progress{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+.sig-pips{display:flex;gap:var(--space-1)}
+.sig-pips i{width:28px;height:8px;border-radius:4px;background:var(--color-primary-600);
+border:1px solid var(--color-primary-700)}
+.sig-pips i.empty{background:var(--color-neutral-0);border:1px dashed var(--color-neutral-500)}
+.sig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+.sig{border:1px solid var(--color-neutral-200);border-radius:var(--radius-md);padding:var(--space-4);
+background:var(--color-neutral-0)}
+/* Waiting signature: dashed frame plus its own glyph and wording, not colour alone */
+.sig.waiting{border-style:dashed;border-color:var(--color-neutral-500);background:var(--color-neutral-50)}
+.sig-top{display:flex;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-3)}
+.sig-seal{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;
+font-size:var(--text-lg);border:2px solid var(--color-success-600);color:var(--color-success-600);
+background:color-mix(in srgb,var(--color-success-600) 8%,var(--color-neutral-0))}
+.sig.waiting .sig-seal{border-style:dashed;border-color:var(--color-neutral-500);
+color:var(--color-neutral-600);background:var(--color-neutral-0)}
+.sig-role{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600)}
+.sig-name{font-size:var(--text-base);line-height:var(--leading-base);font-weight:var(--weight-semibold);
+margin-top:2px}
+.sig-line{display:flex;gap:var(--space-2);font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);margin-top:var(--space-2)}
+.sig-line b{color:var(--color-neutral-900);font-weight:var(--weight-medium);flex:none;min-width:96px}
+.sig-fp{font-family:var(--font-family-mono);font-size:11px;line-height:16px;letter-spacing:.02em;
+color:var(--color-neutral-900);word-break:break-all}
+.sig-check{display:inline-flex;align-items:center;gap:var(--space-2);margin-top:var(--space-3);
+padding:var(--space-1) var(--space-3);border-radius:var(--radius-sm);
+font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-medium);
+color:var(--color-success-600);
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0));
+border:1px solid color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0))}
+.sig-check.pending{color:var(--color-warning-600);
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0));
+border-color:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0))}
+.sig-order{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+border-radius:50%;background:var(--color-neutral-50);border:1px solid var(--color-neutral-500);
+font-size:11px;font-weight:var(--weight-semibold);color:var(--color-neutral-600);
+margin-left:auto;flex:none}
+
+/* ══ Open question callout ════════════════════════════════
+   Marked on the mock itself: the mock must not pretend a decision
+   has been taken when the customer has not taken it. */
+.qnote{display:flex;gap:var(--space-3);margin-top:var(--space-4);padding:var(--space-4);
+border-radius:var(--radius-md);border:1px solid var(--color-warning-600);
+background:color-mix(in srgb,var(--color-warning-600) 6%,var(--color-neutral-0));
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+.qnote .ic{flex:none;font-size:var(--text-lg);color:var(--color-warning-600);line-height:1.2}
+.qnote b{font-weight:var(--weight-semibold)}
+.qnote .tag{display:inline-block;font-family:var(--font-family-mono);font-size:11px;
+padding:0 var(--space-2);border-radius:var(--radius-sm);background:var(--color-warning-600);
+color:var(--color-neutral-0);font-weight:var(--weight-semibold);margin-right:var(--space-1)}
+.qnote ul{margin:var(--space-2) 0 0 var(--space-4);display:grid;gap:var(--space-1)}
+
+/* ══ Second block: how the document lands on paper ════════ */
+.state{max-width:var(--content-max);margin:0 auto;padding:var(--space-6)}
+.state-label{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);font-weight:var(--weight-semibold);letter-spacing:.04em;
+text-transform:uppercase;color:var(--color-neutral-600);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:16px;padding:var(--space-1) var(--space-3);margin-bottom:var(--space-4)}
+.state-lead{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+max-width:78ch;margin-bottom:var(--space-6)}
+
+/* A4 at 210 × 297 mm, kept in proportion: 660 × 933 px, 15 mm margins.
+   Paper carries no brand colour — the print is black on white. */
+.paper{width:660px;min-height:933px;margin:0 auto;background:var(--color-neutral-0);
+border:1px solid var(--color-neutral-500);box-shadow:var(--shadow-lg);
+padding:47px;color:#000;font-size:11px;line-height:15px}
+.paper-org{text-align:center;font-size:10px;line-height:14px;letter-spacing:.04em;text-transform:uppercase}
+.paper-org b{display:block;font-weight:var(--weight-semibold)}
+.paper-rule{height:1px;background:#000;margin:10px 0 14px}
+.paper-title{text-align:center;font-size:16px;line-height:22px;font-weight:var(--weight-semibold);
+letter-spacing:.06em}
+.paper-title small{display:block;font-size:11px;line-height:15px;font-weight:var(--weight-regular);
+letter-spacing:0;margin-top:4px}
+.paper-id{display:flex;justify-content:space-between;align-items:flex-end;margin:16px 0 12px;
+font-family:var(--font-family-mono);font-size:13px;font-weight:var(--weight-semibold)}
+.paper-id .date{font-weight:var(--weight-regular);font-size:11px}
+.paper-tbl{width:100%;border-collapse:collapse;margin-bottom:14px}
+.paper-tbl th,.paper-tbl td{border:1px solid #000;padding:3px 6px;font-size:10px;line-height:14px;
+vertical-align:top;text-align:left}
+.paper-tbl th{width:34%;font-weight:var(--weight-medium);background:#f2f2f2}
+.paper-tbl td.n{font-family:var(--font-family-mono);text-align:right;white-space:nowrap;width:22%}
+.paper-sub{font-size:10px;line-height:14px;font-weight:var(--weight-semibold);
+text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}
+.paper-sign{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.paper-sign div{border:1px solid #000;padding:6px 8px;min-height:58px}
+.paper-sign .r{font-size:9px;line-height:12px;text-transform:uppercase;letter-spacing:.04em}
+.paper-sign .n{font-size:11px;line-height:15px;font-weight:var(--weight-semibold);margin-top:2px}
+.paper-sign .f{font-family:var(--font-family-mono);font-size:9px;line-height:12px;margin-top:3px}
+.paper-sign .blank{border-style:dashed}
+.paper-foot{display:flex;align-items:flex-end;gap:16px;margin-top:18px;
+border-top:1px solid #000;padding-top:10px}
+.paper-qr{width:96px;height:96px;flex:none;color:#000;fill:currentColor}
+.paper-foot p{font-size:9px;line-height:13px}
+.paper-foot .mono{font-family:var(--font-family-mono);font-size:9px}
+.print-meta{max-width:660px;margin:var(--space-4) auto 0;font-size:var(--text-xs);
+line-height:var(--leading-xs);color:var(--color-neutral-600);text-align:center}
+</style>
+</head>
+<body>
+
+<!-- QR module matrix drawn once, reused by the screen and the paper view -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+<symbol id="qr-a004182" viewBox="0 0 25 25" shape-rendering="crispEdges">
+    <rect x="0" y="0" width="7" height="1"/>
+    <rect x="8" y="0" height="1"/>
+    <rect x="10" y="0" height="1"/>
+    <rect x="12" y="0" width="2" height="1"/>
+    <rect x="18" y="0" width="7" height="1"/>
+    <rect x="0" y="1" height="1"/>
+    <rect x="6" y="1" height="1"/>
+    <rect x="9" y="1" width="2" height="1"/>
+    <rect x="12" y="1" width="4" height="1"/>
+    <rect x="18" y="1" height="1"/>
+    <rect x="24" y="1" height="1"/>
+    <rect x="0" y="2" height="1"/>
+    <rect x="2" y="2" width="3" height="1"/>
+    <rect x="6" y="2" height="1"/>
+    <rect x="9" y="2" width="2" height="1"/>
+    <rect x="12" y="2" height="1"/>
+    <rect x="14" y="2" height="1"/>
+    <rect x="18" y="2" height="1"/>
+    <rect x="20" y="2" width="3" height="1"/>
+    <rect x="24" y="2" height="1"/>
+    <rect x="0" y="3" height="1"/>
+    <rect x="2" y="3" width="3" height="1"/>
+    <rect x="6" y="3" height="1"/>
+    <rect x="8" y="3" height="1"/>
+    <rect x="10" y="3" height="1"/>
+    <rect x="13" y="3" height="1"/>
+    <rect x="15" y="3" width="2" height="1"/>
+    <rect x="18" y="3" height="1"/>
+    <rect x="20" y="3" width="3" height="1"/>
+    <rect x="24" y="3" height="1"/>
+    <rect x="0" y="4" height="1"/>
+    <rect x="2" y="4" width="3" height="1"/>
+    <rect x="6" y="4" height="1"/>
+    <rect x="8" y="4" height="1"/>
+    <rect x="11" y="4" height="1"/>
+    <rect x="13" y="4" height="1"/>
+    <rect x="15" y="4" width="2" height="1"/>
+    <rect x="18" y="4" height="1"/>
+    <rect x="20" y="4" width="3" height="1"/>
+    <rect x="24" y="4" height="1"/>
+    <rect x="0" y="5" height="1"/>
+    <rect x="6" y="5" height="1"/>
+    <rect x="9" y="5" width="3" height="1"/>
+    <rect x="13" y="5" width="2" height="1"/>
+    <rect x="18" y="5" height="1"/>
+    <rect x="24" y="5" height="1"/>
+    <rect x="0" y="6" width="7" height="1"/>
+    <rect x="8" y="6" height="1"/>
+    <rect x="10" y="6" height="1"/>
+    <rect x="12" y="6" height="1"/>
+    <rect x="14" y="6" height="1"/>
+    <rect x="16" y="6" height="1"/>
+    <rect x="18" y="6" width="7" height="1"/>
+    <rect x="9" y="7" height="1"/>
+    <rect x="11" y="7" height="1"/>
+    <rect x="13" y="7" width="2" height="1"/>
+    <rect x="0" y="8" height="1"/>
+    <rect x="2" y="8" width="2" height="1"/>
+    <rect x="5" y="8" width="2" height="1"/>
+    <rect x="8" y="8" height="1"/>
+    <rect x="10" y="8" width="2" height="1"/>
+    <rect x="13" y="8" height="1"/>
+    <rect x="16" y="8" height="1"/>
+    <rect x="18" y="8" width="2" height="1"/>
+    <rect x="22" y="8" height="1"/>
+    <rect x="24" y="8" height="1"/>
+    <rect x="4" y="9" height="1"/>
+    <rect x="9" y="9" height="1"/>
+    <rect x="12" y="9" height="1"/>
+    <rect x="15" y="9" width="3" height="1"/>
+    <rect x="21" y="9" height="1"/>
+    <rect x="23" y="9" width="2" height="1"/>
+    <rect x="4" y="10" height="1"/>
+    <rect x="6" y="10" width="2" height="1"/>
+    <rect x="11" y="10" height="1"/>
+    <rect x="14" y="10" width="2" height="1"/>
+    <rect x="17" y="10" height="1"/>
+    <rect x="19" y="10" width="3" height="1"/>
+    <rect x="24" y="10" height="1"/>
+    <rect x="0" y="11" height="1"/>
+    <rect x="2" y="11" width="3" height="1"/>
+    <rect x="11" y="11" width="3" height="1"/>
+    <rect x="15" y="11" width="2" height="1"/>
+    <rect x="20" y="11" height="1"/>
+    <rect x="22" y="11" height="1"/>
+    <rect x="24" y="11" height="1"/>
+    <rect x="0" y="12" height="1"/>
+    <rect x="6" y="12" width="2" height="1"/>
+    <rect x="9" y="12" width="2" height="1"/>
+    <rect x="12" y="12" height="1"/>
+    <rect x="15" y="12" height="1"/>
+    <rect x="18" y="12" height="1"/>
+    <rect x="21" y="12" height="1"/>
+    <rect x="24" y="12" height="1"/>
+    <rect x="2" y="13" height="1"/>
+    <rect x="8" y="13" width="3" height="1"/>
+    <rect x="13" y="13" height="1"/>
+    <rect x="16" y="13" width="4" height="1"/>
+    <rect x="22" y="13" height="1"/>
+    <rect x="24" y="13" height="1"/>
+    <rect x="1" y="14" width="4" height="1"/>
+    <rect x="6" y="14" width="2" height="1"/>
+    <rect x="11" y="14" height="1"/>
+    <rect x="15" y="14" height="1"/>
+    <rect x="17" y="14" width="3" height="1"/>
+    <rect x="21" y="14" height="1"/>
+    <rect x="23" y="14" width="2" height="1"/>
+    <rect x="0" y="15" height="1"/>
+    <rect x="3" y="15" height="1"/>
+    <rect x="5" y="15" height="1"/>
+    <rect x="7" y="15" width="4" height="1"/>
+    <rect x="12" y="15" height="1"/>
+    <rect x="16" y="15" width="2" height="1"/>
+    <rect x="20" y="15" height="1"/>
+    <rect x="1" y="16" height="1"/>
+    <rect x="4" y="16" width="3" height="1"/>
+    <rect x="11" y="16" width="2" height="1"/>
+    <rect x="16" y="16" width="5" height="1"/>
+    <rect x="8" y="17" height="1"/>
+    <rect x="11" y="17" width="3" height="1"/>
+    <rect x="16" y="17" height="1"/>
+    <rect x="20" y="17" width="2" height="1"/>
+    <rect x="24" y="17" height="1"/>
+    <rect x="0" y="18" width="7" height="1"/>
+    <rect x="9" y="18" height="1"/>
+    <rect x="13" y="18" height="1"/>
+    <rect x="16" y="18" height="1"/>
+    <rect x="18" y="18" height="1"/>
+    <rect x="20" y="18" height="1"/>
+    <rect x="0" y="19" height="1"/>
+    <rect x="6" y="19" height="1"/>
+    <rect x="14" y="19" width="3" height="1"/>
+    <rect x="20" y="19" width="2" height="1"/>
+    <rect x="23" y="19" width="2" height="1"/>
+    <rect x="0" y="20" height="1"/>
+    <rect x="2" y="20" width="3" height="1"/>
+    <rect x="6" y="20" height="1"/>
+    <rect x="8" y="20" height="1"/>
+    <rect x="10" y="20" height="1"/>
+    <rect x="13" y="20" width="2" height="1"/>
+    <rect x="16" y="20" width="5" height="1"/>
+    <rect x="23" y="20" height="1"/>
+    <rect x="0" y="21" height="1"/>
+    <rect x="2" y="21" width="3" height="1"/>
+    <rect x="6" y="21" height="1"/>
+    <rect x="13" y="21" height="1"/>
+    <rect x="16" y="21" height="1"/>
+    <rect x="19" y="21" height="1"/>
+    <rect x="24" y="21" height="1"/>
+    <rect x="0" y="22" height="1"/>
+    <rect x="2" y="22" width="3" height="1"/>
+    <rect x="6" y="22" height="1"/>
+    <rect x="8" y="22" width="2" height="1"/>
+    <rect x="13" y="22" height="1"/>
+    <rect x="15" y="22" width="2" height="1"/>
+    <rect x="18" y="22" width="3" height="1"/>
+    <rect x="23" y="22" width="2" height="1"/>
+    <rect x="0" y="23" height="1"/>
+    <rect x="6" y="23" height="1"/>
+    <rect x="8" y="23" height="1"/>
+    <rect x="11" y="23" width="2" height="1"/>
+    <rect x="19" y="23" height="1"/>
+    <rect x="21" y="23" height="1"/>
+    <rect x="23" y="23" height="1"/>
+    <rect x="0" y="24" width="7" height="1"/>
+    <rect x="10" y="24" width="3" height="1"/>
+    <rect x="17" y="24" height="1"/>
+    <rect x="21" y="24" height="1"/>
+</symbol>
+</svg>
+
+<div class="note">
+    <p><strong>Разрешение — готовый документ.</strong> Итог всей системы: то, ради чего заявитель
+    проходил мастер подачи, а лесхоз — рассмотрение. Документ имеет юридическую силу, хранится
+    как <span class="code">immutable snapshot</span> и выгружается в <span class="code">PDF/A</span>.
+    Собран в каркасе <span class="code">layouts/cabinet.html</span>, статус взят из
+    <span class="code">components/status.html</span>.</p>
+    <p><strong>Идентификаторы набираются моноширинным.</strong> Серия и номер, ЖШШИР (14 цифр),
+    СТИР (9 цифр), отпечатки сертификатов — всё это диктуют по телефону и сверяют посимвольно,
+    поэтому цифры выровнены по разрядам.</p>
+    <p>Ниже каркаса — второй блок: как этот же документ ложится на бумагу формата A4.</p>
+</div>
+
+<div class="shell">
+
+    <div class="brand">
+        <div class="brand-mark">Р</div>
+        <div>
+            <div class="brand-name">RUXSATNOMA</div>
+            <div class="brand-sub">Агентство по лесам</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="search">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Поиск по номеру, ЖШШИР, СТИР" aria-label="Поиск">
+        </div>
+
+        <div class="header-right">
+            <div class="lang" role="group" aria-label="Язык интерфейса">
+                <button aria-pressed="true">Ўз</button>
+                <button aria-pressed="false">Uz</button>
+                <button aria-pressed="false">Ру</button>
+            </div>
+
+            <button class="icon-btn" aria-label="Уведомления, 2 непрочитанных">
+                <span aria-hidden="true">🔔</span>
+                <span class="badge-dot">2</span>
+            </button>
+
+            <button class="user">
+                <span class="avatar">ДА</span>
+                <span>
+                    <span class="user-name">Дилноза Абдуллаева</span><br>
+                    <span class="user-role">Сотрудник · Тошкент ДЎХ</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="sidebar" aria-label="Основное меню">
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▤</span>Обзор</a>
+
+        <div class="nav-group">Процесс</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">✉</span>Заявки<span class="nav-count">24</span></a>
+        <a class="nav-item" href="#" aria-current="page">
+            <span class="ico" aria-hidden="true">◆</span>Разрешения<span class="nav-count">86</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◉</span>Карта</a>
+
+        <div class="nav-group">Контроль</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◈</span>Задания на выезд<span class="nav-count">4</span></a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">₴</span>Платежи</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▥</span>Отчёты</a>
+
+        <div class="nav-group">Справочники</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">☰</span>Классификаторы</a>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" href="#"><span class="ico" aria-hidden="true">?</span>Помощь</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <nav class="crumbs" aria-label="Хлебные крошки">
+            <a href="#">Главная</a><span aria-hidden="true">/</span>
+            <a href="#">Процесс</a><span aria-hidden="true">/</span>
+            <a href="#">Разрешения</a><span aria-hidden="true">/</span>
+            <span aria-current="page">А № 004182</span>
+        </nav>
+
+        <div class="page-head">
+            <div>
+                <h1 class="page-title">Разрешение на выпас скота</h1>
+                <div class="page-sub">По заявке А-00021 от 09.07.2026 · Тошкент вилояти давлат ўрмон хўжалиги ·
+                    шаблон документа <span class="mono">PERMIT-GRAZ-2026.1</span></div>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-primary"><span aria-hidden="true">⤓</span>Скачать PDF/A</button>
+                <button class="btn btn-secondary"><span aria-hidden="true">⎙</span>Печать</button>
+                <button class="btn btn-secondary"><span aria-hidden="true">⊕</span>Продлить</button>
+                <button class="btn btn-danger"><span aria-hidden="true">✕</span>Отозвать</button>
+            </div>
+        </div>
+
+        <!-- ── Document header: identity, status, validity, QR ── -->
+        <div class="doc-head">
+            <div>
+                <div class="doc-kicker">Серия и номер разрешения</div>
+                <div class="doc-id"><span class="ser">А №</span> 004182</div>
+
+                <div class="doc-row">
+                    <span class="chip chip-lg tone-success">
+                        <span class="dot" aria-hidden="true"></span>
+                        <span class="ic" aria-hidden="true">◈</span>Действует
+                        <span class="uz" lang="uz-Cyrl">(Амалда)</span>
+                    </span>
+                    <span class="doc-issued">Выдано <b>25.07.2026</b>, вступило в силу <b>01.08.2026</b></span>
+                </div>
+
+                <div class="validity">
+                    <div class="val-line">
+                        <span>Срок действия</span>
+                        <span class="val-dates">01.08.2026 — 31.10.2026</span>
+                        <span class="val-left">осталось 82 дня из 92</span>
+                    </div>
+                    <div class="val-bar" role="img" aria-label="Использовано 10 дней из 92, осталось 82">
+                        <i style="width:11%"></i>
+                    </div>
+                    <div class="val-scale">
+                        <span>01.08</span><span>сегодня 10.08.2026</span><span>31.10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qr-box">
+                <svg class="qr" viewBox="0 0 25 25" role="img"
+                     aria-label="QR-код разрешения серии А номер 004182 для публичной проверки подлинности">
+                    <use href="#qr-a004182"></use>
+                </svg>
+                <p class="qr-cap">
+                    <b>Проверка без авторизации</b>
+                    По этому коду любой человек — покупатель, инспектор, участковый — открывает
+                    публичную страницу и видит статус документа и подлинность подписи.
+                    Сценарий <b>С12</b>, ответ не дольше 3 секунд.
+                </p>
+                <p class="qr-code">ruxsatnoma · verify · A-004182 · 7d3f9c21</p>
+            </div>
+        </div>
+
+        <!-- ── Requisites ────────────────────────────────────── -->
+        <section class="panel" aria-labelledby="h-req">
+            <div class="panel-head">
+                <h2 id="h-req">Реквизиты</h2>
+                <span class="hint">Приложение 1 к ТЗ, пункты 1–17<br>площадь и ID контура — автоматически из GIS</span>
+            </div>
+            <div class="panel-body">
+                <dl class="dl">
+                    <div class="wide">
+                        <dt>Заявитель — юридическое лицо</dt>
+                        <dd>«Чорвадор-Сардор» фермер хўжалиги
+                            <small>СТИР <span class="id-num">305718842</span> · Тошкент вилояти, Зангиота тумани,
+                                Назарбек МФЙ, Богишамол кўчаси, 14</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Руководитель и подписант</dt>
+                        <dd>Юлдашев Рустам Норматович
+                            <small>ЖШШИР <span class="id-num">31708860250017</span></small>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Уполномоченный орган</dt>
+                        <dd>Тошкент вилояти давлат ўрмон хўжалиги
+                            <small>Агентство по лесам, код организации <span class="mono">ORG-14-021</span></small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Лесничество, обход, квартал</dt>
+                        <dd>Зангиота ўрмончилиги
+                            <small>обход (айланма) № 3 · квартал (бўлак) 14</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Вид деятельности</dt>
+                        <dd>Выпас скота
+                            <small lang="uz-Cyrl">Чорва молларини боқиш</small>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Контур и субконтур</dt>
+                        <dd class="mono">KT-14-03-217 / 217-2
+                            <small>версия контура 4, опубликована 02.04.2026</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Выделенная площадь</dt>
+                        <dd><span class="mono">42,6 га</span>
+                            <small>вычислена по геометрии, не введена вручную</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Период пользования</dt>
+                        <dd class="mono">01.08.2026 — 31.10.2026
+                            <small>92 дня, сезон по календарю ВМҚ 689-сон</small>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Всего голов скота</dt>
+                        <dd class="mono">198 голов
+                            <small>состав по четырём группам — в расчёте ниже</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Нагрузка</dt>
+                        <dd class="mono">49,1 СБ
+                            <small>условных голов (шартли бош) при остатке 55,4</small>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Состояние платежа</dt>
+                        <dd>Оплачено полностью
+                            <small>26.07.2026, 100 % предоплата по ВМҚ 278-сон</small>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- ── Calculation ───────────────────────────────────── -->
+        <section class="panel" aria-labelledby="h-calc">
+            <div class="panel-head">
+                <h2 id="h-calc">Расчёт нормы и платежа</h2>
+                <span class="hint">Версия правил <span class="mono">NORM-2026.2</span> ·
+                    тариф <span class="mono">TARIFF-278-2026.1</span><br>
+                    при изменении нормы этот документ не пересчитывается</span>
+            </div>
+            <div class="panel-body">
+
+                <div class="tbl-cap">Норма участка</div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Показатель</th>
+                                <th scope="col" class="num">Значение</th>
+                                <th scope="col">Откуда взято</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Урожайность пастбища</td>
+                                <td class="num">13,8 ц/га</td>
+                                <td>Геоботаническое обследование № 47-ГБ от 12.03.2026</td>
+                            </tr>
+                            <tr>
+                                <td>Площадь контура</td>
+                                <td class="num">42,6 га</td>
+                                <td>Геометрия контура KT-14-03-217, версия 4</td>
+                            </tr>
+                            <tr>
+                                <td>Доля сезона</td>
+                                <td class="num">0,72</td>
+                                <td>Календарь сезона и ротации, ВМҚ 689-сон</td>
+                            </tr>
+                            <tr>
+                                <td>Запас корма</td>
+                                <td class="num">423,27 ц</td>
+                                <td class="formula">Oz = 13,8 × 42,6 × 0,72</td>
+                            </tr>
+                            <tr>
+                                <td>Эффективный запас</td>
+                                <td class="num">359,78 ц</td>
+                                <td class="formula">Oz_eff = Oz × 0,85 — минус 15 % страхового фонда</td>
+                            </tr>
+                            <tr>
+                                <td>Максимум условных голов</td>
+                                <td class="num">96,0 СБ</td>
+                                <td class="formula">MaxSB = floor(359,78 / 3,74)</td>
+                            </tr>
+                            <tr>
+                                <td>Занято действующими разрешениями</td>
+                                <td class="num">40,6 СБ</td>
+                                <td>7 разрешений с пересекающимся периодом</td>
+                            </tr>
+                            <tr>
+                                <td>Остаточный лимит на момент выдачи</td>
+                                <td class="num">55,4 СБ</td>
+                                <td class="formula">RemainingSB = 96,0 − 40,6</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tbl-cap">Поголовье, нагрузка и сумма</div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Группа скота</th>
+                                <th scope="col" class="num">Голов</th>
+                                <th scope="col" class="num">Коэф. СБ</th>
+                                <th scope="col" class="num">Нагрузка, СБ</th>
+                                <th scope="col" class="num">Коэф. тарифа</th>
+                                <th scope="col" class="num">Сумма, сум</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>КРС, лошади, верблюды, ослы — взрослые</td>
+                                <td class="num">22</td><td class="num">1,00</td><td class="num">22,0</td>
+                                <td class="num">0,45</td><td class="num">4 078 800</td>
+                            </tr>
+                            <tr>
+                                <td>Те же виды, молодняк до 2 лет</td>
+                                <td class="num">11</td><td class="num">0,50</td><td class="num">5,5</td>
+                                <td class="num">0,25</td><td class="num">1 133 000</td>
+                            </tr>
+                            <tr>
+                                <td>Овцы и козы старше 6 месяцев</td>
+                                <td class="num">120</td><td class="num">0,15</td><td class="num">18,0</td>
+                                <td class="num">0,06</td><td class="num">2 966 400</td>
+                            </tr>
+                            <tr>
+                                <td>Ягнята и козлята до 6 месяцев</td>
+                                <td class="num">45</td><td class="num">0,08</td><td class="num">3,6</td>
+                                <td class="num">0,03</td><td class="num">556 200</td>
+                            </tr>
+                            <tr>
+                                <td>Сбор за рассмотрение заявки, юридическое лицо</td>
+                                <td class="num">—</td><td class="num">—</td><td class="num">—</td>
+                                <td class="num">0,50</td><td class="num">206 000</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Итого · БҲМ 412 000 сум с 01.01.2026</td>
+                                <td class="num">198</td><td class="num">—</td><td class="num">49,1</td>
+                                <td class="num">—</td><td class="num">8 940 400</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <p class="limit-ok">
+                    <span class="ic" aria-hidden="true">✓</span>
+                    <span>Условие нормы выполнено: нагрузка <b>49,1 СБ</b> не превысила
+                    остаточный лимит <b>55,4 СБ</b>. Проверка выполнена при подаче заявки
+                    и повторно перед выдачей документа.</span>
+                </p>
+
+                <div class="paid">
+                    <span class="paid-sum">8 940 400 сум</span>
+                    <span class="paid-note">оплачено 26.07.2026 через Payme,
+                        чек <span class="mono">PY-2026-0728841</span>,
+                        распределение 50 / 50 зафиксировано в реестре</span>
+                </div>
+
+                <div class="qnote">
+                    <span class="ic" aria-hidden="true">▲</span>
+                    <div>
+                        <span class="tag">Н1, Н2</span>
+                        <b>Числовые коэффициенты условные.</b> Значения приведения к условным головам
+                        (приложение 5 к ВМҚ 689-сон) и тарифные коэффициенты (ВМҚ 278-сон) в ТЗ
+                        не приведены. На макете стоят правдоподобные значения, чтобы показать
+                        разрядность сумм и вид таблицы. Утверждённые цифры нужны к приёмке,
+                        расчётный модуль от них не зависит — это данные, а не код.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Digital signatures: up to four on one document ── -->
+        <section class="panel" aria-labelledby="h-sig">
+            <div class="panel-head">
+                <h2 id="h-sig">Электронные подписи</h2>
+                <div class="sig-progress">
+                    <span class="sig-pips" role="img" aria-label="Подписано 3 из 4">
+                        <i></i><i></i><i></i><i class="empty"></i>
+                    </span>
+                    <b>Подписано 3 из 4</b>
+                </div>
+                <span class="hint">E-IMZO, алгоритм O‘z DSt 1092:2009<br>метки времени из единого источника NTP</span>
+            </div>
+            <div class="panel-body">
+                <div class="sig-grid">
+
+                    <div class="sig">
+                        <div class="sig-top">
+                            <span class="sig-seal" aria-hidden="true">✓</span>
+                            <div>
+                                <div class="sig-role">Руководитель хозяйства</div>
+                                <div class="sig-name">Тошматов Шухрат Абдуллаевич</div>
+                            </div>
+                            <span class="sig-order" aria-hidden="true">1</span>
+                        </div>
+                        <div class="sig-line"><b>Подписано</b><span class="mono">24.07.2026, 14:32:07 (UTC+5)</span></div>
+                        <div class="sig-line"><b>Отпечаток</b>
+                            <span class="sig-fp">9F:2C:41:AB:7D:05:E8:63:1C:44:B9:0A:6E:D2:37:88</span></div>
+                        <div class="sig-line"><b>Сертификат</b><span>действует до 11.02.2027</span></div>
+                        <span class="sig-check"><span aria-hidden="true">✓</span>Подпись проверена 25.07.2026, 09:48</span>
+                    </div>
+
+                    <div class="sig">
+                        <div class="sig-top">
+                            <span class="sig-seal" aria-hidden="true">✓</span>
+                            <div>
+                                <div class="sig-role">Главный лесничий</div>
+                                <div class="sig-name">Эргашев Бахтиёр Рахимович</div>
+                            </div>
+                            <span class="sig-order" aria-hidden="true">2</span>
+                        </div>
+                        <div class="sig-line"><b>Подписано</b><span class="mono">24.07.2026, 15:08:44 (UTC+5)</span></div>
+                        <div class="sig-line"><b>Отпечаток</b>
+                            <span class="sig-fp">4A:11:C7:90:3E:BD:22:F6:57:8D:10:E4:9B:03:AF:75</span></div>
+                        <div class="sig-line"><b>Сертификат</b><span>действует до 30.09.2026</span></div>
+                        <span class="sig-check"><span aria-hidden="true">✓</span>Подпись проверена 25.07.2026, 09:48</span>
+                    </div>
+
+                    <div class="sig">
+                        <div class="sig-top">
+                            <span class="sig-seal" aria-hidden="true">✓</span>
+                            <div>
+                                <div class="sig-role">Главный бухгалтер</div>
+                                <div class="sig-name">Собирова Нодира Азизовна</div>
+                            </div>
+                            <span class="sig-order" aria-hidden="true">3</span>
+                        </div>
+                        <div class="sig-line"><b>Подписано</b><span class="mono">25.07.2026, 09:47:19 (UTC+5)</span></div>
+                        <div class="sig-line"><b>Отпечаток</b>
+                            <span class="sig-fp">E3:57:0D:9A:41:6C:B8:12:2F:76:CD:35:80:EE:14:29</span></div>
+                        <div class="sig-line"><b>Сертификат</b><span>действует до 06.06.2027</span></div>
+                        <span class="sig-check"><span aria-hidden="true">✓</span>Подпись проверена 25.07.2026, 09:48</span>
+                    </div>
+
+                    <!-- Fourth signature is missing: dashed frame, hourglass, wording -->
+                    <div class="sig waiting">
+                        <div class="sig-top">
+                            <span class="sig-seal" aria-hidden="true">⧗</span>
+                            <div>
+                                <div class="sig-role">Пользователь</div>
+                                <div class="sig-name">Юлдашев Рустам Норматович</div>
+                            </div>
+                            <span class="sig-order" aria-hidden="true">4</span>
+                        </div>
+                        <div class="sig-line"><b>Подписано</b><span>нет, подпись не поставлена</span></div>
+                        <div class="sig-line"><b>Отпечаток</b>
+                            <span class="sig-fp">— · сертификат привязан к кабинету 03.06.2026</span></div>
+                        <div class="sig-line"><b>Приглашение</b><span>отправлено 25.07.2026, повтор 03.08.2026</span></div>
+                        <span class="sig-check pending"><span aria-hidden="true">⧗</span>Ожидает подписи пользователя</span>
+                    </div>
+
+                </div>
+
+                <div class="qnote">
+                    <span class="ic" aria-hidden="true">▲</span>
+                    <div>
+                        <span class="tag">П7</span>
+                        <b>Порядок и обязательность подписей у Заказчика уточняются.</b>
+                        Форма разрешения (приложение 1) предусматривает четыре ЭЦП, но ТЗ не оговаривает главного.
+                        Нумерация 1–4 на карточках и состояние «подписано 3 из 4» — это допущение макета,
+                        а не принятое решение. Открыты вопросы:
+                        <ul>
+                            <li>обязательны ли все три подписи должностных лиц или достаточно одной;</li>
+                            <li>ставятся ли они последовательно или в произвольном порядке;</li>
+                            <li>что делать при отсутствии должностного лица — отпуск, болезнь, вакансия;</li>
+                            <li>подписывает ли пользователь до должностных лиц или после;</li>
+                            <li>действует ли разрешение до получения всех четырёх подписей.</li>
+                        </ul>
+                        От последнего пункта зависит вид этого экрана: либо статус «Действует»
+                        выставляется после третьей подписи, как сейчас на макете, либо документ
+                        до четвёртой подписи остаётся в промежуточном состоянии — и тогда нужна
+                        шестая метка статуса, которой в наборе пока нет.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ══ Second block: the same document on paper ══ -->
+<div class="state">
+    <span class="state-label"><span aria-hidden="true">⎙</span>Вид документа для печати · A4</span>
+    <p class="state-lead">Экран и бумага — разные носители одного документа. На печать уходит
+        то же содержимое, но без интерфейсных элементов, в один столбец, чёрным по белому и на
+        государственном языке с русским подзаголовком. Поля 15 мм, шрифт от 9 пунктов,
+        QR в правом нижнем углу — там его ищут привычно. Экспорт в PDF/A-2b, шрифты внедряются
+        в файл, потому что документ хранится 10 лет и должен открываться без внешних зависимостей.</p>
+
+    <div class="paper">
+        <div class="paper-org">
+            <b>Ўзбекистон Республикаси Ўрмон хўжалиги агентлиги</b>
+            Тошкент вилояти давлат ўрмон хўжалиги · Зангиота ўрмончилиги
+        </div>
+        <div class="paper-rule"></div>
+
+        <div class="paper-title">
+            РУХСАТНОМА
+            <small>Ўрмон фонди яйлов ҳудудларида чорва молларини боқиш учун</small>
+            <small>Разрешение на выпас скота на пастбищных территориях лесного фонда</small>
+        </div>
+
+        <div class="paper-id">
+            <span>Серия А № 004182</span>
+            <span class="date">Берилган санаси / Дата выдачи: 25.07.2026</span>
+        </div>
+
+        <table class="paper-tbl">
+            <tbody>
+                <tr><th>1. Уполномоченный орган</th><td colspan="2">Тошкент вилояти давлат ўрмон хўжалиги</td></tr>
+                <tr><th>2. Лесничество, обход, квартал</th><td colspan="2">Зангиота ўрмончилиги · обход № 3 · квартал 14</td></tr>
+                <tr><th>3. Контур / субконтур</th><td colspan="2">KT-14-03-217 / 217-2</td></tr>
+                <tr><th>4. Выделенная площадь</th><td class="n">42,6 га</td><td>по геометрии GIS</td></tr>
+                <tr><th>5. Пользователь</th><td colspan="2">«Чорвадор-Сардор» фермер хўжалиги, СТИР 305718842<br>
+                    руководитель Юлдашев Рустам Норматович, ЖШШИР 31708860250017</td></tr>
+                <tr><th>6. Адрес пользователя</th><td colspan="2">Тошкент вилояти, Зангиота тумани, Назарбек МФЙ, Богишамол кўчаси, 14</td></tr>
+                <tr><th>7. Скот, взрослые: КРС, лошади, верблюды, ослы</th><td class="n">22</td><td>голов</td></tr>
+                <tr><th>8. Молодняк до 2 лет: КРС, лошади, верблюды, ослы</th><td class="n">11</td><td>голов</td></tr>
+                <tr><th>9. Овцы и козы старше 6 месяцев</th><td class="n">120</td><td>голов</td></tr>
+                <tr><th>10. Ягнята и козлята до 6 месяцев</th><td class="n">45</td><td>голов</td></tr>
+                <tr><th>11. Нагрузка в условных головах (СБ)</th><td class="n">49,1</td><td>при лимите 55,4</td></tr>
+                <tr><th>12. Срок пользования</th><td colspan="2">с 01.08.2026 по 31.10.2026</td></tr>
+                <tr><th>13. Общая сумма разрешения</th><td class="n">8 940 400</td><td>сум</td></tr>
+                <tr><th>14. Состояние и дата платежа</th><td colspan="2">Оплачено полностью, 26.07.2026</td></tr>
+                <tr><th>15. Статус документа</th><td colspan="2">Действует / Амалда</td></tr>
+            </tbody>
+        </table>
+
+        <div class="paper-sub">Электрон рақамли имзолар / Электронные подписи</div>
+        <div class="paper-sign">
+            <div>
+                <div class="r">Руководитель хозяйства</div>
+                <div class="n">Тошматов Ш. А.</div>
+                <div class="f">24.07.2026 14:32 · 9F:2C:41:AB:7D:05:E8:63</div>
+            </div>
+            <div>
+                <div class="r">Главный лесничий</div>
+                <div class="n">Эргашев Б. Р.</div>
+                <div class="f">24.07.2026 15:08 · 4A:11:C7:90:3E:BD:22:F6</div>
+            </div>
+            <div>
+                <div class="r">Главный бухгалтер</div>
+                <div class="n">Собирова Н. А.</div>
+                <div class="f">25.07.2026 09:47 · E3:57:0D:9A:41:6C:B8:12</div>
+            </div>
+            <div class="blank">
+                <div class="r">Пользователь</div>
+                <div class="n">Юлдашев Р. Н.</div>
+                <div class="f">подпись не поставлена — поле остаётся пустым</div>
+            </div>
+        </div>
+
+        <div class="paper-foot">
+            <svg class="paper-qr" viewBox="0 0 25 25" role="img"
+                 aria-label="QR-код для проверки подлинности разрешения А № 004182">
+                <use href="#qr-a004182"></use>
+            </svg>
+            <p>
+                Ҳужжатнинг ҳақиқийлиги QR-код орқали текширилади.<br>
+                Подлинность документа проверяется по QR-коду на публичной странице системы
+                либо по серии и номеру, без авторизации.<br>
+                <span class="mono">ruxsatnoma · verify · A-004182 · 7d3f9c21</span><br>
+                Документ сформирован автоматически, действителен без печати и рукописной подписи.
+                Шаблон PERMIT-GRAZ-2026.1, версия правил NORM-2026.2.
+            </p>
+        </div>
+    </div>
+
+    <p class="print-meta">Лист A4 210 × 297 мм в пропорции · поля 15 мм · экспорт PDF/A-2b со встроенными шрифтами</p>
+</div>
+
+</body>
+</html>

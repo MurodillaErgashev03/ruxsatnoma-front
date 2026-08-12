@@ -1,0 +1,831 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Рабочий стол сотрудника лесхоза</title>
+<style>
+:root{
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;
+--text-base:16px;--leading-base:24px;--text-lg:18px;--leading-lg:28px;
+--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--header-height:64px;--sidebar-width:260px;
+--control-height:40px;--control-height-touch:48px;
+--row-height:48px;--row-height-compact:36px;--touch-target:44px;--content-max:1440px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50)}
+
+/* Every interactive element must show focus: WCAG 2.4.7 */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:none;
+box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+.note{max-width:var(--content-max);margin:0 auto var(--space-6);padding:var(--space-4) var(--space-6);
+background:var(--color-primary-50);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-md);font-size:var(--text-sm);line-height:var(--leading-sm);
+color:var(--color-primary-900)}
+.note strong{font-weight:var(--weight-semibold)}
+.note p+p{margin-top:var(--space-2)}
+.note .code{font-family:var(--font-family-mono);font-size:var(--text-xs)}
+
+/* ══ Shell: identical to layouts/cabinet.html ═════════════ */
+.shell{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:var(--header-height) 1fr;
+grid-template-areas:"brand header" "sidebar main";min-height:100vh}
+
+.brand{grid-area:brand;background:var(--color-primary-700);color:#fff;display:flex;align-items:center;
+gap:var(--space-3);padding:0 var(--space-4)}
+.brand-mark{width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-primary-300);
+display:grid;place-items:center;font-weight:600;color:var(--color-primary-900);flex:none}
+.brand-name{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-size:12px;line-height:14px;opacity:.75;font-weight:400}
+
+.header{grid-area:header;background:var(--color-neutral-0);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6)}
+.search{flex:1;max-width:420px;position:relative}
+.search input{width:100%;height:var(--control-height);padding:0 var(--space-3) 0 36px;font-size:16px;
+font-family:inherit;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+background:var(--color-neutral-50);color:var(--color-neutral-900)}
+.search input::placeholder{color:var(--color-neutral-400)}
+.search .ico{position:absolute;left:10px;top:11px;color:var(--color-neutral-400)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-2)}
+
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:none;background:none;
+cursor:pointer;border-radius:var(--radius-md);color:var(--color-neutral-600);position:relative}
+.icon-btn:hover{background:var(--color-neutral-50)}
+.badge-dot{position:absolute;top:9px;right:9px;min-width:16px;height:16px;padding:0 4px;
+background:var(--color-danger-600);color:#fff;border-radius:8px;font-size:11px;line-height:16px;font-weight:600}
+
+.lang{display:flex;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);overflow:hidden}
+.lang button{border:none;background:var(--color-neutral-0);color:var(--color-neutral-600);
+padding:0 10px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.lang button[aria-pressed="true"]{background:var(--color-primary-600);color:#fff}
+
+.user{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);
+border-radius:var(--radius-md);cursor:pointer;border:none;background:none;font-family:inherit;text-align:left}
+.user:hover{background:var(--color-neutral-50)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--color-primary-100);
+color:var(--color-primary-900);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.user-name{font-size:13px;line-height:16px;font-weight:500}
+.user-role{font-size:12px;line-height:14px;color:var(--color-neutral-600)}
+
+.sidebar{grid-area:sidebar;background:var(--color-neutral-0);border-right:1px solid var(--color-neutral-200);
+padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);overflow-y:auto}
+.nav-group{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+color:var(--color-neutral-400);padding:var(--space-4) var(--space-3) var(--space-2)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);height:var(--control-height);
+padding:0 var(--space-3);border-radius:var(--radius-md);color:var(--color-neutral-900);
+text-decoration:none;font-size:14px;font-weight:500}
+.nav-item:hover{background:var(--color-neutral-50)}
+.nav-item .ico{width:20px;text-align:center;flex:none;color:var(--color-neutral-600)}
+.nav-item[aria-current="page"]{background:var(--color-primary-50);color:var(--color-primary-900);
+font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.nav-item[aria-current="page"] .ico{color:var(--color-primary-600)}
+.nav-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--color-neutral-600);
+background:var(--color-neutral-50);border-radius:10px;padding:2px 8px}
+.nav-item[aria-current="page"] .nav-count{background:var(--color-primary-100);color:var(--color-primary-900)}
+/* An overdue counter is red plus bold plus its own aria-label — not colour alone */
+.nav-count.is-late{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.sidebar-foot{margin-top:auto;padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+
+.main{grid-area:main;padding:var(--space-6);overflow-y:auto}
+.crumbs{display:flex;align-items:center;gap:var(--space-2);font-size:13px;
+color:var(--color-neutral-600);margin-bottom:var(--space-3);flex-wrap:wrap}
+.crumbs a{color:var(--color-neutral-600);text-decoration:none}
+.crumbs a:hover{color:var(--color-primary-600);text-decoration:underline}
+.crumbs span[aria-current]{color:var(--color-neutral-900);font-weight:500}
+
+.page-head{display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap}
+.page-title{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold)}
+.page-sub{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);margin-top:var(--space-1)}
+.page-actions{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+
+/* ══ Buttons ══════════════════════════════════════════════ */
+.btn{height:var(--control-height);padding:0 var(--space-4);border-radius:var(--radius-md);
+font-family:inherit;font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;
+border:1px solid transparent;display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap}
+.btn-primary{background:var(--color-primary-600);color:var(--color-neutral-0)}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+.btn-danger{background:var(--color-neutral-0);color:var(--color-danger-600);border-color:var(--color-danger-600)}
+.btn-danger:hover{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.btn-sm{height:32px;padding:0 var(--space-3);font-size:var(--text-xs)}
+
+/* ══ Counter tabs ═════════════════════════════════════════ */
+.tabs{display:flex;gap:var(--space-1);border-bottom:1px solid var(--color-neutral-200);
+overflow-x:auto;margin-bottom:var(--space-4)}
+.tab{appearance:none;border:none;background:none;font-family:inherit;font-size:var(--text-sm);
+font-weight:var(--weight-medium);color:var(--color-neutral-600);cursor:pointer;
+padding:0 var(--space-4);height:var(--touch-target);display:inline-flex;align-items:center;
+gap:var(--space-2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;
+border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.tab:hover{color:var(--color-neutral-900);background:var(--color-neutral-50)}
+.tab[aria-selected="true"]{color:var(--color-primary-900);font-weight:var(--weight-semibold);
+border-bottom-color:var(--color-primary-600)}
+.tab-count{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+background:var(--color-neutral-50);border:1px solid var(--color-neutral-200);
+border-radius:10px;padding:0 var(--space-2);color:var(--color-neutral-600)}
+.tab[aria-selected="true"] .tab-count{background:var(--color-primary-100);
+border-color:var(--color-primary-100);color:var(--color-primary-900)}
+/* Overdue tab: red count, warning glyph and a spelled-out label. Never colour alone */
+.tab-count.is-late{background:var(--color-danger-600);border-color:var(--color-danger-600);
+color:var(--color-neutral-0)}
+.tab .warn-ic{color:var(--color-danger-600);font-weight:var(--weight-semibold)}
+
+/* ══ Filter panel ═════════════════════════════════════════ */
+.filters{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4)}
+.filter-row{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:var(--space-1);min-width:170px}
+.field.wide{min-width:230px}
+.label{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-medium);
+color:var(--color-neutral-600)}
+/* Control borders use neutral-500: neutral-200 gives 1.24 against 3.0 required by WCAG 1.4.11 */
+.control{height:var(--control-height);width:100%;padding:0 var(--space-3);font-family:inherit;
+font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-900);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-500);border-radius:var(--radius-md)}
+.control:focus{outline:none;border-color:var(--color-primary-600);box-shadow:var(--focus-ring)}
+.period{display:flex;align-items:center;gap:var(--space-2)}
+.period .dash{color:var(--color-neutral-600)}
+.filter-actions{display:flex;gap:var(--space-2);margin-left:auto}
+
+.profiles{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;
+margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+.profiles-label{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);margin-right:var(--space-1)}
+.profile{display:inline-flex;align-items:center;gap:var(--space-2);height:32px;padding:0 var(--space-3);
+border:1px solid var(--color-neutral-500);border-radius:16px;background:var(--color-neutral-0);
+font-family:inherit;font-size:var(--text-xs);color:var(--color-neutral-900);cursor:pointer}
+.profile:hover{background:var(--color-neutral-50)}
+/* Active profile: fill, check glyph and aria-pressed — three signals, not one */
+.profile[aria-pressed="true"]{background:var(--color-primary-600);border-color:var(--color-primary-600);
+color:var(--color-neutral-0);font-weight:var(--weight-semibold)}
+.profile .n{color:var(--color-neutral-600)}
+.profile[aria-pressed="true"] .n{color:var(--color-primary-100)}
+.profile-add{border-style:dashed;color:var(--color-primary-600);font-weight:var(--weight-semibold)}
+
+.chips-applied{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;margin-bottom:var(--space-3)}
+.filter-pill{display:inline-flex;align-items:center;gap:var(--space-2);height:32px;padding:0 var(--space-3);
+border:1px solid var(--color-neutral-500);border-radius:16px;background:var(--color-neutral-0);
+font-size:var(--text-xs);color:var(--color-neutral-900);font-family:inherit;cursor:pointer}
+.filter-pill .x{color:var(--color-neutral-600)}
+.found{font-size:var(--text-sm);color:var(--color-neutral-600)}
+.found b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+
+/* ══ Bulk actions ═════════════════════════════════════════ */
+.bulkbar{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+background:var(--color-primary-50);border:1px solid var(--color-primary-300);
+border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none;
+padding:var(--space-2) var(--space-3);color:var(--color-primary-900);font-size:var(--text-sm)}
+.bulkbar strong{font-weight:var(--weight-semibold)}
+.bulkbar .spacer{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+.bulkbar+.tbl-wrap{border-radius:0 0 var(--radius-lg) var(--radius-lg);border-top-color:var(--color-primary-300)}
+
+/* ══ Table ════════════════════════════════════════════════ */
+.tbl-wrap{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);overflow:auto;max-height:620px}
+table{width:100%;border-collapse:separate;border-spacing:0}
+/* border-collapse:separate is required — a collapsed table drops the sticky header border */
+thead th{position:sticky;top:0;z-index:2;background:var(--color-neutral-50);
+text-align:left;font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);
+height:var(--control-height);padding:0 var(--space-3);white-space:nowrap;
+box-shadow:inset 0 -1px 0 var(--color-neutral-200)}
+tbody td{height:var(--row-height);padding:var(--space-2) var(--space-3);
+border-bottom:1px solid var(--color-neutral-200);font-size:var(--text-sm);line-height:var(--leading-sm);
+vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--color-neutral-50)}
+tbody tr[aria-selected="true"] td{background:var(--color-primary-50)}
+tbody tr[aria-selected="true"] td:first-child{box-shadow:inset 3px 0 0 var(--color-primary-600)}
+
+.num{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.num{text-align:right}
+.mono{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.link{color:var(--color-primary-700);font-weight:var(--weight-semibold);text-decoration:none}
+.link:hover{text-decoration:underline}
+.applicant{font-weight:var(--weight-medium)}
+.applicant small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.contour small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.cell-actions{width:56px;text-align:center}
+.kebab{width:var(--touch-target);height:var(--touch-target);border:none;background:none;cursor:pointer;
+color:var(--color-neutral-600);border-radius:var(--radius-md);font-size:var(--text-base)}
+.kebab:hover{background:var(--color-neutral-200)}
+.cell-pick{width:var(--touch-target);padding:0}
+.pick{display:grid;place-items:center;width:var(--touch-target);height:var(--touch-target);cursor:pointer}
+.pick input{width:18px;height:18px;accent-color:var(--color-primary-600);cursor:pointer;margin:0}
+thead .pick{height:var(--control-height)}
+.sort{border:none;background:none;font:inherit;font-size:var(--text-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);cursor:pointer;
+display:inline-flex;align-items:center;gap:var(--space-1);padding:0;height:var(--control-height)}
+.sort:hover{color:var(--color-primary-600)}
+.sort .arr{font-size:var(--text-sm);opacity:.3}
+th[aria-sort] .sort{color:var(--color-neutral-900)}
+th[aria-sort] .sort .arr{opacity:1;color:var(--color-primary-600)}
+th.num .sort{flex-direction:row-reverse}
+
+/* ══ Status chip: dot + icon + text, see components/status.html ══ */
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);
+padding:var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+border-radius:var(--radius-sm);border:1px solid;background:var(--color-neutral-0);
+font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-medium);white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.chip .ic{font-size:var(--text-sm);line-height:1;flex:none;width:14px;text-align:center}
+.tone-neutral{color:var(--color-neutral-600);border-color:var(--color-neutral-200);background:var(--color-neutral-50)}
+.tone-info{color:var(--color-info-600);
+border-color:color-mix(in srgb,var(--color-info-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-info-600) 7%,var(--color-neutral-0))}
+.tone-success{color:var(--color-success-600);
+border-color:color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))}
+.tone-warning{color:var(--color-warning-600);
+border-color:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0))}
+.tone-danger{color:var(--color-danger-600);
+border-color:color-mix(in srgb,var(--color-danger-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+
+/* ══ SLA cell ═════════════════════════════════════════════
+   The deadline is the reason this screen exists, so it gets four
+   signals at once: a glyph, a word, a colour and a bar. Under
+   grayscale(1) the glyph and the wording still separate the states —
+   WCAG 1.4.1. Bar width is the share of the 15 days already spent. */
+.sla{min-width:210px}
+.sla-mark{display:flex;gap:var(--space-2);align-items:flex-start}
+.sla-ic{width:20px;height:20px;flex:none;border:1px solid currentColor;border-radius:50%;
+display:grid;place-items:center;font-size:var(--text-xs);font-weight:var(--weight-semibold);
+line-height:1;margin-top:1px}
+.sla-text{display:block;font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.sla-text small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.sla-bar{display:block;margin-top:var(--space-1);width:120px;height:4px;border-radius:2px;
+background:var(--color-neutral-200);overflow:hidden}
+.sla-bar i{display:block;height:100%;background:currentColor;border-radius:2px}
+/* Спокойно: срок ещё в запасе */
+.sla-ok{color:var(--color-success-600)}
+.sla-ok .sla-text{color:var(--color-neutral-900)}
+/* Предупреждение: истекает сегодня */
+.sla-warn{color:var(--color-warning-600)}
+.sla-warn .sla-text{color:var(--color-warning-600);font-weight:var(--weight-semibold)}
+/* Опасность: срок нарушен, порождён риск-индикатор RI-07 */
+.sla-late{color:var(--color-danger-600)}
+.sla-late .sla-text{color:var(--color-danger-600);font-weight:var(--weight-semibold)}
+/* Нейтрально: таймер остановлен статусом PENDING_INFO или RETURNED */
+.sla-hold{color:var(--color-neutral-600)}
+.sla-hold .sla-text{color:var(--color-neutral-600)}
+.ri-tag{display:inline-block;margin-top:2px;font-family:var(--font-family-mono);font-size:11px;
+line-height:14px;padding:0 var(--space-1);border-radius:var(--radius-sm);
+background:var(--color-danger-600);color:var(--color-neutral-0);font-weight:var(--weight-semibold)}
+
+/* ══ Pagination ═══════════════════════════════════════════ */
+.pager{display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-4)}
+.pager-info{font-size:var(--text-sm);color:var(--color-neutral-600)}
+.pager-info b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+.pager-list{display:flex;align-items:center;gap:var(--space-1);margin-left:auto}
+.pg{min-width:var(--touch-target);height:var(--touch-target);padding:0 var(--space-2);
+border:1px solid var(--color-neutral-500);background:var(--color-neutral-0);
+border-radius:var(--radius-md);font-family:inherit;font-size:var(--text-sm);
+font-weight:var(--weight-medium);color:var(--color-neutral-900);cursor:pointer;
+display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.pg:hover{background:var(--color-neutral-50)}
+.pg[aria-current="page"]{background:var(--color-primary-600);border-color:var(--color-primary-600);
+color:var(--color-neutral-0);font-weight:var(--weight-semibold)}
+.pg[aria-disabled="true"]{color:var(--color-neutral-400);cursor:not-allowed;background:var(--color-neutral-50)}
+.pager select{height:var(--control-height);border:1px solid var(--color-neutral-500);
+border-radius:var(--radius-md);font-family:inherit;font-size:var(--text-sm);
+padding:0 var(--space-2);background:var(--color-neutral-0);color:var(--color-neutral-900)}
+
+/* ══ Empty state ══════════════════════════════════════════ */
+.empty{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-12) var(--space-8);text-align:center}
+.empty-ic{font-size:32px;line-height:1;color:var(--color-neutral-400);margin-bottom:var(--space-4)}
+.empty h3{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold);
+margin-bottom:var(--space-2)}
+.empty p{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+max-width:64ch;margin:0 auto var(--space-6)}
+.empty-actions{display:flex;gap:var(--space-2);justify-content:center;flex-wrap:wrap}
+
+/* ══ Second state of the same screen, shown below the shell ══ */
+.state{max-width:var(--content-max);margin:0 auto;padding:var(--space-6)}
+.state-label{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);font-weight:var(--weight-semibold);letter-spacing:.04em;
+text-transform:uppercase;color:var(--color-neutral-600);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:16px;padding:var(--space-1) var(--space-3);margin-bottom:var(--space-4)}
+</style>
+</head>
+<body>
+
+<div class="note">
+    <p><strong>Рабочий стол сотрудника лесхоза.</strong> Экран сценариев <strong>С4</strong> и <strong>С5</strong>:
+    заявки, назначенные на исполнителя автоматически по территории и виду деятельности.
+    Собран в каркасе <span class="code">layouts/cabinet.html</span> из компонентов
+    <span class="code">table.html</span> и <span class="code">status.html</span>.</p>
+    <p><strong>Главная колонка здесь — срок SLA</strong>, а не статус. По ТЗ рассмотрение занимает
+    не более 15 дней, нарушение порождает риск-индикатор <span class="code">RI-07</span> и уходит
+    в поток цифрового надзора. Поэтому срок несёт сразу четыре сигнала: иконку, слово, цвет
+    и полосу израсходованного времени — в оттенках серого состояния по-прежнему различимы.</p>
+    <p>Ниже каркаса показано второе состояние того же экрана — когда фильтр не нашёл ни одной заявки.</p>
+</div>
+
+<div class="shell">
+
+    <div class="brand">
+        <div class="brand-mark">Р</div>
+        <div>
+            <div class="brand-name">RUXSATNOMA</div>
+            <div class="brand-sub">Агентство по лесам</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="search">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Поиск по номеру, ЖШШИР, СТИР" aria-label="Поиск">
+        </div>
+
+        <div class="header-right">
+            <div class="lang" role="group" aria-label="Язык интерфейса">
+                <button aria-pressed="true">Ўз</button>
+                <button aria-pressed="false">Uz</button>
+                <button aria-pressed="false">Ру</button>
+            </div>
+
+            <button class="icon-btn" aria-label="Уведомления, 5 непрочитанных">
+                <span aria-hidden="true">🔔</span>
+                <span class="badge-dot">5</span>
+            </button>
+
+            <button class="user">
+                <span class="avatar">ДА</span>
+                <span>
+                    <span class="user-name">Дилноза Абдуллаева</span><br>
+                    <span class="user-role">Сотрудник · Тошкент ДЎХ</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="sidebar" aria-label="Основное меню">
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▤</span>Обзор</a>
+
+        <div class="nav-group">Процесс</div>
+        <a class="nav-item" href="#" aria-current="page">
+            <span class="ico" aria-hidden="true">✉</span>Заявки<span class="nav-count">24</span>
+        </a>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">◆</span>Разрешения<span class="nav-count">86</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◉</span>Карта</a>
+
+        <div class="nav-group">Контроль</div>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">◈</span>Задания на выезд
+            <span class="nav-count is-late" aria-label="4 задания, из них просроченные">4</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">₴</span>Платежи</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▥</span>Отчёты</a>
+
+        <div class="nav-group">Справочники</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">☰</span>Классификаторы</a>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" href="#"><span class="ico" aria-hidden="true">?</span>Помощь</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <nav class="crumbs" aria-label="Хлебные крошки">
+            <a href="#">Главная</a><span aria-hidden="true">/</span>
+            <a href="#">Процесс</a><span aria-hidden="true">/</span>
+            <span aria-current="page">Мои заявки</span>
+        </nav>
+
+        <div class="page-head">
+            <div>
+                <h1 class="page-title">Мои заявки</h1>
+                <div class="page-sub">Тошкент давлат ўрмон хўжалиги · 24 заявки назначено на вас ·
+                    <strong>2 просрочены</strong> · данные на 10.08.2026, 09:40</div>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-secondary">Выгрузить в XLSX</button>
+                <button class="btn btn-primary">Регистрация бумажной заявки</button>
+            </div>
+        </div>
+
+        <!-- ── Counter tabs: slices of the same list ──────────── -->
+        <div class="tabs" role="tablist" aria-label="Срезы списка заявок">
+            <button class="tab" role="tab" aria-selected="true">Все<span class="tab-count">24</span></button>
+            <button class="tab" role="tab" aria-selected="false">Новые<span class="tab-count">5</span></button>
+            <button class="tab" role="tab" aria-selected="false">В работе<span class="tab-count">11</span></button>
+            <button class="tab" role="tab" aria-selected="false">Ожидают информации<span class="tab-count">3</span></button>
+            <button class="tab" role="tab" aria-selected="false">
+                <span class="warn-ic" aria-hidden="true">▲</span>Просрочены<span class="tab-count is-late">2</span>
+            </button>
+        </div>
+
+        <!-- ── Filters ───────────────────────────────────────── -->
+        <section class="filters" aria-label="Фильтры списка заявок">
+            <div class="filter-row">
+                <div class="field">
+                    <label class="label" for="f-status">Статус</label>
+                    <select class="control" id="f-status">
+                        <option>Любой</option>
+                        <option>Отправлена</option>
+                        <option selected>На рассмотрении</option>
+                        <option>Запрошены сведения</option>
+                        <option>Готовится договор</option>
+                        <option>Возвращена</option>
+                        <option>Одобрена</option>
+                    </select>
+                </div>
+
+                <div class="field wide">
+                    <label class="label" for="f-activity">Вид деятельности</label>
+                    <select class="control" id="f-activity">
+                        <option>Все шесть видов</option>
+                        <option>Выпас скота</option>
+                        <option>Сенокошение</option>
+                        <option>Размещение пчелиных ульев</option>
+                        <option>Рекреационное использование</option>
+                        <option>Сбор дров и хвороста</option>
+                        <option>Научные исследования</option>
+                    </select>
+                </div>
+
+                <div class="field wide">
+                    <span class="label" id="f-period-label">Период подачи</span>
+                    <div class="period" role="group" aria-labelledby="f-period-label">
+                        <input class="control" type="date" value="2026-07-01" aria-label="Период подачи, с">
+                        <span class="dash" aria-hidden="true">—</span>
+                        <input class="control" type="date" value="2026-08-10" aria-label="Период подачи, по">
+                    </div>
+                </div>
+
+                <div class="field wide">
+                    <label class="label" for="f-sla">Срок SLA</label>
+                    <select class="control" id="f-sla">
+                        <option selected>Любой</option>
+                        <option>Просроченные</option>
+                        <option>Истекают сегодня</option>
+                        <option>Осталось 3 дня и меньше</option>
+                        <option>Таймер остановлен</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-secondary">Сбросить</button>
+                    <button class="btn btn-primary">Применить</button>
+                </div>
+            </div>
+
+            <!-- Saved filter profiles: a clerk returns to the same three slices daily -->
+            <div class="profiles" role="group" aria-label="Сохранённые профили фильтров">
+                <span class="profiles-label">Мои подборки</span>
+                <button class="profile" aria-pressed="true">
+                    <span aria-hidden="true">✓</span>Всё, что на мне <span class="n">24</span>
+                </button>
+                <button class="profile" aria-pressed="false">Горит срок <span class="n">4</span></button>
+                <button class="profile" aria-pressed="false">Выпас скота, Бўстонлиқ <span class="n">9</span></button>
+                <button class="profile" aria-pressed="false">Ждут ответа заявителя <span class="n">3</span></button>
+                <button class="profile profile-add">
+                    <span aria-hidden="true">＋</span>Сохранить текущий фильтр
+                </button>
+            </div>
+        </section>
+
+        <!-- ── Applied filters and count ─────────────────────── -->
+        <div class="chips-applied">
+            <span class="found">Найдено <b>24</b> заявки</span>
+            <button class="filter-pill">Статус: На рассмотрении <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+            <button class="filter-pill">01.07.2026 — 10.08.2026 <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+        </div>
+
+        <!-- ── Bulk actions: visible only when rows are picked ── -->
+        <div class="bulkbar" role="region" aria-label="Групповые действия">
+            <strong>Выбрано: 2</strong>
+            <button class="btn btn-secondary btn-sm">Снять выделение</button>
+            <span class="spacer">
+                <button class="btn btn-primary btn-sm">Принять в работу</button>
+                <button class="btn btn-secondary btn-sm">Назначить исполнителя</button>
+                <button class="btn btn-secondary btn-sm">Запросить сведения</button>
+                <button class="btn btn-secondary btn-sm">Выгрузить в XLSX</button>
+                <button class="btn btn-danger btn-sm">Вернуть заявителю</button>
+            </span>
+        </div>
+
+        <!-- ── The list ──────────────────────────────────────── -->
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Список назначенных заявок, прокручиваемый">
+        <table>
+            <caption class="vh">Заявки, назначенные на сотрудника Дилнозу Абдуллаеву</caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать все заявки</span></label></th>
+                    <th scope="col"><button class="sort">Номер <span class="arr" aria-hidden="true">⇅</span></button></th>
+                    <th scope="col"><button class="sort">Заявитель <span class="arr" aria-hidden="true">⇅</span></button></th>
+                    <th scope="col">Вид деятельности</th>
+                    <th scope="col">Контур</th>
+                    <th scope="col" class="num"><button class="sort">Площадь, га <span class="arr" aria-hidden="true">⇅</span></button></th>
+                    <th scope="col" class="num"><button class="sort">Сумма, сўм <span class="arr" aria-hidden="true">⇅</span></button></th>
+                    <th scope="col">Статус</th>
+                    <th scope="col" aria-sort="ascending"><button class="sort">Срок SLA <span class="arr" aria-hidden="true">↑</span></button></th>
+                    <th scope="col" class="cell-actions"><span class="vh">Действия</span></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- OVERDUE: the hardest state, sorted to the top -->
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00031</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00031</a></td>
+                    <td class="applicant">«Ипак йўли агросервис» МЧЖ<small>СТИР 306 •• •• 12</small></td>
+                    <td>Выпас скота</td>
+                    <td class="contour">Бўстонлиқ 14-2<small>Слой «Пастбища»</small></td>
+                    <td class="num">41,0</td>
+                    <td class="num">4 100 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>На рассмотрении</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-late">
+                            <span class="sla-ic" aria-hidden="true">!</span>
+                            <span class="sla-text">Просрочено на 4 дня
+                                <small>Срок истёк 06.08.2026</small>
+                                <span class="ri-tag">RI-07</span>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:100%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00031">⋯</button></td>
+                </tr>
+
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00040</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00040</a></td>
+                    <td class="applicant">«Чорвачилик сервис» МЧЖ<small>СТИР 305 •• •• 41</small></td>
+                    <td>Сенокошение</td>
+                    <td class="contour">Оққўрғон 7-1<small>Слой «Сенокосы»</small></td>
+                    <td class="num">34,0</td>
+                    <td class="num">3 400 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>На рассмотрении</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-late">
+                            <span class="sla-ic" aria-hidden="true">!</span>
+                            <span class="sla-text">Просрочено на 1 день
+                                <small>Срок истёк 09.08.2026, 18:00</small>
+                                <span class="ri-tag">RI-07</span>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:100%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00040">⋯</button></td>
+                </tr>
+
+                <!-- DUE TODAY: warning tone -->
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00042</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00042</a></td>
+                    <td class="applicant">Азиз Каримов<small>ЖШШИР 3 •• •• 5218</small></td>
+                    <td>Выпас скота</td>
+                    <td class="contour">Бўстонлиқ 14-2<small>Слой «Пастбища»</small></td>
+                    <td class="num">12,5</td>
+                    <td class="num">1 207 324,80</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>На рассмотрении</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-warn">
+                            <span class="sla-ic" aria-hidden="true">▲</span>
+                            <span class="sla-text">Истекает сегодня
+                                <small>До 18:00, осталось 8 ч 20 мин</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:97%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00042">⋯</button></td>
+                </tr>
+
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00037</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00037</a></td>
+                    <td class="applicant">Шоира Умарова<small>ЖШШИР 4 •• •• 3391</small></td>
+                    <td>Рекреационное использование</td>
+                    <td class="contour">Бўстонлиқ 21-6<small>Слой «Рекреация»</small></td>
+                    <td class="num">8,0</td>
+                    <td class="num">960 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>На рассмотрении</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-warn">
+                            <span class="sla-ic" aria-hidden="true">▲</span>
+                            <span class="sla-text">Истекает сегодня
+                                <small>До 18:00, осталось 8 ч 20 мин</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:97%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00037">⋯</button></td>
+                </tr>
+
+                <!-- SPARE TIME: calm tone, the majority of the list -->
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00038</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00038</a></td>
+                    <td class="applicant">«Ўрмон агро» МЧЖ<small>СТИР 302 •• •• 07</small></td>
+                    <td>Сбор дров и хвороста</td>
+                    <td class="contour">Паркент 9-3<small>Слой «Рубки ухода»</small></td>
+                    <td class="num">5,2</td>
+                    <td class="num">312 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>На рассмотрении</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-ok">
+                            <span class="sla-ic" aria-hidden="true">◷</span>
+                            <span class="sla-text">Осталось 2 дня
+                                <small>Срок до 12.08.2026</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:87%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00038">⋯</button></td>
+                </tr>
+
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00036</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00036</a></td>
+                    <td class="applicant">Собир Юсупов<small>ЖШШИР 3 •• •• 9024</small></td>
+                    <td>Выпас скота</td>
+                    <td class="contour">Оққўрғон 12-8<small>Слой «Пастбища»</small></td>
+                    <td class="num">20,0</td>
+                    <td class="num">2 060 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">▤</span>Готовится договор</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-ok">
+                            <span class="sla-ic" aria-hidden="true">◷</span>
+                            <span class="sla-text">Осталось 6 дней
+                                <small>Срок до 16.08.2026</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:60%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00036">⋯</button></td>
+                </tr>
+
+                <!-- Two rows picked: bulk bar above shows «Выбрано: 2» -->
+                <tr aria-selected="true">
+                    <td class="cell-pick"><label class="pick"><input type="checkbox" checked><span class="vh">Заявка А-00044 выбрана</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00044</a></td>
+                    <td class="applicant">Дилшод Раҳимов<small>ЖШШИР 3 •• •• 1740</small></td>
+                    <td>Размещение пчелиных ульев</td>
+                    <td class="contour">Чирчиқ 3-4<small>Слой «Медоносы»</small></td>
+                    <td class="num">2,4</td>
+                    <td class="num">480 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">✉</span>Отправлена</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-ok">
+                            <span class="sla-ic" aria-hidden="true">◷</span>
+                            <span class="sla-text">Осталось 11 дней
+                                <small>Срок до 21.08.2026</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:27%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00044">⋯</button></td>
+                </tr>
+
+                <tr aria-selected="true">
+                    <td class="cell-pick"><label class="pick"><input type="checkbox" checked><span class="vh">Заявка А-00043 выбрана</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00043</a></td>
+                    <td class="applicant">Ботир Эргашев<small>ЖШШИР 3 •• •• 6155</small></td>
+                    <td>Научные исследования</td>
+                    <td class="contour">Чотқол 1-2<small>Слой «Заповедная зона»</small></td>
+                    <td class="num">1,0</td>
+                    <td class="num">150 000,00</td>
+                    <td><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">✉</span>Отправлена</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-ok">
+                            <span class="sla-ic" aria-hidden="true">◷</span>
+                            <span class="sla-text">Осталось 13 дней
+                                <small>Срок до 23.08.2026</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:13%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00043">⋯</button></td>
+                </tr>
+
+                <!-- TIMER STOPPED: PENDING_INFO holds the SLA clock (ТЗ, приложение 5) -->
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00039</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00039</a></td>
+                    <td class="applicant">Нодира Тошматова<small>ЖШШИР 4 •• •• 0663</small></td>
+                    <td>Сенокошение</td>
+                    <td class="contour">Паркент 4-5<small>Слой «Сенокосы»</small></td>
+                    <td class="num">16,4</td>
+                    <td class="num">1 640 000,00</td>
+                    <td><span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">?</span>Запрошены сведения</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-hold">
+                            <span class="sla-ic" aria-hidden="true">‖</span>
+                            <span class="sla-text">Таймер остановлен
+                                <small>Пауза 3 д 6 ч · оставалось 9 дней</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:40%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00039">⋯</button></td>
+                </tr>
+
+                <tr>
+                    <td class="cell-pick"><label class="pick"><input type="checkbox"><span class="vh">Выбрать заявку А-00033</span></label></td>
+                    <td class="mono"><a class="link" href="#">А-00033</a></td>
+                    <td class="applicant">Зулфия Насриддинова<small>ЖШШИР 4 •• •• 8827</small></td>
+                    <td>Сбор дров и хвороста</td>
+                    <td class="contour">Паркент 9-3<small>Слой «Рубки ухода»</small></td>
+                    <td class="num">3,8</td>
+                    <td class="num">228 000,00</td>
+                    <td><span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">↩</span>Возвращена</span></td>
+                    <td class="sla">
+                        <div class="sla-mark sla-hold">
+                            <span class="sla-ic" aria-hidden="true">‖</span>
+                            <span class="sla-text">Таймер остановлен
+                                <small>Возвращена 05.08.2026, код RJ-01</small>
+                                <span class="sla-bar" aria-hidden="true"><i style="width:33%"></i></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="cell-actions"><button class="kebab" aria-label="Действия по заявке А-00033">⋯</button></td>
+                </tr>
+
+            </tbody>
+        </table>
+        </div>
+
+        <nav class="pager" aria-label="Постраничная навигация">
+            <span class="pager-info">Показано <b>1–10</b> из <b>24</b></span>
+            <label class="pager-info">Строк на странице
+                <select aria-label="Строк на странице">
+                    <option>10</option><option>20</option><option>50</option>
+                </select>
+            </label>
+            <div class="pager-list">
+                <span class="pg" aria-disabled="true" aria-label="Предыдущая страница">‹</span>
+                <a class="pg" href="#" aria-current="page" aria-label="Страница 1, текущая">1</a>
+                <a class="pg" href="#" aria-label="Страница 2">2</a>
+                <a class="pg" href="#" aria-label="Страница 3, последняя">3</a>
+                <a class="pg" href="#" aria-label="Следующая страница">›</a>
+            </div>
+        </nav>
+    </main>
+
+</div>
+
+<!-- ══ Second state of the same screen: the filter found nothing ══ -->
+<div class="state">
+    <span class="state-label"><span aria-hidden="true">◻</span>Состояние того же экрана · фильтр ничего не нашёл</span>
+
+    <div class="tabs" role="tablist" aria-label="Срезы списка заявок">
+        <button class="tab" role="tab" aria-selected="false">Все<span class="tab-count">24</span></button>
+        <button class="tab" role="tab" aria-selected="false">Новые<span class="tab-count">5</span></button>
+        <button class="tab" role="tab" aria-selected="false">В работе<span class="tab-count">11</span></button>
+        <button class="tab" role="tab" aria-selected="true">Ожидают информации<span class="tab-count">0</span></button>
+        <button class="tab" role="tab" aria-selected="false">
+            <span class="warn-ic" aria-hidden="true">▲</span>Просрочены<span class="tab-count is-late">2</span>
+        </button>
+    </div>
+
+    <div class="chips-applied">
+        <span class="found">Найдено <b>0</b> заявок</span>
+        <button class="filter-pill">Статус: Запрошены сведения <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+        <button class="filter-pill">Вид: Научные исследования <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+        <button class="filter-pill">01.08.2026 — 10.08.2026 <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+        <button class="filter-pill">Срок: Просроченные <span class="x" aria-hidden="true">✕</span><span class="vh">, снять фильтр</span></button>
+    </div>
+
+    <!-- An empty rectangle is not a state. Пусто всегда объясняется: почему и что делать -->
+    <div class="empty">
+        <div class="empty-ic" aria-hidden="true">⌕</div>
+        <h3>По этому фильтру заявок нет</h3>
+        <p>Ни одной просроченной заявки со статусом «Запрошены сведения» по научным исследованиям
+        за 1–10 августа 2026 года. Просроченные заявки у вас есть — две, по выпасу скота
+        и сенокошению. Снимите условие по виду деятельности или расширьте период до июля.</p>
+        <div class="empty-actions">
+            <button class="btn btn-primary">Показать все просроченные</button>
+            <button class="btn btn-secondary">Сбросить фильтры</button>
+            <button class="btn btn-secondary">Расширить период до июля</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

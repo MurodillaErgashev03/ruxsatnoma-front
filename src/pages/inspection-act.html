@@ -1,0 +1,979 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Акт инспекции — PWA инспектора</title>
+<style>
+:root{
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;
+--text-base:16px;--leading-base:24px;--text-lg:18px;--leading-lg:28px;
+--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--control-height:40px;--control-height-touch:48px;--row-height:48px;--touch-target:44px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--shadow-lg:0 12px 32px rgba(26,31,36,.16);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50);padding:var(--space-6)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
+outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+
+.wrap{max-width:960px;margin:0 auto}
+.note{padding:var(--space-4) var(--space-6);background:var(--color-primary-50);
+border-left:3px solid var(--color-primary-600);border-radius:var(--radius-md);
+font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-primary-900);margin-bottom:var(--space-8)}
+.note strong{font-weight:var(--weight-semibold)}
+.note p+p{margin-top:var(--space-2)}
+h1{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold);margin-bottom:var(--space-2)}
+h2.state{font-size:var(--text-xl);line-height:var(--leading-xl);font-weight:var(--weight-semibold);
+margin:var(--space-12) 0 var(--space-2)}
+.lead{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+max-width:78ch;margin-bottom:var(--space-4)}
+.brief{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4) var(--space-6);margin-bottom:var(--space-6);
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+.brief ul{margin:var(--space-2) 0 0 var(--space-4)}
+.brief li{margin-bottom:var(--space-1)}
+.brief b{font-weight:var(--weight-semibold)}
+
+/* ── Phone frame ────────────────────────────────────
+   Screen width is exactly 390px: the smallest device the field PWA
+   is designed for. The frame is only a stage for the design kit,
+   it is not part of the interface. */
+.phone{width:410px;margin:0 auto var(--space-4);padding:10px;background:#14181C;
+border-radius:42px;box-shadow:var(--shadow-lg)}
+.screen{width:390px;background:var(--color-neutral-0);border-radius:32px;overflow:hidden;
+display:flex;flex-direction:column}
+.dev-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 22px 4px;
+font-size:13px;font-weight:var(--weight-semibold);color:var(--color-neutral-900)}
+.dev-bar .right{display:flex;gap:6px;align-items:center;font-size:12px}
+.cap{max-width:410px;margin:0 auto var(--space-8);font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);text-align:center}
+
+/* ── Persistent network indicator ───────────────────
+   Sits above the app bar and never scrolls away. It answers two
+   questions at a glance: is there a connection, and how many records
+   are still waiting to be sent. */
+.netbar{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);
+font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-semibold);border-bottom:1px solid}
+.netbar .ic{font-size:15px;flex:none}
+.netbar .sub{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-regular)}
+.netbar .q{margin-left:auto;font-size:var(--text-xs);font-weight:var(--weight-semibold);
+padding:3px 8px;border-radius:10px;border:1px solid;white-space:nowrap}
+.net-on{background:color-mix(in srgb,var(--color-success-600) 8%,var(--color-neutral-0));
+color:var(--color-success-600);border-color:color-mix(in srgb,var(--color-success-600) 30%,var(--color-neutral-0))}
+.net-on .q{border-color:currentColor}
+.net-cache{background:color-mix(in srgb,var(--color-warning-600) 10%,var(--color-neutral-0));
+color:var(--color-warning-600);border-color:color-mix(in srgb,var(--color-warning-600) 32%,var(--color-neutral-0))}
+.net-cache .q{border-color:currentColor}
+.net-off{background:color-mix(in srgb,var(--color-danger-600) 10%,var(--color-neutral-0));
+color:var(--color-danger-700);border-color:color-mix(in srgb,var(--color-danger-600) 32%,var(--color-neutral-0))}
+.net-off .q{border-color:currentColor}
+
+/* ── App bar ────────────────────────────────────────── */
+.appbar{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-2);
+border-bottom:1px solid var(--color-neutral-200)}
+/* Touch target is 48×48 even though the glyph inside is 20px — WCAG 2.5.8 */
+.ib{width:48px;height:48px;flex:none;display:grid;place-items:center;border:none;background:none;
+border-radius:var(--radius-md);font-size:20px;color:var(--color-neutral-900);cursor:pointer}
+.ib:hover{background:var(--color-neutral-50)}
+.appbar .ttl{flex:1;min-width:0}
+.appbar .t1{display:block;font-size:var(--text-base);line-height:20px;font-weight:var(--weight-semibold)}
+.appbar .t2{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-family:var(--font-family-mono)}
+
+.body{padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-4);background:var(--color-neutral-50)}
+.blk{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4)}
+.blk-h{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3)}
+.blk-t{font-size:var(--text-base);line-height:var(--leading-base);font-weight:var(--weight-semibold)}
+.blk-n{margin-left:auto;font-size:var(--text-xs);color:var(--color-neutral-600)}
+.rows{display:flex;flex-direction:column;gap:var(--space-2)}
+.row{display:flex;gap:var(--space-3);font-size:var(--text-sm);line-height:var(--leading-sm)}
+.row .k{color:var(--color-neutral-600);flex:none;width:112px}
+.row .v{font-weight:var(--weight-medium)}
+.mono{font-family:var(--font-family-mono)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 7px;border-radius:var(--radius-sm);
+border:1px solid;background:var(--color-neutral-0);font-size:var(--text-xs);line-height:var(--leading-xs);
+font-weight:var(--weight-semibold);white-space:nowrap}
+.chip .ic{width:12px;text-align:center;flex:none}
+.t-success{color:var(--color-success-600);border-color:color-mix(in srgb,var(--color-success-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 8%,var(--color-neutral-0))}
+.t-warning{color:var(--color-warning-600);border-color:color-mix(in srgb,var(--color-warning-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 8%,var(--color-neutral-0))}
+.t-danger{color:var(--color-danger-700);border-color:color-mix(in srgb,var(--color-danger-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 8%,var(--color-neutral-0))}
+.t-info{color:var(--color-info-600);border-color:color-mix(in srgb,var(--color-info-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-info-600) 8%,var(--color-neutral-0))}
+.t-neutral{color:var(--color-neutral-600);border-color:var(--color-neutral-500);background:var(--color-neutral-50)}
+
+/* ── Distance to the contour ────────────────────────
+   The inspector must be on site. The figure is written into the act
+   whatever it is — С15, alternative 15.2. */
+.geo{display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3);
+border-radius:var(--radius-md);border:1px solid;margin-top:var(--space-3)}
+.geo .big{display:block;font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.geo .sub{display:block;margin-top:var(--space-1);font-size:var(--text-xs);line-height:var(--leading-xs)}
+.geo .pin{font-size:22px;line-height:1;flex:none;margin-top:2px}
+.geo-out{border-color:color-mix(in srgb,var(--color-warning-600) 32%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 8%,var(--color-neutral-0));color:var(--color-warning-600)}
+.geo-in{border-color:color-mix(in srgb,var(--color-success-600) 32%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 8%,var(--color-neutral-0));color:var(--color-success-600)}
+.map{width:100%;height:auto;display:block;border-radius:var(--radius-md);border:1px solid var(--color-neutral-200)}
+
+/* ── Checklist ──────────────────────────────────────
+   Three answers per item. Every button is at least 48px tall and the
+   chosen one carries a fill, a bold label and a ✓/✕/— glyph. */
+.chk{padding:var(--space-3) 0;border-bottom:1px solid var(--color-neutral-200)}
+.chk:last-child{border-bottom:none;padding-bottom:0}
+.chk-q{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium);
+margin-bottom:var(--space-2)}
+.chk-q .no{color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.seg3{display:flex;gap:6px}
+.seg3 button{flex:1;min-height:48px;min-width:44px;padding:4px 2px;border-radius:var(--radius-md);
+border:1px solid var(--color-neutral-500);background:var(--color-neutral-0);color:var(--color-neutral-900);
+font-family:inherit;font-size:13px;font-weight:var(--weight-medium);cursor:pointer;
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:14px}
+.seg3 button .g{font-size:15px;line-height:1}
+.seg3 button[aria-pressed="true"]{font-weight:var(--weight-semibold);color:#fff}
+.seg3 button.ok[aria-pressed="true"]{background:var(--color-success-600);border-color:var(--color-success-600)}
+.seg3 button.bad[aria-pressed="true"]{background:var(--color-danger-600);border-color:var(--color-danger-600)}
+.seg3 button.na[aria-pressed="true"]{background:var(--color-neutral-600);border-color:var(--color-neutral-600)}
+
+/* ── Counters and norm comparison ───────────────────── */
+.cnt{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) 0}
+.cnt .lbl{flex:1;min-width:0;font-size:var(--text-sm);line-height:18px}
+.cnt .lbl b{font-weight:var(--weight-medium)}
+.cnt .lbl span{display:block;font-size:var(--text-xs);color:var(--color-neutral-600)}
+.step{display:flex;align-items:center;gap:6px;flex:none}
+.step button{width:48px;height:48px;border:1px solid var(--color-neutral-500);background:var(--color-neutral-0);
+border-radius:var(--radius-md);font-size:20px;font-family:inherit;cursor:pointer;color:var(--color-neutral-900)}
+.step .val{width:62px;height:48px;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+display:grid;place-items:center;font-size:17px;font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
+.sum{margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-neutral-200)}
+.sum-row{display:flex;justify-content:space-between;font-size:var(--text-sm);line-height:22px}
+.sum-row b{font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
+.meter{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--color-neutral-200);margin:var(--space-2) 0 6px}
+.meter .fill{background:var(--color-primary-600)}
+/* The part above the norm is both red and hatched, so exceeding is
+   visible without colour perception */
+.meter .over{background:repeating-linear-gradient(45deg,var(--color-danger-600) 0 4px,#ffffff 4px 8px)}
+.meter-lg{display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-neutral-600)}
+.verdict{margin-top:var(--space-3);padding:var(--space-3);border-radius:var(--radius-md);
+font-size:var(--text-sm);line-height:var(--leading-sm);border:1px solid}
+.v-bad{border-color:color-mix(in srgb,var(--color-danger-600) 32%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+.v-bad b{color:var(--color-danger-700)}
+
+/* ── Photos ─────────────────────────────────────────── */
+.thumbs{display:flex;gap:var(--space-2)}
+.thumb{position:relative;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--color-neutral-500);
+flex:1;min-width:0;background:var(--color-neutral-50)}
+.thumb svg{display:block;width:100%;height:auto}
+.thumb .tag{position:absolute;left:4px;bottom:4px;background:rgba(26,31,36,.82);color:#fff;
+font-size:10px;line-height:14px;font-weight:var(--weight-semibold);padding:1px 5px;border-radius:3px}
+.thumb .gps{position:absolute;right:4px;top:4px;background:rgba(26,31,36,.82);color:#fff;
+font-size:10px;line-height:14px;padding:1px 5px;border-radius:3px}
+.meta{margin-top:var(--space-3);font-size:var(--text-xs);line-height:18px;color:var(--color-neutral-600)}
+.meta div{display:flex;gap:var(--space-2)}
+.meta .k{width:96px;flex:none}
+.meta .v{color:var(--color-neutral-900);font-family:var(--font-family-mono);word-break:break-all}
+
+/* ── Buttons ────────────────────────────────────────── */
+.btn{width:100%;min-height:48px;border-radius:var(--radius-md);font-family:inherit;font-size:16px;
+font-weight:var(--weight-semibold);cursor:pointer;border:1px solid transparent;
+display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);padding:6px var(--space-4)}
+.btn-primary{background:var(--color-primary-600);color:#fff}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+.btn-warning{background:var(--color-warning-600);color:#fff}
+.btn[disabled]{background:var(--color-neutral-50);color:var(--color-neutral-600);
+border-color:var(--color-neutral-500);cursor:not-allowed}
+.btn-row{display:flex;flex-direction:column;gap:var(--space-2)}
+.hint{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+textarea{width:100%;min-height:84px;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+padding:var(--space-3);font-family:inherit;font-size:16px;line-height:22px;color:var(--color-neutral-900);resize:vertical}
+textarea::placeholder{color:var(--color-neutral-400)}
+
+/* ── Availability list for the empty-cache state ───── */
+.avail{list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
+.avail li{display:flex;gap:var(--space-2);font-size:var(--text-sm);line-height:var(--leading-sm)}
+.avail .g{flex:none;width:18px;text-align:center;font-weight:var(--weight-semibold)}
+.avail .yes{color:var(--color-success-600)}
+.avail .no{color:var(--color-danger-700)}
+.avail small{display:block;color:var(--color-neutral-600);font-size:var(--text-xs);line-height:var(--leading-xs)}
+
+/* ── Bottom navigation ──────────────────────────────
+   Bottom, not side: the thumb of the hand holding the phone reaches
+   only the lower third of a 390px screen. */
+.tabbar{display:flex;background:var(--color-neutral-0);border-top:1px solid var(--color-neutral-200)}
+.tab{flex:1;min-height:56px;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;text-decoration:none;color:var(--color-neutral-600);
+font-size:11px;line-height:14px;font-weight:var(--weight-medium);position:relative;padding:6px 2px}
+.tab .ico{font-size:19px;line-height:1}
+.tab[aria-current="page"]{color:var(--color-primary-700);font-weight:var(--weight-semibold);
+background:var(--color-primary-50);box-shadow:inset 0 3px 0 var(--color-primary-600)}
+.tab .b{position:absolute;top:5px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;
+border-radius:9px;font-size:10px;line-height:17px;font-weight:var(--weight-semibold);color:#fff;
+background:var(--color-danger-600);text-align:center}
+.tab .b.warn{background:var(--color-warning-600)}
+.tab[aria-disabled="true"]{color:var(--color-neutral-400)}
+.homebar{height:22px;display:grid;place-items:center;background:var(--color-neutral-0)}
+.homebar span{width:120px;height:4px;border-radius:2px;background:var(--color-neutral-400)}
+
+.rules{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-6);margin-top:var(--space-12);
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+.rules h3{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold);
+margin-bottom:var(--space-3)}
+.rules dl{display:grid;grid-template-columns:210px 1fr;gap:var(--space-2) var(--space-4)}
+.rules dt{font-weight:var(--weight-semibold)}
+.rules dd{color:var(--color-neutral-600)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="note">
+    <p><strong>Акт инспекции — экран инспектора в поле.</strong> Сценарий <strong>С15</strong>, группа маршрутов <code>(field)</code>.
+    Это единственный экран системы, который не вставляется в каркас кабинета: у него своя оболочка, нижняя навигация и собственные правила размеров.</p>
+    <p>Условия работы заданы не вкусом, а обстановкой: телефон в одной руке, вторая занята; солнце в экран; перчатки; связи в лесу может не быть часами.
+    Отсюда крупные элементы управления, нижняя навигация и постоянный индикатор сети.</p>
+    <p>Ниже — <strong>три состояния одного экрана</strong>: онлайн, офлайн с кэшем и офлайн без кэша.
+    Третье состояние — не «пустой экран», а объяснение того, что инспектор всё-таки может сделать прямо сейчас.</p>
+</div>
+
+<h1>Акт инспекции · PWA инспектора</h1>
+<p class="lead">Инспектор: Шухрат Мирзаев, Бўстонлиқ ДЎХ. Задание на 10 августа 2026 года, объект — контур OFC-14-238-07, Хумсон ўрмончилиги.</p>
+
+<!-- ══ STATE 1 — online ══════════════════════════════ -->
+<h2 class="state">Состояние 1. Онлайн</h2>
+<p class="lead">Сеть есть, очередь пуста, данные разрешения и контура получены с сервера. Это исходное состояние, от которого отличаются два других.</p>
+
+<div class="brief">
+    <b>Что показывает экран:</b>
+    <ul>
+        <li>индикатор сети — зелёный, «всё отправлено», очередь 0;</li>
+        <li>расстояние до контура: инспектор <b>вне границ</b>, 120 м — это фиксируется в акте автоматически (С15, ситуация 15.2);</li>
+        <li>фактическое поголовье превышает норму на 14 условных голов — статус акта выставляется «нарушение» и запускает сценарий С16;</li>
+        <li>фотографии несут время, координаты, устройство и hash — они подписываются вместе с актом.</li>
+    </ul>
+</div>
+
+<div class="phone">
+<div class="screen">
+
+    <div class="dev-bar">
+        <span>11:24</span>
+        <span class="right"><span aria-hidden="true">▮▮▮</span><span>4G</span><span aria-hidden="true">🔋 68 %</span></span>
+    </div>
+
+    <!-- Persistent network indicator -->
+    <div class="netbar net-on" role="status">
+        <span class="ic" aria-hidden="true">✓</span>
+        <span>
+            Онлайн
+            <span class="sub">Синхронизировано в 11:22 · очередь пуста</span>
+        </span>
+        <span class="q">0 в очереди</span>
+    </div>
+
+    <div class="appbar">
+        <button class="ib" aria-label="Назад к списку заданий"><span aria-hidden="true">←</span></button>
+        <span class="ttl">
+            <span class="t1">Акт инспекции</span>
+            <span class="t2">ACT-2026-004431 · черновик</span>
+        </span>
+        <button class="ib" aria-label="Дополнительные действия"><span aria-hidden="true">⋮</span></button>
+    </div>
+
+    <div class="body">
+
+        <!-- Permit -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Разрешение</span>
+                <span class="chip t-success"><span class="ic" aria-hidden="true">✓</span> Действует</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+                <svg width="56" height="56" viewBox="0 0 56 56" role="img" aria-label="QR-код разрешения, считан камерой">
+                    <rect width="56" height="56" fill="#ffffff"></rect>
+                    <g fill="var(--color-neutral-900)">
+                        <path d="M4 4h16v16H4zM8 8h8v8H8z"></path>
+                        <path d="M36 4h16v16H36zM40 8h8v8h-8z"></path>
+                        <path d="M4 36h16v16H4zM8 40h8v8H8z"></path>
+                        <rect x="24" y="4" width="4" height="4"></rect><rect x="28" y="10" width="4" height="4"></rect>
+                        <rect x="24" y="16" width="4" height="4"></rect><rect x="30" y="20" width="4" height="4"></rect>
+                        <rect x="24" y="24" width="4" height="4"></rect><rect x="34" y="26" width="4" height="4"></rect>
+                        <rect x="42" y="24" width="4" height="4"></rect><rect x="48" y="30" width="4" height="4"></rect>
+                        <rect x="24" y="32" width="4" height="4"></rect><rect x="32" y="34" width="4" height="4"></rect>
+                        <rect x="40" y="38" width="4" height="4"></rect><rect x="26" y="42" width="4" height="4"></rect>
+                        <rect x="34" y="46" width="4" height="4"></rect><rect x="44" y="44" width="4" height="4"></rect>
+                        <rect x="48" y="50" width="4" height="4"></rect><rect x="38" y="50" width="4" height="4"></rect>
+                    </g>
+                </svg>
+                <div class="rows" style="flex:1;min-width:0">
+                    <div class="row"><span class="k">Номер</span><span class="v mono">RX-2026-0014872</span></div>
+                    <div class="row"><span class="k">Заявитель</span><span class="v">Каримов А. Ш.</span></div>
+                    <div class="row"><span class="k">Вид</span><span class="v">Выпас скота</span></div>
+                </div>
+            </div>
+            <div class="rows" style="margin-top:12px">
+                <div class="row"><span class="k">Контур</span><span class="v mono">OFC-14-238-07</span></div>
+                <div class="row"><span class="k">Лесничество</span><span class="v">Хумсон, обход 3, квартал 14</span></div>
+                <div class="row"><span class="k">Период</span><span class="v">12.05.2026 — 31.10.2026</span></div>
+                <div class="row"><span class="k">Разрешено</span><span class="v">38,5 га · 64 условные головы</span></div>
+            </div>
+        </section>
+
+        <!-- Distance to contour -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Ваше положение</span>
+                <span class="blk-n">GPS ±6 м</span>
+            </div>
+
+            <svg class="map" viewBox="0 0 358 160" role="img"
+                aria-label="Схема: инспектор находится в 120 метрах восточнее границы разрешённого контура.">
+                <rect width="358" height="160" fill="var(--color-primary-50)"></rect>
+                <g stroke="var(--color-primary-300)" stroke-width="1" fill="none" opacity=".7">
+                    <path d="M0 24 C60 34 90 12 140 22 C200 34 250 8 358 20"></path>
+                    <path d="M0 142 C70 132 120 152 190 140 C260 128 300 148 358 138"></path>
+                </g>
+                <!-- allowed contour -->
+                <polygon points="60,30 180,20 250,60 240,110 150,140 70,110"
+                    fill="var(--color-primary-100)" stroke="var(--color-primary-600)" stroke-width="2.5"></polygon>
+                <text x="150" y="78" font-size="12" font-weight="600" fill="var(--color-primary-900)"
+                    text-anchor="middle" font-family="inherit">Разрешённый контур</text>
+                <text x="150" y="94" font-size="11" fill="var(--color-primary-700)"
+                    text-anchor="middle" font-family="inherit">OFC-14-238-07 · 38,5 га</text>
+                <!-- track and current position -->
+                <path d="M352 140 L336 124 L320 104 L306 96" stroke="var(--color-neutral-500)"
+                    stroke-width="1.5" stroke-dasharray="3 3" fill="none"></path>
+                <circle cx="300" cy="92" r="15" fill="none" stroke="var(--color-warning-600)"
+                    stroke-width="1.2" stroke-dasharray="4 3"></circle>
+                <circle cx="300" cy="92" r="6" fill="var(--color-warning-600)" stroke="#ffffff" stroke-width="2"></circle>
+                <text x="300" y="124" font-size="11" font-weight="600" fill="var(--color-warning-600)"
+                    text-anchor="middle" font-family="inherit">Вы здесь</text>
+                <!-- distance to the nearest edge -->
+                <line x1="244" y1="92" x2="294" y2="92" stroke="var(--color-warning-600)"
+                    stroke-width="2" stroke-dasharray="5 4"></line>
+                <line x1="244" y1="85" x2="244" y2="99" stroke="var(--color-warning-600)" stroke-width="2"></line>
+                <rect x="248" y="62" width="44" height="19" rx="4" fill="var(--color-neutral-0)"
+                    stroke="var(--color-warning-600)"></rect>
+                <text x="270" y="76" font-size="12" font-weight="600" fill="var(--color-warning-600)"
+                    text-anchor="middle" font-family="inherit">120 м</text>
+                <!-- scale and north -->
+                <g font-family="inherit">
+                    <line x1="16" y1="150" x2="76" y2="150" stroke="var(--color-neutral-900)" stroke-width="2"></line>
+                    <line x1="16" y1="146" x2="16" y2="154" stroke="var(--color-neutral-900)" stroke-width="2"></line>
+                    <line x1="76" y1="146" x2="76" y2="154" stroke="var(--color-neutral-900)" stroke-width="2"></line>
+                    <text x="80" y="154" font-size="10" fill="var(--color-neutral-900)">200 м</text>
+                    <text x="338" y="26" font-size="13" font-weight="600" fill="var(--color-neutral-900)" text-anchor="middle">С</text>
+                    <path d="M338 30 L334 42 L338 39 L342 42 Z" fill="var(--color-neutral-900)"></path>
+                </g>
+            </svg>
+
+            <div class="geo geo-out">
+                <span class="pin" aria-hidden="true">⌖</span>
+                <span>
+                    <span class="big">Вы в 120 м от границы контура</span>
+                    <span class="sub">Вне разрешённого участка. Расстояние и координаты записываются в акт автоматически, изменить их нельзя (С15, ситуация 15.2).</span>
+                </span>
+            </div>
+            <div class="rows" style="margin-top:12px">
+                <div class="row"><span class="k">Координаты</span><span class="v mono">41.5512, 70.0428</span></div>
+                <div class="row"><span class="k">Точность</span><span class="v">±6 м · 11 спутников</span></div>
+                <div class="row"><span class="k">Время</span><span class="v">10.08.2026, 11:24</span></div>
+            </div>
+        </section>
+
+        <!-- Checklist -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Чек-лист</span>
+                <span class="blk-n">5 из 5 заполнено</span>
+            </div>
+
+            <div class="chk">
+                <div class="chk-q"><span class="no">1.</span> Разрешение предъявлено и действует</div>
+                <div class="seg3" role="group" aria-label="Пункт 1">
+                    <button class="ok" aria-pressed="true"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+
+            <div class="chk">
+                <div class="chk-q"><span class="no">2.</span> Деятельность ведётся в границах контура</div>
+                <div class="seg3" role="group" aria-label="Пункт 2">
+                    <button class="ok" aria-pressed="false"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="true"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+
+            <div class="chk">
+                <div class="chk-q"><span class="no">3.</span> Поголовье соответствует разрешению</div>
+                <div class="seg3" role="group" aria-label="Пункт 3">
+                    <button class="ok" aria-pressed="false"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="true"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+
+            <div class="chk">
+                <div class="chk-q"><span class="no">4.</span> Соблюдены правила пожарной безопасности</div>
+                <div class="seg3" role="group" aria-label="Пункт 4">
+                    <button class="ok" aria-pressed="true"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+
+            <div class="chk">
+                <div class="chk-q"><span class="no">5.</span> Ветеринарные документы на скот в наличии</div>
+                <div class="seg3" role="group" aria-label="Пункт 5">
+                    <button class="ok" aria-pressed="false"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="true"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facts vs norm -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Фактическое поголовье</span>
+                <span class="blk-n">пересчёт на лету</span>
+            </div>
+
+            <div class="cnt">
+                <span class="lbl"><b>Крупный рогатый скот</b><span>коэффициент 1,0 → 24 SB</span></span>
+                <span class="step">
+                    <button aria-label="Уменьшить число КРС">−</button>
+                    <span class="val">24</span>
+                    <button aria-label="Увеличить число КРС">+</button>
+                </span>
+            </div>
+            <div class="cnt">
+                <span class="lbl"><b>Овцы и козы</b><span>коэффициент 0,2 → 42 SB</span></span>
+                <span class="step">
+                    <button aria-label="Уменьшить число овец и коз">−</button>
+                    <span class="val">210</span>
+                    <button aria-label="Увеличить число овец и коз">+</button>
+                </span>
+            </div>
+            <div class="cnt">
+                <span class="lbl"><b>Лошади</b><span>коэффициент 1,5 → 12 SB</span></span>
+                <span class="step">
+                    <button aria-label="Уменьшить число лошадей">−</button>
+                    <span class="val">8</span>
+                    <button aria-label="Увеличить число лошадей">+</button>
+                </span>
+            </div>
+
+            <div class="sum">
+                <div class="sum-row"><span>Фактически, условных голов</span><b>78 SB</b></div>
+                <div class="sum-row"><span>Норма по контуру</span><b>64 SB</b></div>
+                <div class="meter" role="img" aria-label="Фактическая нагрузка 78 условных голов при норме 64: превышение 14 голов, 21,9 процента">
+                    <span class="fill" style="width:82%"></span>
+                    <span class="over" style="width:18%"></span>
+                </div>
+                <div class="meter-lg"><span>0</span><span>норма 64 SB</span><span>факт 78 SB</span></div>
+                <div class="sum-row"><span>Занятая площадь</span><b>46,2 га при 38,5 га</b></div>
+                <div class="hint" style="margin-top:4px">Площадь измерена обходом по периметру — 12 точек, погрешность ±0,4 га.</div>
+
+                <div class="verdict v-bad">
+                    <b>Превышение нормы: +14 SB (21,9 %) и +7,7 га (20 %).</b><br>
+                    Статус акта выставляется «нарушение». После подписания создаётся дело о нарушении по сценарию С16
+                    и формируется риск-индикатор <span class="mono">RI-02</span>.
+                </div>
+            </div>
+        </section>
+
+        <!-- Photos -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Фото и видео</span>
+                <span class="blk-n">3 файла · 7,1 МБ</span>
+            </div>
+
+            <div class="thumbs">
+                <div class="thumb">
+                    <svg viewBox="0 0 106 80" role="img" aria-label="Снимок 1: стадо на склоне, 11:19">
+                        <rect width="106" height="80" fill="#CFE4EE"></rect>
+                        <circle cx="86" cy="16" r="8" fill="#F5E6C8"></circle>
+                        <path d="M0 44 L26 26 L48 44 L70 22 L106 48 L106 80 L0 80 Z" fill="var(--color-primary-300)"></path>
+                        <path d="M0 58 L34 44 L66 60 L106 48 L106 80 L0 80 Z" fill="var(--color-primary-600)"></path>
+                        <g fill="#F3F4F2">
+                            <ellipse cx="26" cy="68" rx="6" ry="4"></ellipse>
+                            <ellipse cx="42" cy="72" rx="6" ry="4"></ellipse>
+                            <ellipse cx="60" cy="67" rx="6" ry="4"></ellipse>
+                            <ellipse cx="76" cy="73" rx="6" ry="4"></ellipse>
+                        </g>
+                    </svg>
+                    <span class="gps">GPS</span>
+                    <span class="tag">11:19</span>
+                </div>
+                <div class="thumb">
+                    <svg viewBox="0 0 106 80" role="img" aria-label="Снимок 2: граничный знак контура, 11:21">
+                        <rect width="106" height="80" fill="#DCE9EF"></rect>
+                        <path d="M0 50 L30 34 L58 50 L84 32 L106 44 L106 80 L0 80 Z" fill="var(--color-primary-300)"></path>
+                        <rect x="46" y="24" width="7" height="48" fill="#9C7B4E"></rect>
+                        <rect x="34" y="24" width="31" height="18" rx="2" fill="var(--color-neutral-0)"
+                            stroke="var(--color-primary-700)" stroke-width="2"></rect>
+                        <rect x="38" y="30" width="23" height="3" fill="var(--color-primary-700)"></rect>
+                        <rect x="38" y="35" width="15" height="3" fill="var(--color-primary-700)"></rect>
+                    </svg>
+                    <span class="gps">GPS</span>
+                    <span class="tag">11:21</span>
+                </div>
+                <div class="thumb">
+                    <svg viewBox="0 0 106 80" role="img" aria-label="Снимок 3: вытоптанный участок вне контура, 11:23">
+                        <rect width="106" height="80" fill="#D8E7EC"></rect>
+                        <path d="M0 46 L36 30 L74 46 L106 34 L106 80 L0 80 Z" fill="#C6B589"></path>
+                        <g stroke="#8E7A4E" stroke-width="2" fill="none">
+                            <path d="M10 62 L26 58 M34 68 L52 62 M60 70 L80 64 M18 72 L38 74"></path>
+                        </g>
+                        <g fill="var(--color-primary-600)">
+                            <ellipse cx="90" cy="56" rx="10" ry="7"></ellipse>
+                            <ellipse cx="70" cy="52" rx="7" ry="5"></ellipse>
+                        </g>
+                    </svg>
+                    <span class="gps">GPS</span>
+                    <span class="tag">11:23</span>
+                </div>
+            </div>
+
+            <div class="meta">
+                <div><span class="k">Снимок 3</span><span class="v">10.08.2026, 11:23:41</span></div>
+                <div><span class="k">Координаты</span><span class="v">41.5512, 70.0428 ±6 м</span></div>
+                <div><span class="k">Устройство</span><span class="v">Redmi Note 12 · IMEI ****7431</span></div>
+                <div><span class="k">SHA-256</span><span class="v">3f9a41c7…c21b</span></div>
+            </div>
+            <p class="hint" style="margin:8px 0 12px">Метаданные вшиты в файл и подписываются вместе с актом.
+            Снимок из галереи прикрепить нельзя — только съёмка внутри приложения.</p>
+
+            <button class="btn btn-secondary"><span aria-hidden="true">◉</span> Сделать снимок</button>
+        </section>
+
+        <!-- Note -->
+        <section class="blk">
+            <div class="blk-h"><span class="blk-t">Примечание инспектора</span></div>
+            <textarea placeholder="Что зафиксировано на месте: обстоятельства, объяснения присутствующих, принятые меры">Скот выпасается за восточной границей контура, на участке лесных культур 2024 года. Присутствовал пастух, документы предъявлены.</textarea>
+        </section>
+
+        <!-- Signature -->
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Подписание</span>
+                <span class="chip t-danger"><span class="ic" aria-hidden="true">✕</span> Нарушение</span>
+            </div>
+            <div class="rows" style="margin-bottom:12px">
+                <div class="row"><span class="k">Сертификат</span><span class="v">Мирзаев Ш. Т., до 14.03.2027</span></div>
+                <div class="row"><span class="k">Отзыв</span><span class="v">Проверен онлайн в 11:24</span></div>
+                <div class="row"><span class="k">Метка времени</span><span class="v">Будет получена от TSA при подписании</span></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary"><span aria-hidden="true">✎</span> Подписать ЭЦП и отправить</button>
+                <button class="btn btn-secondary">Сохранить черновик</button>
+            </div>
+            <p class="hint" style="margin-top:8px">Подписанный акт изменить нельзя. Исправление оформляется отдельным актом со ссылкой на исходный.</p>
+        </section>
+
+    </div>
+
+    <nav class="tabbar" aria-label="Основная навигация">
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">▤</span>Задания<span class="b">3</span></a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">▦</span>Сканер</a>
+        <a class="tab" href="#" aria-current="page"><span class="ico" aria-hidden="true">✎</span>Акты</a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">⇅</span>Синхронизация</a>
+    </nav>
+    <div class="homebar" aria-hidden="true"><span></span></div>
+
+</div>
+</div>
+<p class="cap">Состояние 1 — онлайн. Полоса сети и нижняя навигация закреплены: при прокрутке акта они остаются на месте.</p>
+
+<!-- ══ STATE 2 — offline with cache ══════════════════ -->
+<h2 class="state">Состояние 2. Офлайн, кэш загружен</h2>
+<p class="lead">Связь пропала в 10:47. Работа не останавливается: разрешение, границы контура и норма взяты из зашифрованного локального кэша. Акт подписывается на устройстве и уходит в очередь.</p>
+
+<div class="brief">
+    <b>Что меняется по сравнению с состоянием 1:</b>
+    <ul>
+        <li>полоса сети становится жёлтой и показывает <b>число неотправленных записей</b> и время последней синхронизации;</li>
+        <li>у данных из кэша появляется отметка «из кэша» с датой — инспектор видит, насколько они свежие;</li>
+        <li>кнопка подписания меняет подпись: не «отправить», а <b>«поставить в очередь»</b>, и объясняет, когда запись уйдёт;</li>
+        <li>метка времени TSA и проверка отзыва сертификата откладываются до появления связи — об этом сказано прямо, а не умолчанием.</li>
+    </ul>
+</div>
+
+<div class="phone">
+<div class="screen">
+
+    <div class="dev-bar">
+        <span>12:06</span>
+        <span class="right"><span aria-hidden="true">▮▯▯</span><span>нет сети</span><span aria-hidden="true">🔋 54 %</span></span>
+    </div>
+
+    <div class="netbar net-cache" role="status">
+        <span class="ic" aria-hidden="true">⚠</span>
+        <span>
+            Офлайн · работаем из кэша
+            <span class="sub">Связь пропала в 10:47 · синхронизация 09.08, 20:14</span>
+        </span>
+        <span class="q">3 в очереди</span>
+    </div>
+
+    <div class="appbar">
+        <button class="ib" aria-label="Назад к списку заданий"><span aria-hidden="true">←</span></button>
+        <span class="ttl">
+            <span class="t1">Акт инспекции</span>
+            <span class="t2">ACT-2026-004432 · черновик</span>
+        </span>
+        <button class="ib" aria-label="Дополнительные действия"><span aria-hidden="true">⋮</span></button>
+    </div>
+
+    <div class="body">
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Разрешение</span>
+                <span class="chip t-info"><span class="ic" aria-hidden="true">▤</span> Из кэша 09.08, 20:14</span>
+            </div>
+            <div class="rows">
+                <div class="row"><span class="k">Номер</span><span class="v mono">RX-2026-0015104</span></div>
+                <div class="row"><span class="k">Статус</span><span class="v">Действует на момент выгрузки кэша</span></div>
+                <div class="row"><span class="k">Заявитель</span><span class="v">Тошматов Ж. Р.</span></div>
+                <div class="row"><span class="k">Контур</span><span class="v mono">OFC-14-241-02 · 21,0 га</span></div>
+                <div class="row"><span class="k">Разрешено</span><span class="v">36 условных голов</span></div>
+            </div>
+            <p class="hint" style="margin-top:10px">Проверка по кэшу занимает менее секунды. Если разрешение было приостановлено после 09.08, инспектор
+            узнает об этом при синхронизации — акт будет помечен как требующий пересмотра.</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Ваше положение</span>
+                <span class="blk-n">GPS ±8 м</span>
+            </div>
+            <div class="geo geo-in">
+                <span class="pin" aria-hidden="true">⌖</span>
+                <span>
+                    <span class="big">Вы внутри контура, 340 м от границы</span>
+                    <span class="sub">Расстояние рассчитано на устройстве по кэшированной геометрии — спутники и карта офлайн не нужны.</span>
+                </span>
+            </div>
+            <div class="rows" style="margin-top:12px">
+                <div class="row"><span class="k">Координаты</span><span class="v mono">41.5604, 70.0217</span></div>
+                <div class="row"><span class="k">Карта</span><span class="v">Тайлы из кэша, зона 14 · 09.08</span></div>
+            </div>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Чек-лист</span>
+                <span class="blk-n">2 из 5 заполнено</span>
+            </div>
+            <div class="chk">
+                <div class="chk-q"><span class="no">1.</span> Разрешение предъявлено и действует</div>
+                <div class="seg3" role="group" aria-label="Пункт 1">
+                    <button class="ok" aria-pressed="true"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+            <div class="chk">
+                <div class="chk-q"><span class="no">2.</span> Деятельность ведётся в границах контура</div>
+                <div class="seg3" role="group" aria-label="Пункт 2">
+                    <button class="ok" aria-pressed="true"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+            <div class="chk">
+                <div class="chk-q"><span class="no">3.</span> Поголовье соответствует разрешению</div>
+                <div class="seg3" role="group" aria-label="Пункт 3">
+                    <button class="ok" aria-pressed="false"><span class="g" aria-hidden="true">✓</span>Соответствует</button>
+                    <button class="bad" aria-pressed="false"><span class="g" aria-hidden="true">✕</span>Нарушение</button>
+                    <button class="na" aria-pressed="false"><span class="g" aria-hidden="true">—</span>Не применимо</button>
+                </div>
+            </div>
+            <p class="hint" style="margin-top:10px">Ещё 2 пункта ниже. Норма для сравнения взята из кэша, пересчёт идёт на устройстве.</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Фактическое поголовье</span>
+                <span class="blk-n">норма из кэша</span>
+            </div>
+            <div class="sum" style="margin-top:0;padding-top:0;border:none">
+                <div class="sum-row"><span>Фактически, условных голов</span><b>31 SB</b></div>
+                <div class="sum-row"><span>Норма по контуру</span><b>36 SB</b></div>
+                <div class="meter" role="img" aria-label="Фактическая нагрузка 31 условная голова при норме 36: в пределах нормы">
+                    <span class="fill" style="width:86%"></span>
+                </div>
+                <div class="meter-lg"><span>0</span><span>факт 31 SB</span><span>норма 36 SB</span></div>
+                <div class="sum-row"><span>Занятая площадь</span><b>19,4 га при 21,0 га</b></div>
+            </div>
+            <div class="verdict" style="border-color:color-mix(in srgb,var(--color-success-600) 32%,var(--color-neutral-0));background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))">
+                <b style="color:var(--color-success-600)">В пределах нормы: запас 5 SB и 1,6 га.</b><br>
+                Предварительный статус акта — «соответствует». Окончательный будет подтверждён на сервере при синхронизации.
+            </div>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Фото</span>
+                <span class="blk-n">2 файла · сохранены локально</span>
+            </div>
+            <div class="thumbs">
+                <div class="thumb">
+                    <svg viewBox="0 0 106 80" role="img" aria-label="Снимок 1: пастбище в границах контура, 12:02">
+                        <rect width="106" height="80" fill="#CFE4EE"></rect>
+                        <path d="M0 48 L30 30 L62 50 L88 34 L106 44 L106 80 L0 80 Z" fill="var(--color-primary-300)"></path>
+                        <path d="M0 62 L40 52 L74 64 L106 56 L106 80 L0 80 Z" fill="var(--color-primary-600)"></path>
+                        <g fill="#F3F4F2">
+                            <ellipse cx="34" cy="70" rx="6" ry="4"></ellipse>
+                            <ellipse cx="54" cy="74" rx="6" ry="4"></ellipse>
+                            <ellipse cx="72" cy="70" rx="6" ry="4"></ellipse>
+                        </g>
+                    </svg>
+                    <span class="gps">GPS</span>
+                    <span class="tag">12:02</span>
+                </div>
+                <div class="thumb">
+                    <svg viewBox="0 0 106 80" role="img" aria-label="Снимок 2: водопой и ограждение, 12:04">
+                        <rect width="106" height="80" fill="#D6E8EF"></rect>
+                        <path d="M0 52 L34 36 L70 52 L106 40 L106 80 L0 80 Z" fill="var(--color-primary-300)"></path>
+                        <ellipse cx="52" cy="68" rx="34" ry="9" fill="#7FA8C4"></ellipse>
+                        <g stroke="#9C7B4E" stroke-width="3">
+                            <path d="M12 40 L12 62 M28 38 L28 60 M44 36 L44 58"></path>
+                            <path d="M8 44 L48 41" stroke-width="2"></path>
+                        </g>
+                    </svg>
+                    <span class="gps">GPS</span>
+                    <span class="tag">12:04</span>
+                </div>
+                <div class="thumb" style="display:grid;place-items:center;min-height:80px;border-style:dashed">
+                    <span style="font-size:12px;color:var(--color-neutral-600);text-align:center;padding:6px">Добавить<br>снимок</span>
+                </div>
+            </div>
+            <p class="hint" style="margin-top:10px">Файлы лежат в зашифрованном хранилище устройства. Место: занято 74 МБ из 500 МБ.</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h"><span class="blk-t">Очередь на отправку</span></div>
+            <div class="rows">
+                <div class="row"><span class="k">Акт</span><span class="v">ACT-2026-004429 от 09.08, подписан</span></div>
+                <div class="row"><span class="k">Фото</span><span class="v">5 файлов · 18,4 МБ</span></div>
+                <div class="row"><span class="k">Отметка</span><span class="v">Выезд по заданию TSK-8841</span></div>
+            </div>
+            <p class="hint" style="margin-top:10px">Отправится автоматически в течение 5 минут после появления связи — регламент сценария С15.
+            При расхождении версий сохраняются обе, решение принимается по метке времени и пользователю (ситуация 15.3).</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Подписание</span>
+                <span class="chip t-warning"><span class="ic" aria-hidden="true">⚠</span> Уйдёт в очередь</span>
+            </div>
+            <div class="rows" style="margin-bottom:12px">
+                <div class="row"><span class="k">Сертификат</span><span class="v">Мирзаев Ш. Т., ключ на устройстве</span></div>
+                <div class="row"><span class="k">Отзыв</span><span class="v">Проверка отложена до связи</span></div>
+                <div class="row"><span class="k">Метка времени</span><span class="v">TSA добавится при синхронизации</span></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-warning"><span aria-hidden="true">✎</span> Подписать и поставить в очередь</button>
+                <button class="btn btn-secondary">Сохранить черновик</button>
+            </div>
+            <p class="hint" style="margin-top:8px">Подпись создаётся на устройстве и связь для неё не нужна. Не хватает только метки доверенного времени —
+            она добавляется при отправке, до тех пор акт помечен как «подписан офлайн».</p>
+        </section>
+
+    </div>
+
+    <nav class="tabbar" aria-label="Основная навигация">
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">▤</span>Задания<span class="b warn">3</span></a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">▦</span>Сканер</a>
+        <a class="tab" href="#" aria-current="page"><span class="ico" aria-hidden="true">✎</span>Акты</a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">⇅</span>Синхронизация<span class="b warn">3</span></a>
+    </nav>
+    <div class="homebar" aria-hidden="true"><span></span></div>
+
+</div>
+</div>
+<p class="cap">Состояние 2 — офлайн с кэшем. Ни одно действие инспектора не блокируется: меняются только формулировки и источник данных.</p>
+
+<!-- ══ STATE 3 — offline, empty cache ════════════════ -->
+<h2 class="state">Состояние 3. Офлайн, кэша нет</h2>
+<p class="lead">Худший случай: связи нет и локальных данных тоже. Так бывает при первом входе на новом устройстве, после очистки хранилища или когда кэш просрочен — он живёт 7 дней.
+Экран обязан объяснить, что доступно, а не показать пустоту.</p>
+
+<div class="brief">
+    <b>Правило состояния «нет данных»:</b>
+    <ul>
+        <li>сначала — <b>что можно сделать прямо сейчас</b>, крупной кнопкой, а не мелкой ссылкой;</li>
+        <li>затем — что недоступно и <b>почему именно</b>, с указанием, что вернёт эти возможности;</li>
+        <li>очередь не теряется и показывается: инспектор должен видеть, что вчерашняя работа цела;</li>
+        <li>ни одной формулировки вида «ошибка загрузки данных» — это ничего не объясняет человеку в поле.</li>
+    </ul>
+</div>
+
+<div class="phone">
+<div class="screen">
+
+    <div class="dev-bar">
+        <span>08:12</span>
+        <span class="right"><span aria-hidden="true">▯▯▯</span><span>нет сети</span><span aria-hidden="true">🔋 91 %</span></span>
+    </div>
+
+    <div class="netbar net-off" role="status">
+        <span class="ic" aria-hidden="true">✕</span>
+        <span>
+            Офлайн · кэш не загружен
+            <span class="sub">Данные разрешений и контуров недоступны · последняя связь 08:01</span>
+        </span>
+        <span class="q">3 в очереди</span>
+    </div>
+
+    <div class="appbar">
+        <button class="ib" aria-label="Назад"><span aria-hidden="true">←</span></button>
+        <span class="ttl">
+            <span class="t1">Акт инспекции</span>
+            <span class="t2">Новый акт</span>
+        </span>
+        <button class="ib" aria-label="Дополнительные действия"><span aria-hidden="true">⋮</span></button>
+    </div>
+
+    <div class="body">
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Почему так вышло</span>
+            </div>
+            <p style="font-size:14px;line-height:20px">Приложение впервые запущено на этом устройстве, и справочник разрешений ещё не выгружался.
+            Без сети получить данные разрешения, границы контура и норму невозможно.</p>
+            <p class="hint" style="margin-top:8px">Последняя точка со связью на маршруте — 08:01, около 2,4 км назад, у поворота на Хумсон.</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h"><span class="blk-t">Что можно сделать сейчас</span></div>
+            <ul class="avail">
+                <li><span class="g yes" aria-hidden="true">✓</span><span>Составить акт «деятельность без разрешения»
+                    <small>Ситуация 15.4 сценария С15: акт составляется и без найденного разрешения</small></span></li>
+                <li><span class="g yes" aria-hidden="true">✓</span><span>Снимать фото и видео с временем, GPS и hash
+                    <small>Метаданные пишутся на устройстве, сервер для этого не нужен</small></span></li>
+                <li><span class="g yes" aria-hidden="true">✓</span><span>Записать поголовье, площадь и координаты
+                    <small>Без сравнения с нормой — норма придёт позже</small></span></li>
+                <li><span class="g yes" aria-hidden="true">✓</span><span>Подписать акт ЭЦП и поставить в очередь
+                    <small>Ключ хранится на устройстве, метка времени TSA добавится при отправке</small></span></li>
+                <li><span class="g yes" aria-hidden="true">✓</span><span>Ввести номер разрешения вручную
+                    <small>Проверка выполнится позже, номер сохранится в акте как есть</small></span></li>
+            </ul>
+
+            <div class="btn-row" style="margin-top:16px">
+                <button class="btn btn-primary"><span aria-hidden="true">✎</span> Составить акт без разрешения</button>
+                <button class="btn btn-secondary"><span aria-hidden="true">◉</span> Сделать снимок с координатами</button>
+            </div>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h"><span class="blk-t">Что недоступно без связи</span></div>
+            <ul class="avail">
+                <li><span class="g no" aria-hidden="true">✕</span><span>Проверка разрешения по QR-коду и номеру
+                    <small>Нужен либо кэш, либо сеть</small></span></li>
+                <li><span class="g no" aria-hidden="true">✕</span><span>Границы контура и расстояние до них
+                    <small>Геометрия не загружена — расстояние в акте останется пустым</small></span></li>
+                <li><span class="g no" aria-hidden="true">✕</span><span>Норма, лимит и сравнение с фактом
+                    <small>Сравнение выполнится на сервере после отправки</small></span></li>
+                <li><span class="g no" aria-hidden="true">✕</span><span>Задания на сегодня и история нарушений
+                    <small>Список появится сразу после загрузки кэша</small></span></li>
+            </ul>
+            <div class="btn-row" style="margin-top:16px">
+                <button class="btn btn-secondary"><span aria-hidden="true">⇅</span> Повторить подключение</button>
+                <button class="btn" disabled><span aria-hidden="true">▼</span> Загрузить кэш · около 40 МБ</button>
+            </div>
+            <p class="hint" style="margin-top:8px">Кнопка загрузки станет активной, как только появится сеть. Выгрузка по своей территории занимает 2–3 минуты
+            и держится 7 дней.</p>
+        </section>
+
+        <section class="blk">
+            <div class="blk-h">
+                <span class="blk-t">Очередь сохранена</span>
+                <span class="chip t-neutral"><span class="ic" aria-hidden="true">▣</span> 3 записи</span>
+            </div>
+            <div class="rows">
+                <div class="row"><span class="k">Акт</span><span class="v">ACT-2026-004429 от 09.08, подписан</span></div>
+                <div class="row"><span class="k">Фото</span><span class="v">5 файлов · 18,4 МБ</span></div>
+                <div class="row"><span class="k">Отметка</span><span class="v">Выезд по заданию TSK-8841</span></div>
+            </div>
+            <p class="hint" style="margin-top:10px">Записи не потеряны и не будут удалены при выходе из приложения. Отправятся автоматически в течение 5 минут после появления связи.</p>
+        </section>
+
+    </div>
+
+    <nav class="tabbar" aria-label="Основная навигация">
+        <a class="tab" href="#" aria-disabled="true"><span class="ico" aria-hidden="true">▤</span>Задания</a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">▦</span>Сканер</a>
+        <a class="tab" href="#" aria-current="page"><span class="ico" aria-hidden="true">✎</span>Акты</a>
+        <a class="tab" href="#"><span class="ico" aria-hidden="true">⇅</span>Синхронизация<span class="b">3</span></a>
+    </nav>
+    <div class="homebar" aria-hidden="true"><span></span></div>
+
+</div>
+</div>
+<p class="cap">Состояние 3 — офлайн без кэша. «Задания» приглушены и помечены <code>aria-disabled</code>: пункт виден, но данных за ним нет.
+Сканер и Акты работают — они не требуют сети.</p>
+
+<!-- ══ Rules ═════════════════════════════════════════ -->
+<div class="rules">
+    <h3>Размеры и правила, которые проверяются на ревью</h3>
+    <dl>
+        <dt>Ширина экрана</dt>
+        <dd>390 px — самый узкий целевой размер. Всё, что не помещается сюда, не помещается никуда.</dd>
+
+        <dt>Высота кнопки</dt>
+        <dd>Не менее 48 px. Кнопки чек-листа, счётчиков и подписания сделаны ровно такими.</dd>
+
+        <dt>Область касания</dt>
+        <dd>Не менее 44 × 44 px даже у иконки 20 px — WCAG 2.5.8. Стрелка «назад» и меню занимают 48 × 48.</dd>
+
+        <dt>Расстояние между целями</dt>
+        <dd>Не менее 6–8 px. Соседние ответы чек-листа нельзя нажать одним пальцем случайно.</dd>
+
+        <dt>Навигация внизу</dt>
+        <dd>Большой палец руки, держащей телефон, достаёт до нижней трети экрана. Боковое меню кабинета в поле не работает.</dd>
+
+        <dt>Индикатор сети</dt>
+        <dd>Закреплён вверху и виден всегда. Он отвечает сразу на два вопроса: есть ли связь и сколько записей ещё не ушло.</dd>
+
+        <dt>Статус не только цветом</dt>
+        <dd>Каждое состояние несёт знак, слово и цвет одновременно: ✓ «Соответствует», ✕ «Нарушение», — «Не применимо».
+        Превышение нормы на шкале показано и красным, и штриховкой — на солнце цвет различается плохо.</dd>
+
+        <dt>Размер текста</dt>
+        <dd>Основной текст 14–16 px, поля ввода 16 px: меньше — и мобильный браузер начинает масштабировать страницу при фокусе.</dd>
+    </dl>
+</div>
+
+</div>
+</body>
+</html>

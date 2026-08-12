@@ -1,0 +1,1018 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Кабинет заявителя</title>
+<style>
+:root{
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;
+--text-base:16px;--leading-base:24px;--text-lg:18px;--leading-lg:28px;
+--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;--text-3xl:36px;--leading-3xl:44px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--space-16:64px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--header-height:64px;--sidebar-width:260px;
+--control-height:40px;--control-height-touch:48px;
+--row-height:48px;--row-height-compact:36px;--touch-target:44px;--content-max:1440px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--shadow-lg:0 12px 32px rgba(26,31,36,.16);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50)}
+
+/* Every interactive element must show focus: WCAG 2.4.7 */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:none;
+box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+.note{max-width:var(--content-max);margin:0 auto var(--space-6);padding:var(--space-4) var(--space-6);
+background:var(--color-primary-50);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-md);font-size:var(--text-sm);line-height:var(--leading-sm);
+color:var(--color-primary-900)}
+.note strong{font-weight:var(--weight-semibold)}
+.note p+p{margin-top:var(--space-2)}
+.note .code{font-family:var(--font-family-mono);font-size:var(--text-xs)}
+
+/* ══ Shell: identical to layouts/cabinet.html ═════════════ */
+.shell{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:var(--header-height) 1fr;
+grid-template-areas:"brand header" "sidebar main";min-height:100vh}
+
+.brand{grid-area:brand;background:var(--color-primary-700);color:#fff;display:flex;align-items:center;
+gap:var(--space-3);padding:0 var(--space-4)}
+.brand-mark{width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-primary-300);
+display:grid;place-items:center;font-weight:600;color:var(--color-primary-900);flex:none}
+.brand-name{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-size:12px;line-height:14px;opacity:.75;font-weight:400}
+
+.header{grid-area:header;background:var(--color-neutral-0);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6)}
+.search{flex:1;max-width:420px;position:relative}
+.search input{width:100%;height:var(--control-height);padding:0 var(--space-3) 0 36px;font-size:16px;
+font-family:inherit;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+background:var(--color-neutral-50);color:var(--color-neutral-900)}
+.search input::placeholder{color:var(--color-neutral-400)}
+.search .ico{position:absolute;left:10px;top:11px;color:var(--color-neutral-400)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-2)}
+
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:none;background:none;
+cursor:pointer;border-radius:var(--radius-md);color:var(--color-neutral-600);position:relative}
+.icon-btn:hover{background:var(--color-neutral-50)}
+.badge-dot{position:absolute;top:9px;right:9px;min-width:16px;height:16px;padding:0 4px;
+background:var(--color-danger-600);color:#fff;border-radius:8px;font-size:11px;line-height:16px;font-weight:600}
+
+.lang{display:flex;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);overflow:hidden}
+.lang button{border:none;background:var(--color-neutral-0);color:var(--color-neutral-600);
+padding:0 10px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.lang button[aria-pressed="true"]{background:var(--color-primary-600);color:#fff}
+
+.user{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);
+border-radius:var(--radius-md);cursor:pointer;border:none;background:none;font-family:inherit;text-align:left}
+.user:hover{background:var(--color-neutral-50)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--color-primary-100);
+color:var(--color-primary-900);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.user-name{font-size:13px;line-height:16px;font-weight:500}
+.user-role{font-size:12px;line-height:14px;color:var(--color-neutral-600)}
+
+.sidebar{grid-area:sidebar;background:var(--color-neutral-0);border-right:1px solid var(--color-neutral-200);
+padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);overflow-y:auto}
+.nav-group{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+color:var(--color-neutral-400);padding:var(--space-4) var(--space-3) var(--space-2)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);height:var(--control-height);
+padding:0 var(--space-3);border-radius:var(--radius-md);color:var(--color-neutral-900);
+text-decoration:none;font-size:14px;font-weight:500}
+.nav-item:hover{background:var(--color-neutral-50)}
+.nav-item .ico{width:20px;text-align:center;flex:none;color:var(--color-neutral-600)}
+.nav-item[aria-current="page"]{background:var(--color-primary-50);color:var(--color-primary-900);
+font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.nav-item[aria-current="page"] .ico{color:var(--color-primary-600)}
+.nav-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--color-neutral-600);
+background:var(--color-neutral-50);border-radius:10px;padding:2px 8px}
+.nav-item[aria-current="page"] .nav-count{background:var(--color-primary-100);color:var(--color-primary-900)}
+/* Money owed: filled counter plus its own aria-label, never colour alone */
+.nav-count.is-due{background:var(--color-warning-600);color:var(--color-neutral-0)}
+.sidebar-foot{margin-top:auto;padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+
+.main{grid-area:main;padding:var(--space-6);overflow-y:auto}
+
+/* ══ Buttons ══════════════════════════════════════════════ */
+.btn{height:var(--control-height);padding:0 var(--space-4);border-radius:var(--radius-md);
+font-family:inherit;font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;
+border:1px solid transparent;display:inline-flex;align-items:center;gap:var(--space-2);
+white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--color-primary-600);color:var(--color-neutral-0)}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+.btn-warning{background:var(--color-warning-600);color:var(--color-neutral-0)}
+.btn-warning:hover{background:color-mix(in srgb,var(--color-warning-600) 82%,var(--color-neutral-900))}
+.btn-touch{height:var(--control-height-touch);font-size:var(--text-base);padding:0 var(--space-6)}
+/* The one action the whole cabinet exists for. Deliberately oversized */
+.btn-huge{height:64px;padding:0 var(--space-8);border-radius:var(--radius-lg);
+font-family:inherit;font-size:var(--text-xl);line-height:var(--leading-xl);font-weight:var(--weight-semibold);
+background:var(--color-neutral-0);color:var(--color-primary-900);border:2px solid var(--color-neutral-0);
+display:inline-flex;align-items:center;gap:var(--space-3);cursor:pointer;text-decoration:none;
+box-shadow:var(--shadow-md)}
+.btn-huge:hover{background:var(--color-primary-50)}
+.btn-huge .plus{font-size:26px;line-height:1}
+/* Same button on a light background: filled instead of inverted */
+.btn-huge-solid{background:var(--color-primary-600);color:var(--color-neutral-0);
+border-color:var(--color-primary-700)}
+.btn-huge-solid:hover{background:var(--color-primary-700)}
+
+/* ══ Greeting ═════════════════════════════════════════════ */
+.hero{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;
+background:var(--color-primary-700);color:var(--color-neutral-0);
+border-radius:var(--radius-lg);padding:var(--space-8);margin-bottom:var(--space-6)}
+.hero h1{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold)}
+.hero p{font-size:var(--text-base);line-height:var(--leading-base);margin-top:var(--space-2);
+max-width:58ch;opacity:.92}
+.hero-cta{margin-left:auto;text-align:center}
+.hero-cta small{display:block;margin-top:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);opacity:.85}
+.hero-focus .btn-huge:focus-visible{outline:none;
+box-shadow:0 0 0 3px var(--color-primary-700),0 0 0 6px var(--color-neutral-0)}
+
+/* ══ Section headings ═════════════════════════════════════ */
+.sec{margin-bottom:var(--space-8)}
+.sec-head{display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-3)}
+.sec-head h2{font-size:var(--text-xl);line-height:var(--leading-xl);font-weight:var(--weight-semibold)}
+.sec-head p{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.sec-head .more{margin-left:auto;font-size:var(--text-sm);font-weight:var(--weight-semibold);
+color:var(--color-primary-700);text-decoration:none}
+.sec-head .more:hover{text-decoration:underline}
+
+/* ══ Payment due ══════════════════════════════════════════
+   The reason most people open this cabinet at all. Warning tone,
+   the amount set large in mono, one obvious button. Three signals
+   carry the state: the glyph, the wording and the colour. */
+.pay{display:flex;align-items:center;gap:var(--space-6);flex-wrap:wrap;
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0));
+border:2px solid var(--color-warning-600);border-radius:var(--radius-lg);
+padding:var(--space-6);margin-bottom:var(--space-8)}
+.pay-ic{width:52px;height:52px;flex:none;border-radius:50%;display:grid;place-items:center;
+border:2px solid var(--color-warning-600);color:var(--color-warning-600);
+font-size:24px;background:var(--color-neutral-0)}
+.pay-txt h2{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold);
+color:var(--color-warning-600)}
+.pay-txt p{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-900);
+margin-top:var(--space-1);max-width:62ch}
+.pay-txt b{font-weight:var(--weight-semibold)}
+.pay-sum{margin-left:auto;text-align:right}
+.pay-amount{font-family:var(--font-family-mono);font-size:var(--text-2xl);line-height:var(--leading-2xl);
+font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pay-deadline{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-warning-600);
+font-weight:var(--weight-semibold);margin-top:var(--space-1)}
+.pay-actions{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3);justify-content:flex-end}
+.pay-methods{width:100%;display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;
+margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-warning-600);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.method{display:inline-flex;align-items:center;height:28px;padding:0 var(--space-3);
+border:1px solid var(--color-neutral-500);border-radius:14px;background:var(--color-neutral-0);
+font-size:var(--text-xs);font-weight:var(--weight-medium);color:var(--color-neutral-900)}
+
+/* ══ Status chip: dot + icon + text, see components/status.html ══ */
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);
+padding:var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+border-radius:var(--radius-sm);border:1px solid;background:var(--color-neutral-0);
+font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium);white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.chip .ic{font-size:var(--text-sm);line-height:1;flex:none;width:14px;text-align:center}
+.tone-neutral{color:var(--color-neutral-600);border-color:var(--color-neutral-200);background:var(--color-neutral-50)}
+.tone-info{color:var(--color-info-600);
+border-color:color-mix(in srgb,var(--color-info-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-info-600) 7%,var(--color-neutral-0))}
+.tone-success{color:var(--color-success-600);
+border-color:color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))}
+.tone-warning{color:var(--color-warning-600);
+border-color:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0))}
+.tone-danger{color:var(--color-danger-600);
+border-color:color-mix(in srgb,var(--color-danger-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+
+/* ══ Application cards ════════════════════════════════════
+   Three questions in fixed order: what is happening now, what is
+   needed from you, by when. Everything else is secondary. */
+.cards{display:grid;gap:var(--space-4)}
+.appcard{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-6)}
+.appcard.needs-you{border-color:var(--color-warning-600);box-shadow:inset 4px 0 0 var(--color-warning-600)}
+.app-top{display:flex;align-items:flex-start;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)}
+.app-what{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.app-where{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+margin-top:var(--space-1)}
+.app-no{margin-left:auto;text-align:right;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600)}
+.app-no b{display:block;font-family:var(--font-family-mono);font-size:var(--text-sm);
+color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);
+border-top:1px solid var(--color-neutral-200);padding-top:var(--space-4)}
+.qa dt{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.03em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-1)}
+.qa dd{font-size:var(--text-sm);line-height:var(--leading-sm)}
+.qa dd b{font-weight:var(--weight-semibold)}
+.qa .calm{color:var(--color-neutral-600)}
+.qa .urge{color:var(--color-warning-600);font-weight:var(--weight-semibold)}
+
+.app-actions{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4)}
+
+/* Plain-language progress. No codes, no percentages — five words */
+.steps{display:flex;gap:var(--space-1);flex-wrap:wrap;margin-top:var(--space-4);
+padding-top:var(--space-4);border-top:1px dashed var(--color-neutral-200)}
+.step{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);color:var(--color-neutral-600);padding-right:var(--space-3)}
+.step .bead{width:16px;height:16px;border-radius:50%;flex:none;display:grid;place-items:center;
+font-size:10px;border:1px solid var(--color-neutral-500);background:var(--color-neutral-0);
+color:var(--color-neutral-600)}
+.step.done .bead{background:var(--color-primary-600);border-color:var(--color-primary-700);
+color:var(--color-neutral-0)}
+.step.done{color:var(--color-neutral-900)}
+.step.now .bead{background:var(--color-neutral-0);border:2px solid var(--color-primary-600);
+color:var(--color-primary-700);font-weight:var(--weight-semibold)}
+.step.now{color:var(--color-primary-900);font-weight:var(--weight-semibold)}
+.step .arr{color:var(--color-neutral-400)}
+
+/* ══ Permit cards ═════════════════════════════════════════ */
+.permits{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+.permit{display:grid;grid-template-columns:180px 1fr auto;gap:var(--space-4);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4)}
+.minimap{width:180px;height:112px;display:block;border-radius:var(--radius-md);
+border:1px solid var(--color-neutral-500)}
+.mm-bg{fill:var(--color-primary-50)}
+.mm-other{fill:var(--color-neutral-0);stroke:var(--color-neutral-500);stroke-width:1}
+.mm-own{fill:var(--color-primary-300);fill-opacity:.75;stroke:var(--color-primary-700);stroke-width:2}
+.mm-road{fill:none;stroke:var(--color-neutral-500);stroke-width:1.5;stroke-dasharray:5 3}
+.mm-pin{fill:var(--color-primary-700);stroke:var(--color-neutral-0);stroke-width:1.5}
+.mm-cap{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:var(--space-1);text-align:center}
+.permit-id{font-family:var(--font-family-mono);font-size:var(--text-lg);line-height:var(--leading-lg);
+font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
+.permit-what{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+margin-bottom:var(--space-3)}
+.permit-dl{display:grid;gap:var(--space-2);margin:var(--space-3) 0}
+.permit-dl div{display:flex;gap:var(--space-2);font-size:var(--text-sm);line-height:var(--leading-sm)}
+.permit-dl dt{color:var(--color-neutral-600);min-width:104px;flex:none}
+.permit-dl dd{font-weight:var(--weight-medium)}
+.permit-dl .mono{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums}
+.days{display:inline-flex;align-items:baseline;gap:var(--space-2)}
+.days b{font-size:var(--text-base);font-weight:var(--weight-semibold)}
+.days .soon{color:var(--color-warning-600)}
+.permit-bar{height:6px;border-radius:3px;background:var(--color-neutral-200);
+border:1px solid var(--color-neutral-500);overflow:hidden;margin-top:var(--space-1)}
+.permit-bar i{display:block;height:100%;background:var(--color-primary-600)}
+.permit-bar.soon i{background:var(--color-warning-600)}
+.permit-side{text-align:center;width:112px}
+.qr-mini{width:96px;height:96px;display:block;margin:0 auto;color:var(--color-neutral-900);
+fill:currentColor;background:var(--color-neutral-0);border:1px solid var(--color-neutral-500);
+border-radius:var(--radius-sm);padding:6px}
+.qr-mini-cap{font-size:11px;line-height:14px;color:var(--color-neutral-600);margin-top:var(--space-2)}
+.permit-actions{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3)}
+.btn-sm{height:32px;padding:0 var(--space-3);font-size:var(--text-xs)}
+
+/* ══ History, collapsed ═══════════════════════════════════ */
+.hist{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);overflow:hidden}
+.hist summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:var(--space-3);
+padding:var(--space-4) var(--space-6);font-size:var(--text-base);font-weight:var(--weight-semibold);
+min-height:var(--touch-target)}
+.hist summary::-webkit-details-marker{display:none}
+.hist summary:hover{background:var(--color-neutral-50)}
+.hist summary .tw{color:var(--color-neutral-600);transition:none}
+.hist[open] summary{border-bottom:1px solid var(--color-neutral-200)}
+.hist summary small{font-weight:var(--weight-regular);color:var(--color-neutral-600);
+font-size:var(--text-sm);margin-left:auto}
+.hist-body{padding:var(--space-2) var(--space-6) var(--space-6)}
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{text-align:left;font-size:var(--text-xs);line-height:var(--leading-xs);
+font-weight:var(--weight-semibold);letter-spacing:.04em;text-transform:uppercase;
+color:var(--color-neutral-600);height:var(--row-height-compact);padding:0 var(--space-3) 0 0;
+white-space:nowrap;border-bottom:1px solid var(--color-neutral-200)}
+tbody td{padding:var(--space-3) var(--space-3) var(--space-3) 0;
+border-bottom:1px solid var(--color-neutral-200);
+font-size:var(--text-sm);line-height:var(--leading-sm);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+td .mono{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.link{color:var(--color-primary-700);font-weight:var(--weight-semibold);text-decoration:none}
+.link:hover{text-decoration:underline}
+
+/* ══ Second state: the cabinet of a brand-new user ════════ */
+.state{max-width:var(--content-max);margin:0 auto;padding:var(--space-6)}
+.state-label{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);font-weight:var(--weight-semibold);letter-spacing:.04em;
+text-transform:uppercase;color:var(--color-neutral-600);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:16px;padding:var(--space-1) var(--space-3);margin-bottom:var(--space-4)}
+.state-lead{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+max-width:78ch;margin-bottom:var(--space-6)}
+.onboard{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-12) var(--space-8)}
+.onboard h2{font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold);
+text-align:center}
+.onboard>p{font-size:var(--text-base);line-height:var(--leading-base);color:var(--color-neutral-600);
+max-width:66ch;margin:var(--space-3) auto 0;text-align:center}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-6);
+margin:var(--space-8) auto 0;max-width:960px}
+.how-step{text-align:center}
+.how-n{width:44px;height:44px;margin:0 auto var(--space-3);border-radius:50%;
+background:var(--color-primary-50);border:2px solid var(--color-primary-600);
+color:var(--color-primary-900);display:grid;place-items:center;
+font-size:var(--text-lg);font-weight:var(--weight-semibold)}
+.how-step h3{font-size:var(--text-base);line-height:var(--leading-base);font-weight:var(--weight-semibold);
+margin-bottom:var(--space-1)}
+.how-step p{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.kinds{display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:center;
+margin:var(--space-8) auto 0;max-width:900px}
+.kind{display:inline-flex;align-items:center;gap:var(--space-2);height:var(--touch-target);
+padding:0 var(--space-4);border:1px solid var(--color-neutral-500);border-radius:22px;
+background:var(--color-neutral-0);font-family:inherit;font-size:var(--text-sm);
+font-weight:var(--weight-medium);color:var(--color-neutral-900);cursor:pointer;text-decoration:none}
+.kind:hover{background:var(--color-primary-50);border-color:var(--color-primary-600)}
+.kind .ic{color:var(--color-primary-700)}
+.onboard-cta{display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;margin-top:var(--space-8)}
+.onboard-foot{margin-top:var(--space-8);padding-top:var(--space-6);
+border-top:1px solid var(--color-neutral-200);text-align:center;
+font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600)}
+.onboard-foot a{color:var(--color-primary-700);font-weight:var(--weight-semibold)}
+</style>
+</head>
+<body>
+
+<div class="note">
+    <p><strong>Кабинет заявителя.</strong> Взгляд снаружи — глазами фермера, который заходит сюда
+    четыре раза в год. Он не знает и не должен знать внутреннюю кухню: на этом экране нет ни кодов
+    статусов, ни слова «SLA», ни ссылок на пункты ТЗ. Вместо <span class="code">PENDING_INFO</span> —
+    «нужен ваш документ», вместо <span class="code">RETURNED</span> — «вернули на исправление».
+    Коды остаются в кабинете сотрудника и в логах.</p>
+    <p><strong>Каждая карточка отвечает на три вопроса в одном порядке:</strong> что происходит сейчас,
+    что требуется от вас, до какого числа. Всё остальное — второстепенно.</p>
+    <p>Ниже каркаса — второе состояние того же экрана: кабинет человека, который только
+    зарегистрировался и не подавал ещё ни одной заявки.</p>
+</div>
+
+<div class="shell">
+
+    <div class="brand">
+        <div class="brand-mark">Р</div>
+        <div>
+            <div class="brand-name">RUXSATNOMA</div>
+            <div class="brand-sub">Агентство по лесам</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="search">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Найти свою заявку или разрешение" aria-label="Поиск по кабинету">
+        </div>
+
+        <div class="header-right">
+            <div class="lang" role="group" aria-label="Язык интерфейса">
+                <button aria-pressed="true">Ўз</button>
+                <button aria-pressed="false">Uz</button>
+                <button aria-pressed="false">Ру</button>
+            </div>
+
+            <button class="icon-btn" aria-label="Уведомления, 4 непрочитанных">
+                <span aria-hidden="true">🔔</span>
+                <span class="badge-dot">4</span>
+            </button>
+
+            <button class="user">
+                <span class="avatar">РЮ</span>
+                <span>
+                    <span class="user-name">Рустам Юлдашев</span><br>
+                    <span class="user-role">Фермерское хозяйство</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="sidebar" aria-label="Основное меню">
+        <a class="nav-item" href="#" aria-current="page"><span class="ico" aria-hidden="true">▤</span>Главная</a>
+
+        <div class="nav-group">Мои дела</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">✉</span>Мои заявки<span class="nav-count">4</span></a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◆</span>Мои разрешения<span class="nav-count">2</span></a>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">₴</span>Счета и оплата
+            <span class="nav-count is-due" aria-label="1 счёт к оплате">1</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◉</span>Карта участков</a>
+
+        <div class="nav-group">Мой профиль</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">☰</span>Данные хозяйства</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">✎</span>Электронная подпись</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">🔔</span>Уведомления</a>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" href="#"><span class="ico" aria-hidden="true">?</span>Помощь и вопросы</a>
+        </div>
+    </nav>
+
+    <main class="main">
+
+        <!-- ── Greeting and the one big action ──────────────── -->
+        <div class="hero hero-focus">
+            <div>
+                <h1>Здравствуйте, Рустам Норматович</h1>
+                <p>Фермерское хозяйство «Чорвадор-Сардор». У вас два действующих разрешения
+                    и одна заявка ждёт оплаты. Остальное идёт своим ходом — мы напишем,
+                    когда от вас что-то понадобится.</p>
+            </div>
+            <div class="hero-cta">
+                <a class="btn-huge" href="#"><span class="plus" aria-hidden="true">+</span>Подать заявку</a>
+                <small>Шесть шагов, около 15 минут. Можно прерваться — черновик сохранится</small>
+            </div>
+        </div>
+
+        <!-- ── Money owed: the thing he came here for ───────── -->
+        <div class="pay">
+            <span class="pay-ic" aria-hidden="true">₴</span>
+            <div class="pay-txt">
+                <h2>Нужно оплатить</h2>
+                <p>Заявку на сенокошение в Зангиота ўрмончилиги одобрили. Осталось оплатить —
+                    и лесхоз выпишет разрешение. <b>Если не оплатить до 14 августа, заявку придётся
+                    подавать заново</b> и участок может уйти другому.</p>
+            </div>
+            <div class="pay-sum">
+                <div class="pay-amount">2 480 240 сум</div>
+                <div class="pay-deadline"><span aria-hidden="true">⧗</span> до 14 августа, осталось 4 дня</div>
+                <div class="pay-actions">
+                    <button class="btn btn-warning btn-touch">Оплатить</button>
+                    <button class="btn btn-secondary btn-touch">Посмотреть счёт</button>
+                </div>
+            </div>
+            <div class="pay-methods">
+                <span>Способы оплаты:</span>
+                <span class="method">Payme</span>
+                <span class="method">Click</span>
+                <span class="method">Uzum</span>
+                <span class="method">Paynet</span>
+                <span class="method">Банковский перевод</span>
+                <span>Деньги доходят за несколько минут, квитанция появится здесь же.</span>
+            </div>
+        </div>
+
+        <!-- ── Applications in progress ─────────────────────── -->
+        <section class="sec" aria-labelledby="h-apps">
+            <div class="sec-head">
+                <h2 id="h-apps">Ваши заявки</h2>
+                <p>3 в работе</p>
+                <a class="more" href="#">Все заявки и черновики →</a>
+            </div>
+
+            <div class="cards">
+
+                <div class="appcard">
+                    <div class="app-top">
+                        <div>
+                            <div class="app-what">Выпас скота</div>
+                            <div class="app-where">Зангиота ўрмончилиги, квартал 14 · 42,6 га · с 1 ноября по 31 декабря</div>
+                        </div>
+                        <div class="app-no">Номер заявки<b>А-00052</b>подана 9 августа</div>
+                    </div>
+                    <dl class="qa">
+                        <div>
+                            <dt>Что происходит</dt>
+                            <dd><span class="chip tone-info"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◷</span>Проверяем заявку</span>
+                                <br>Лесхоз смотрит участок и документы.</dd>
+                        </div>
+                        <div>
+                            <dt>Что нужно от вас</dt>
+                            <dd class="calm">Сейчас ничего. Мы напишем и позвоним, если что-то понадобится.</dd>
+                        </div>
+                        <div>
+                            <dt>Когда будет ответ</dt>
+                            <dd><b>до 24 августа</b><br><span class="calm">обычно отвечают раньше</span></dd>
+                        </div>
+                    </dl>
+                    <div class="steps">
+                        <span class="step done"><span class="bead" aria-hidden="true">✓</span>Заявка подана</span>
+                        <span class="arr" aria-hidden="true">→</span>
+                        <span class="step now"><span class="bead" aria-hidden="true">2</span>Проверяем</span>
+                        <span class="arr" aria-hidden="true">→</span>
+                        <span class="step"><span class="bead" aria-hidden="true">3</span>Решение лесхоза</span>
+                        <span class="arr" aria-hidden="true">→</span>
+                        <span class="step"><span class="bead" aria-hidden="true">4</span>Оплата</span>
+                        <span class="arr" aria-hidden="true">→</span>
+                        <span class="step"><span class="bead" aria-hidden="true">5</span>Разрешение готово</span>
+                    </div>
+                </div>
+
+                <div class="appcard needs-you">
+                    <div class="app-top">
+                        <div>
+                            <div class="app-what">Размещение пчелиных ульев</div>
+                            <div class="app-where">Пскент ўрмончилиги, квартал 7 · 60 ульев · с 1 сентября по 30 ноября</div>
+                        </div>
+                        <div class="app-no">Номер заявки<b>А-00045</b>подана 28 июля</div>
+                    </div>
+                    <dl class="qa">
+                        <div>
+                            <dt>Что происходит</dt>
+                            <dd><span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">?</span>Ждём ваш документ</span>
+                                <br>Пока документа нет, заявка стоит на месте.</dd>
+                        </div>
+                        <div>
+                            <dt>Что нужно от вас</dt>
+                            <dd class="urge">Приложить ветеринарную справку на пасеку — фото или скан, до 10 МБ.</dd>
+                        </div>
+                        <div>
+                            <dt>До какого числа</dt>
+                            <dd class="urge"><b>до 13 августа</b><br>осталось 3 дня</dd>
+                        </div>
+                    </dl>
+                    <div class="app-actions">
+                        <button class="btn btn-primary btn-touch"><span aria-hidden="true">⤒</span>Приложить документ</button>
+                        <button class="btn btn-secondary btn-touch">Написать в лесхоз</button>
+                    </div>
+                </div>
+
+                <div class="appcard needs-you">
+                    <div class="app-top">
+                        <div>
+                            <div class="app-what">Сбор дров и хвороста</div>
+                            <div class="app-where">Оҳангарон ўрмончилиги, квартал 22 · 6 га · с 1 октября по 30 ноября</div>
+                        </div>
+                        <div class="app-no">Номер заявки<b>А-00039</b>подана 21 июля</div>
+                    </div>
+                    <dl class="qa">
+                        <div>
+                            <dt>Что происходит</dt>
+                            <dd><span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">↩</span>Вернули на исправление</span>
+                                <br>Лесничий Эргашев Б. Р., 5 августа.</dd>
+                        </div>
+                        <div>
+                            <dt>Что нужно от вас</dt>
+                            <dd class="urge">Уменьшить площадь до 4 гектаров: на двух гектарах уже действует
+                                чужое разрешение до конца года. Остальное в заявке менять не нужно.</dd>
+                        </div>
+                        <div>
+                            <dt>До какого числа</dt>
+                            <dd class="urge"><b>до 17 августа</b><br>осталось 7 дней</dd>
+                        </div>
+                    </dl>
+                    <div class="app-actions">
+                        <button class="btn btn-primary btn-touch">Исправить и отправить</button>
+                        <button class="btn btn-secondary btn-touch">Посмотреть участок на карте</button>
+                        <button class="btn btn-secondary btn-touch">Отозвать заявку</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ── Permits in force ─────────────────────────────── -->
+        <section class="sec" aria-labelledby="h-permits">
+            <div class="sec-head">
+                <h2 id="h-permits">Действующие разрешения</h2>
+                <p>2 разрешения</p>
+                <a class="more" href="#">Все разрешения, включая прошлогодние →</a>
+            </div>
+
+            <div class="permits">
+
+                <div class="permit">
+                    <div>
+                        <svg class="minimap" viewBox="0 0 180 112" role="img"
+                             aria-label="Схема участка: контур KT-14-03-217, субконтур 217-2, 42,6 гектара в Зангиота ўрмончилиги">
+                            <rect class="mm-bg" width="180" height="112"/>
+                            <path class="mm-other" d="M6 14 L48 6 L60 34 L36 58 L10 50 Z"/>
+                            <path class="mm-other" d="M128 8 L174 16 L170 52 L134 48 Z"/>
+                            <path class="mm-other" d="M16 70 L58 68 L70 104 L24 106 Z"/>
+                            <path class="mm-road" d="M0 64 C44 56 78 84 180 70"/>
+                            <path class="mm-own" d="M66 22 L120 12 L142 48 L124 92 L82 96 L62 62 Z"/>
+                            <circle class="mm-pin" cx="102" cy="54" r="5"/>
+                        </svg>
+                        <div class="mm-cap">Контур 217-2 · 42,6 га</div>
+                    </div>
+                    <div>
+                        <div class="permit-id">А № 004182</div>
+                        <div class="permit-what">Выпас скота · Зангиота ўрмончилиги, квартал 14</div>
+                        <span class="chip tone-success"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◈</span>Действует</span>
+                        <dl class="permit-dl">
+                            <div><dt>Срок</dt><dd class="mono">1 августа — 31 октября</dd></div>
+                            <div><dt>Осталось</dt>
+                                <dd class="days"><b>82 дня</b><span class="mono">из 92</span></dd></div>
+                            <div><dt>Скот</dt><dd>198 голов</dd></div>
+                        </dl>
+                        <div class="permit-bar" role="img" aria-label="Прошло 10 дней из 92">
+                            <i style="width:11%"></i>
+                        </div>
+                        <div class="permit-actions">
+                            <button class="btn btn-secondary btn-sm">Скачать PDF</button>
+                            <button class="btn btn-secondary btn-sm">Показать инспектору</button>
+                        </div>
+                    </div>
+                    <div class="permit-side">
+                        <svg class="qr-mini" viewBox="0 0 21 21" shape-rendering="crispEdges" role="img"
+                             aria-label="QR-код разрешения А № 004182">
+        <rect x="0" y="0" width="7" height="1"/>
+        <rect x="8" y="0" height="1"/>
+        <rect x="14" y="0" width="7" height="1"/>
+        <rect x="0" y="1" height="1"/>
+        <rect x="6" y="1" height="1"/>
+        <rect x="10" y="1" width="3" height="1"/>
+        <rect x="14" y="1" height="1"/>
+        <rect x="20" y="1" height="1"/>
+        <rect x="0" y="2" height="1"/>
+        <rect x="2" y="2" width="3" height="1"/>
+        <rect x="6" y="2" height="1"/>
+        <rect x="9" y="2" height="1"/>
+        <rect x="11" y="2" height="1"/>
+        <rect x="14" y="2" height="1"/>
+        <rect x="16" y="2" width="3" height="1"/>
+        <rect x="20" y="2" height="1"/>
+        <rect x="0" y="3" height="1"/>
+        <rect x="2" y="3" width="3" height="1"/>
+        <rect x="6" y="3" height="1"/>
+        <rect x="8" y="3" width="2" height="1"/>
+        <rect x="11" y="3" height="1"/>
+        <rect x="14" y="3" height="1"/>
+        <rect x="16" y="3" width="3" height="1"/>
+        <rect x="20" y="3" height="1"/>
+        <rect x="0" y="4" height="1"/>
+        <rect x="2" y="4" width="3" height="1"/>
+        <rect x="6" y="4" height="1"/>
+        <rect x="8" y="4" height="1"/>
+        <rect x="12" y="4" height="1"/>
+        <rect x="14" y="4" height="1"/>
+        <rect x="16" y="4" width="3" height="1"/>
+        <rect x="20" y="4" height="1"/>
+        <rect x="0" y="5" height="1"/>
+        <rect x="6" y="5" height="1"/>
+        <rect x="10" y="5" height="1"/>
+        <rect x="12" y="5" height="1"/>
+        <rect x="14" y="5" height="1"/>
+        <rect x="20" y="5" height="1"/>
+        <rect x="0" y="6" width="7" height="1"/>
+        <rect x="8" y="6" height="1"/>
+        <rect x="10" y="6" height="1"/>
+        <rect x="12" y="6" height="1"/>
+        <rect x="14" y="6" width="7" height="1"/>
+        <rect x="10" y="7" height="1"/>
+        <rect x="12" y="7" height="1"/>
+        <rect x="0" y="8" height="1"/>
+        <rect x="2" y="8" width="2" height="1"/>
+        <rect x="5" y="8" width="2" height="1"/>
+        <rect x="8" y="8" width="2" height="1"/>
+        <rect x="11" y="8" height="1"/>
+        <rect x="14" y="8" width="2" height="1"/>
+        <rect x="18" y="8" height="1"/>
+        <rect x="20" y="8" height="1"/>
+        <rect x="9" y="9" height="1"/>
+        <rect x="13" y="9" width="2" height="1"/>
+        <rect x="18" y="9" width="3" height="1"/>
+        <rect x="0" y="10" height="1"/>
+        <rect x="3" y="10" width="2" height="1"/>
+        <rect x="6" y="10" height="1"/>
+        <rect x="8" y="10" width="3" height="1"/>
+        <rect x="13" y="10" height="1"/>
+        <rect x="15" y="10" height="1"/>
+        <rect x="17" y="10" width="2" height="1"/>
+        <rect x="1" y="11" height="1"/>
+        <rect x="10" y="11" height="1"/>
+        <rect x="12" y="11" width="2" height="1"/>
+        <rect x="17" y="11" width="4" height="1"/>
+        <rect x="2" y="12" height="1"/>
+        <rect x="4" y="12" width="3" height="1"/>
+        <rect x="8" y="12" width="2" height="1"/>
+        <rect x="12" y="12" height="1"/>
+        <rect x="15" y="12" width="2" height="1"/>
+        <rect x="19" y="12" height="1"/>
+        <rect x="8" y="13" height="1"/>
+        <rect x="13" y="13" height="1"/>
+        <rect x="16" y="13" width="2" height="1"/>
+        <rect x="0" y="14" width="7" height="1"/>
+        <rect x="10" y="14" height="1"/>
+        <rect x="16" y="14" height="1"/>
+        <rect x="0" y="15" height="1"/>
+        <rect x="6" y="15" height="1"/>
+        <rect x="9" y="15" width="3" height="1"/>
+        <rect x="18" y="15" height="1"/>
+        <rect x="0" y="16" height="1"/>
+        <rect x="2" y="16" width="3" height="1"/>
+        <rect x="6" y="16" height="1"/>
+        <rect x="8" y="16" height="1"/>
+        <rect x="10" y="16" height="1"/>
+        <rect x="0" y="17" height="1"/>
+        <rect x="2" y="17" width="3" height="1"/>
+        <rect x="6" y="17" height="1"/>
+        <rect x="10" y="17" width="3" height="1"/>
+        <rect x="17" y="17" height="1"/>
+        <rect x="20" y="17" height="1"/>
+        <rect x="0" y="18" height="1"/>
+        <rect x="2" y="18" width="3" height="1"/>
+        <rect x="6" y="18" height="1"/>
+        <rect x="8" y="18" width="2" height="1"/>
+        <rect x="13" y="18" height="1"/>
+        <rect x="19" y="18" height="1"/>
+        <rect x="0" y="19" height="1"/>
+        <rect x="6" y="19" height="1"/>
+        <rect x="8" y="19" height="1"/>
+        <rect x="10" y="19" width="2" height="1"/>
+        <rect x="13" y="19" height="1"/>
+        <rect x="15" y="19" height="1"/>
+        <rect x="20" y="19" height="1"/>
+        <rect x="0" y="20" width="7" height="1"/>
+        <rect x="11" y="20" height="1"/>
+        <rect x="13" y="20" width="2" height="1"/>
+        <rect x="16" y="20" height="1"/>
+        <rect x="19" y="20" height="1"/>
+                        </svg>
+                        <div class="qr-mini-cap">Покажите этот код —<br>по нему проверят<br>разрешение</div>
+                    </div>
+                </div>
+
+                <div class="permit">
+                    <div>
+                        <svg class="minimap" viewBox="0 0 180 112" role="img"
+                             aria-label="Схема участка: контур KT-09-02-104, 18,4 гектара в Оҳангарон ўрмончилиги">
+                            <rect class="mm-bg" width="180" height="112"/>
+                            <path class="mm-other" d="M8 8 L52 10 L56 40 L12 44 Z"/>
+                            <path class="mm-other" d="M118 62 L168 58 L174 100 L124 104 Z"/>
+                            <path class="mm-other" d="M8 62 L44 66 L40 104 L6 100 Z"/>
+                            <path class="mm-road" d="M62 0 C70 40 52 70 74 112"/>
+                            <path class="mm-own" d="M78 14 L142 8 L168 30 L156 50 L112 58 L80 44 Z"/>
+                            <circle class="mm-pin" cx="124" cy="32" r="5"/>
+                        </svg>
+                        <div class="mm-cap">Контур 104 · 18,4 га</div>
+                    </div>
+                    <div>
+                        <div class="permit-id">А № 003960</div>
+                        <div class="permit-what">Сенокошение · Оҳангарон ўрмончилиги, квартал 22</div>
+                        <span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">⧗</span>Скоро закончится</span>
+                        <dl class="permit-dl">
+                            <div><dt>Срок</dt><dd class="mono">15 июня — 31 августа</dd></div>
+                            <div><dt>Осталось</dt>
+                                <dd class="days"><b class="soon">21 день</b><span class="mono">из 78</span></dd></div>
+                            <div><dt>Сено</dt><dd>до 26 тонн</dd></div>
+                        </dl>
+                        <div class="permit-bar soon" role="img" aria-label="Прошло 57 дней из 78">
+                            <i style="width:73%"></i>
+                        </div>
+                        <div class="permit-actions">
+                            <button class="btn btn-primary btn-sm">Продлить срок</button>
+                            <button class="btn btn-secondary btn-sm">Скачать PDF</button>
+                        </div>
+                    </div>
+                    <div class="permit-side">
+                        <svg class="qr-mini" viewBox="0 0 21 21" shape-rendering="crispEdges" role="img"
+                             aria-label="QR-код разрешения А № 003960">
+        <rect x="0" y="0" width="7" height="1"/>
+        <rect x="8" y="0" height="1"/>
+        <rect x="10" y="0" width="2" height="1"/>
+        <rect x="14" y="0" width="7" height="1"/>
+        <rect x="0" y="1" height="1"/>
+        <rect x="6" y="1" height="1"/>
+        <rect x="9" y="1" height="1"/>
+        <rect x="11" y="1" width="2" height="1"/>
+        <rect x="14" y="1" height="1"/>
+        <rect x="20" y="1" height="1"/>
+        <rect x="0" y="2" height="1"/>
+        <rect x="2" y="2" width="3" height="1"/>
+        <rect x="6" y="2" height="1"/>
+        <rect x="10" y="2" width="2" height="1"/>
+        <rect x="14" y="2" height="1"/>
+        <rect x="16" y="2" width="3" height="1"/>
+        <rect x="20" y="2" height="1"/>
+        <rect x="0" y="3" height="1"/>
+        <rect x="2" y="3" width="3" height="1"/>
+        <rect x="6" y="3" height="1"/>
+        <rect x="8" y="3" height="1"/>
+        <rect x="10" y="3" width="2" height="1"/>
+        <rect x="14" y="3" height="1"/>
+        <rect x="16" y="3" width="3" height="1"/>
+        <rect x="20" y="3" height="1"/>
+        <rect x="0" y="4" height="1"/>
+        <rect x="2" y="4" width="3" height="1"/>
+        <rect x="6" y="4" height="1"/>
+        <rect x="8" y="4" height="1"/>
+        <rect x="10" y="4" height="1"/>
+        <rect x="14" y="4" height="1"/>
+        <rect x="16" y="4" width="3" height="1"/>
+        <rect x="20" y="4" height="1"/>
+        <rect x="0" y="5" height="1"/>
+        <rect x="6" y="5" height="1"/>
+        <rect x="10" y="5" width="3" height="1"/>
+        <rect x="14" y="5" height="1"/>
+        <rect x="20" y="5" height="1"/>
+        <rect x="0" y="6" width="7" height="1"/>
+        <rect x="8" y="6" height="1"/>
+        <rect x="10" y="6" height="1"/>
+        <rect x="12" y="6" height="1"/>
+        <rect x="14" y="6" width="7" height="1"/>
+        <rect x="0" y="8" height="1"/>
+        <rect x="2" y="8" width="2" height="1"/>
+        <rect x="5" y="8" width="2" height="1"/>
+        <rect x="8" y="8" height="1"/>
+        <rect x="10" y="8" width="2" height="1"/>
+        <rect x="14" y="8" width="2" height="1"/>
+        <rect x="18" y="8" height="1"/>
+        <rect x="20" y="8" height="1"/>
+        <rect x="4" y="9" width="2" height="1"/>
+        <rect x="8" y="9" height="1"/>
+        <rect x="12" y="9" height="1"/>
+        <rect x="14" y="9" height="1"/>
+        <rect x="18" y="9" height="1"/>
+        <rect x="5" y="10" width="2" height="1"/>
+        <rect x="8" y="10" width="3" height="1"/>
+        <rect x="17" y="10" height="1"/>
+        <rect x="19" y="10" height="1"/>
+        <rect x="0" y="11" height="1"/>
+        <rect x="2" y="11" height="1"/>
+        <rect x="5" y="11" height="1"/>
+        <rect x="8" y="11" height="1"/>
+        <rect x="10" y="11" height="1"/>
+        <rect x="12" y="11" height="1"/>
+        <rect x="15" y="11" height="1"/>
+        <rect x="17" y="11" width="2" height="1"/>
+        <rect x="0" y="12" height="1"/>
+        <rect x="2" y="12" width="2" height="1"/>
+        <rect x="6" y="12" height="1"/>
+        <rect x="9" y="12" height="1"/>
+        <rect x="12" y="12" width="3" height="1"/>
+        <rect x="19" y="12" width="2" height="1"/>
+        <rect x="8" y="13" height="1"/>
+        <rect x="16" y="13" width="2" height="1"/>
+        <rect x="19" y="13" height="1"/>
+        <rect x="0" y="14" width="7" height="1"/>
+        <rect x="9" y="14" height="1"/>
+        <rect x="14" y="14" height="1"/>
+        <rect x="17" y="14" height="1"/>
+        <rect x="20" y="14" height="1"/>
+        <rect x="0" y="15" height="1"/>
+        <rect x="6" y="15" height="1"/>
+        <rect x="9" y="15" height="1"/>
+        <rect x="12" y="15" height="1"/>
+        <rect x="0" y="16" height="1"/>
+        <rect x="2" y="16" width="3" height="1"/>
+        <rect x="6" y="16" height="1"/>
+        <rect x="8" y="16" height="1"/>
+        <rect x="10" y="16" width="2" height="1"/>
+        <rect x="13" y="16" height="1"/>
+        <rect x="0" y="17" height="1"/>
+        <rect x="2" y="17" width="3" height="1"/>
+        <rect x="6" y="17" height="1"/>
+        <rect x="11" y="17" height="1"/>
+        <rect x="15" y="17" height="1"/>
+        <rect x="19" y="17" height="1"/>
+        <rect x="0" y="18" height="1"/>
+        <rect x="2" y="18" width="3" height="1"/>
+        <rect x="6" y="18" height="1"/>
+        <rect x="8" y="18" height="1"/>
+        <rect x="11" y="18" width="2" height="1"/>
+        <rect x="15" y="18" width="2" height="1"/>
+        <rect x="18" y="18" height="1"/>
+        <rect x="0" y="19" height="1"/>
+        <rect x="6" y="19" height="1"/>
+        <rect x="8" y="19" height="1"/>
+        <rect x="11" y="19" width="2" height="1"/>
+        <rect x="14" y="19" height="1"/>
+        <rect x="17" y="19" height="1"/>
+        <rect x="0" y="20" width="7" height="1"/>
+        <rect x="10" y="20" height="1"/>
+        <rect x="13" y="20" height="1"/>
+        <rect x="17" y="20" width="2" height="1"/>
+        <rect x="20" y="20" height="1"/>
+                        </svg>
+                        <div class="qr-mini-cap">Покажите этот код —<br>по нему проверят<br>разрешение</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ── History: folded away, it is not what he came for ── -->
+        <section class="sec" aria-labelledby="h-hist">
+            <details class="hist">
+                <summary id="h-hist">
+                    <span class="tw" aria-hidden="true">▸</span>
+                    Прошлые заявки и разрешения
+                    <small>7 завершённых, 2 отклонённых · с 2024 года</small>
+                </summary>
+                <div class="hist-body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Что это было</th>
+                                <th scope="col">Когда</th>
+                                <th scope="col">Чем закончилось</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Выпас скота<small>Зангиота ўрмончилиги, 40,2 га</small></td>
+                                <td class="mono">август — октябрь 2025</td>
+                                <td><span class="chip tone-neutral"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">⊟</span>Завершено</span>
+                                    <small>разрешение А № 003114, срок вышел</small></td>
+                                <td><a class="link" href="#">Открыть</a></td>
+                            </tr>
+                            <tr>
+                                <td>Сенокошение<small>Оҳангарон ўрмончилиги, 18,4 га</small></td>
+                                <td class="mono">июнь — август 2025</td>
+                                <td><span class="chip tone-neutral"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">⊟</span>Завершено</span>
+                                    <small>разрешение А № 002877, срок вышел</small></td>
+                                <td><a class="link" href="#">Открыть</a></td>
+                            </tr>
+                            <tr>
+                                <td>Выпас скота<small>Пскент ўрмончилиги, 55 га</small></td>
+                                <td class="mono">апрель 2025</td>
+                                <td><span class="chip tone-danger"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">✕</span>Отказано</span>
+                                    <small>на участке нет свободного места: пастбище было занято целиком</small></td>
+                                <td><a class="link" href="#">Причина отказа</a></td>
+                            </tr>
+                            <tr>
+                                <td>Научные исследования<small>Зангиота ўрмончилиги, 3 га</small></td>
+                                <td class="mono">февраль 2025</td>
+                                <td><span class="chip tone-danger"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">✕</span>Отказано</span>
+                                    <small>не хватило письма научной организации, срок на исправление вышел</small></td>
+                                <td><a class="link" href="#">Причина отказа</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ══ Second state: a cabinet with nothing in it yet ══ -->
+<div class="state">
+    <span class="state-label"><span aria-hidden="true">◻</span>Состояние того же экрана · человек только зарегистрировался</span>
+    <p class="state-lead">Пустой экран с надписью «Данных нет» здесь недопустим: человек пришёл
+        за разрешением и не знает ни слова «контур», ни того, сколько всё это стоит и сколько ждать.
+        Поэтому первый вход объясняет порядок целиком — три шага, шесть видов пользования,
+        честный срок и честная цена, — и заканчивается той же большой кнопкой.</p>
+
+    <div class="onboard">
+        <h2>Добро пожаловать, Дилшод Норматович</h2>
+        <p>Здесь оформляют разрешения на пользование лесным фондом: выпас скота, сенокошение,
+            пчелиные ульи, отдых, сбор дров и научные исследования. Пока у вас нет ни одной
+            заявки — начнём с первой.</p>
+
+        <div class="how">
+            <div class="how-step">
+                <div class="how-n" aria-hidden="true">1</div>
+                <h3>Выберите участок и срок</h3>
+                <p>Покажем на карте свободные участки рядом с вами и сразу посчитаем,
+                    сколько скота на них можно поставить.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-n" aria-hidden="true">2</div>
+                <h3>Подпишите и отправьте</h3>
+                <p>Подписать нужно электронной подписью — той же, что для налоговой.
+                    Если её нет, поможем получить.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-n" aria-hidden="true">3</div>
+                <h3>Оплатите и получите документ</h3>
+                <p>Ответ приходит не позже чем через 15 дней. После оплаты разрешение
+                    появляется здесь же, скачивается и печатается.</p>
+            </div>
+        </div>
+
+        <div class="kinds">
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">◈</span>Выпас скота</a>
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">≋</span>Сенокошение</a>
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">⬡</span>Пчелиные ульи</a>
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">⛺</span>Отдых и экскурсии</a>
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">⌇</span>Дрова и хворост</a>
+            <a class="kind" href="#"><span class="ic" aria-hidden="true">⚗</span>Научные исследования</a>
+        </div>
+
+        <div class="onboard-cta">
+            <a class="btn-huge btn-huge-solid" href="#">
+                <span class="plus" aria-hidden="true">+</span>Подать первую заявку
+            </a>
+            <button class="btn btn-secondary btn-touch">Посмотреть, сколько это стоит</button>
+        </div>
+
+        <div class="onboard-foot">
+            Не уверены, что вам подходит? Позвоните в свой лесхоз — телефоны есть
+            <a href="#">в разделе помощи</a>, там же короткие видео о каждом шаге.
+            Заявку можно подать и через my.gov.uz — она попадёт в этот же кабинет.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

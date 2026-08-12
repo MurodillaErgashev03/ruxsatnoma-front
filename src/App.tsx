@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Layers, X, ChevronUp } from 'lucide-react';
 import { PublicLayout } from './components/layouts/PublicLayout';
 import { CabinetLayout } from './components/layouts/CabinetLayout';
 import { HomePage } from './pages/public/HomePage';
@@ -19,198 +18,110 @@ import { ApplicantHelpPage } from './pages/applicant/ApplicantHelpPage';
 import { GisEditorPage } from './pages/gis/GisEditorPage';
 import { GisImportPage } from './pages/gis/GisImportPage';
 import { GeobotanicNormsPage } from './pages/normative/GeobotanicNormsPage';
-import { LeskhozInboxPage } from './pages/leskhoz/LeskhozInboxPage';
 import { LeskhozReviewPage } from './pages/leskhoz/LeskhozReviewPage';
-import { ManagerDecisionPage } from './pages/manager/ManagerDecisionPage';
+import { ExecutiveDashboardPage } from './pages/dashboard/ExecutiveDashboardPage';
 import { InspectorTasksPage } from './pages/field/InspectorTasksPage';
 import { InspectorScanPage } from './pages/field/InspectorScanPage';
 import { InspectorInspectionPage } from './pages/field/InspectorInspectionPage';
 import { AccountantReconciliationPage } from './pages/accountant/AccountantReconciliationPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { ProsecutorPortalPage } from './pages/prosecutor/ProsecutorPortalPage';
+import { ApplicationCardPage } from './pages/application-card/ApplicationCardPage';
+import { PermitDocumentPage } from './pages/permit/PermitDocumentPage';
+import { WorklistPage } from './pages/worklist/WorklistPage';
 import { UIKitShowcase } from './components/ui-kit/UIKitShowcase';
+import { MOCK_USERS, type MockUser } from './data/mockUsers';
 
 export function App() {
-  const [currentPage, setCurrentPage] = useState<string>('home');
+  const [currentUser, setCurrentUser] = useState<MockUser | null>(() => {
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch (e) {
+        return null;
+      }
+    }
+    // If a cabinet route was saved, restore applicant user as fallback
+    const savedPage = localStorage.getItem('active_page');
+    if (
+      savedPage &&
+      !['home', 'services', 'tariffs', 'documents', 'opendata', 'faq', 'verify', 'auth_login', 'auth_register', 'uikit'].includes(savedPage)
+    ) {
+      const defaultApplicant = MOCK_USERS.find((u) => u.role === 'applicant') || MOCK_USERS[8];
+      localStorage.setItem('auth_user', JSON.stringify(defaultApplicant));
+      return defaultApplicant;
+    }
+    return null;
+  });
+
+  const [currentPage, setCurrentPage] = useState<string>(() => {
+    const savedPage = localStorage.getItem('active_page');
+    if (savedPage) return savedPage;
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        return u.defaultPage || 'applicant_dashboard';
+      } catch (e) {
+        return 'home';
+      }
+    }
+    return 'home';
+  });
+
   const [pageParams, setPageParams] = useState<any>({});
-  const [showDemoMenu, setShowDemoMenu] = useState<boolean>(false);
 
   const handleNavigate = (page: string, params?: any) => {
     setCurrentPage(page);
+    localStorage.setItem('active_page', page);
     if (params) setPageParams(params);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('active_page');
+    handleNavigate('home');
+  };
+
   const isCabinetRoute =
-    currentPage.startsWith('applicant_') ||
-    currentPage.startsWith('gis_') ||
-    currentPage.startsWith('normative_') ||
-    currentPage.startsWith('leskhoz_') ||
-    currentPage.startsWith('manager_') ||
-    currentPage.startsWith('field_') ||
-    currentPage.startsWith('accountant_') ||
-    currentPage.startsWith('admin_') ||
-    currentPage.startsWith('prosecutor_');
+    currentUser !== null &&
+    (currentPage === 'dashboard' ||
+      currentPage === 'executive_dashboard' ||
+      currentPage === 'application_card' ||
+      currentPage === 'permit_detail' ||
+      currentPage === 'permit' ||
+      currentPage.startsWith('permit') ||
+      currentPage.startsWith('applicant_') ||
+      currentPage.startsWith('gis_') ||
+      currentPage.startsWith('normative_') ||
+      currentPage.startsWith('leskhoz_') ||
+      currentPage.startsWith('manager_') ||
+      currentPage.startsWith('field_') ||
+      currentPage.startsWith('accountant_') ||
+      currentPage.startsWith('admin_') ||
+      currentPage.startsWith('prosecutor_'));
 
   return (
     <div className="relative min-h-screen bg-[#F8F9FA] text-[#1A1F24]">
-      {/* ── Floating Demo Switcher Widget (Bottom Right) ──────────────── */}
-      <div className="fixed bottom-4 right-4 z-50 font-sans">
-        {showDemoMenu ? (
-          <div className="bg-[#123522] text-white p-4 rounded-2xl shadow-2xl border border-white/20 w-80 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="bg-[#2E7D4F] text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                  DEMO ROLLAR
-                </span>
-                <span className="text-xs font-bold text-gray-200">Sahifalar Oʻtishi</span>
-              </div>
-              <button
-                onClick={() => setShowDemoMenu(false)}
-                className="p-1 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-1.5 text-xs max-h-80 overflow-y-auto pr-1">
-              <div className="text-[10px] font-bold uppercase text-[#7FB98A] pt-1">Ochiq Portal</div>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => { handleNavigate('home'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'home' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Bosh sahifa
-                </button>
-                <button
-                  onClick={() => { handleNavigate('services'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'services' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Xizmatlar
-                </button>
-                <button
-                  onClick={() => { handleNavigate('tariffs'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'tariffs' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Tariflar
-                </button>
-                <button
-                  onClick={() => { handleNavigate('documents'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'documents' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Hujjatlar
-                </button>
-                <button
-                  onClick={() => { handleNavigate('opendata'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'opendata' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Ochiq maʼlumotlar
-                </button>
-                <button
-                  onClick={() => { handleNavigate('faq'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'faq' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Savollar
-                </button>
-              </div>
-
-              <div className="text-[10px] font-bold uppercase text-[#7FB98A] pt-2">Arizachi Kabineti</div>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => { handleNavigate('applicant_dashboard'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'applicant_dashboard' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => { handleNavigate('applicant_wizard'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'applicant_wizard' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  6-Step Vizard
-                </button>
-              </div>
-
-              <div className="text-[10px] font-bold uppercase text-[#7FB98A] pt-2">Xodim va Rahbar</div>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => { handleNavigate('leskhoz_inbox'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'leskhoz_inbox' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Oʻrmon Xodimi
-                </button>
-                <button
-                  onClick={() => { handleNavigate('manager_decision'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'manager_decision' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Rahbar (E-IMZO)
-                </button>
-              </div>
-
-              <div className="text-[10px] font-bold uppercase text-[#7FB98A] pt-2">Nazorat va Moliya</div>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => { handleNavigate('field_tasks'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'field_tasks' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Inspektor PWA
-                </button>
-                <button
-                  onClick={() => { handleNavigate('accountant_reconciliation'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'accountant_reconciliation' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Buxgalteriya
-                </button>
-              </div>
-
-              <div className="text-[10px] font-bold uppercase text-[#7FB98A] pt-2">Tizim va Prokuratura</div>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => { handleNavigate('admin_settings'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'admin_settings' ? 'bg-[#2E7D4F] font-bold text-white' : 'hover:bg-white/10 text-gray-300'}`}
-                >
-                  Admin Tizimi
-                </button>
-                <button
-                  onClick={() => { handleNavigate('prosecutor_portal'); setShowDemoMenu(false); }}
-                  className={`px-2 py-1.5 rounded text-left transition-colors ${currentPage === 'prosecutor_portal' ? 'bg-[#B91C1C] font-bold text-white' : 'hover:bg-white/10 text-red-300'}`}
-                >
-                  Prokuror Portali
-                </button>
-              </div>
-
-              <div className="pt-2 border-t border-white/10">
-                <button
-                  onClick={() => { handleNavigate('uikit'); setShowDemoMenu(false); }}
-                  className="w-full py-1.5 rounded text-center bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
-                >
-                  UI Kit Showcase
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowDemoMenu(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#123522] text-[#FFFFFF] shadow-xl hover:bg-[#23653F] border border-white/20 text-xs font-bold transition-all transform hover:scale-105"
-          >
-            <Layers className="w-4 h-4 text-[#7FB98A]" />
-            <span>Demo Sahifalar</span>
-            <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
-          </button>
-        )}
-      </div>
-
       {/* Render Selected View */}
       {isCabinetRoute ? (
         <CabinetLayout
+          userName={currentUser?.fullName || 'Alisher Abdullayev'}
+          userRole={currentUser?.roleNameUz || 'Tuman inspektori'}
           onNavSelect={(page) => handleNavigate(page)}
+          onLogout={handleLogout}
           activeNavId={
-            currentPage === 'applicant_permits' || currentPage === 'applicant_application_detail'
+            currentPage === 'applicant_permits' || currentPage === 'permit_detail' || currentPage === 'permit'
               ? 'permits'
+              : currentPage === 'application_card' || currentPage === 'applicant_application_detail'
+              ? 'applications'
               : currentPage === 'applicant_help'
               ? 'help'
               : currentPage.startsWith('gis_')
-              ? 'gis'
+              ? 'map'
               : currentPage.startsWith('field_')
               ? 'inspections'
               : currentPage.startsWith('admin_')
@@ -219,7 +130,11 @@ export function App() {
           }
         >
           {currentPage === 'applicant_dashboard' && (
-            <ApplicantDashboard onNavigate={handleNavigate} />
+            <ApplicantDashboard
+              userName={currentUser?.fullName}
+              userOrg={currentUser?.organization}
+              onNavigate={handleNavigate}
+            />
           )}
           {currentPage === 'applicant_wizard' && (
             <PermitWizardPage onNavigate={handleNavigate} />
@@ -243,13 +158,22 @@ export function App() {
             <GeobotanicNormsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'leskhoz_inbox' && (
-            <LeskhozInboxPage onNavigate={handleNavigate} />
+            <WorklistPage onNavigate={handleNavigate} />
+          )}
+          {(currentPage === 'worklist' || currentPage === 'leskhoz_worklist') && (
+            <WorklistPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'leskhoz_review' && (
             <LeskhozReviewPage onNavigate={handleNavigate} />
           )}
-          {currentPage === 'manager_decision' && (
-            <ManagerDecisionPage onNavigate={handleNavigate} />
+          {currentPage === 'application_card' && (
+            <ApplicationCardPage applicationId={pageParams?.id || 'А-00042'} onNavigate={handleNavigate} />
+          )}
+          {(currentPage === 'permit_detail' || currentPage === 'permit') && (
+            <PermitDocumentPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+          {(currentPage === 'manager_decision' || currentPage === 'dashboard' || currentPage === 'executive_dashboard') && (
+            <ExecutiveDashboardPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'field_tasks' && (
             <InspectorTasksPage onNavigate={handleNavigate} />
@@ -257,7 +181,7 @@ export function App() {
           {currentPage === 'field_scan' && (
             <InspectorScanPage onNavigate={handleNavigate} />
           )}
-          {currentPage === 'field_inspection' && (
+          {(currentPage === 'field_inspection' || currentPage === 'inspection_act') && (
             <InspectorInspectionPage permitNo={pageParams?.permitNo || 'RX-2026-0089'} onNavigate={handleNavigate} />
           )}
           {currentPage === 'accountant_reconciliation' && (
@@ -303,7 +227,11 @@ export function App() {
               )}
               {currentPage === 'auth_login' && (
                 <LoginPage
-                  onSuccessLogin={() => handleNavigate('applicant_dashboard')}
+                  onSuccessLogin={(user) => {
+                    setCurrentUser(user);
+                    localStorage.setItem('auth_user', JSON.stringify(user));
+                    handleNavigate(user.defaultPage || 'applicant_dashboard');
+                  }}
                   onNavigate={handleNavigate}
                 />
               )}

@@ -1,0 +1,1648 @@
+<!-- @dsCard group="Страницы" -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Заявка — карточка рассмотрения</title>
+<style>
+:root{
+--color-primary-50:#F0F7F1;--color-primary-100:#D9EBDC;--color-primary-300:#7FB98A;
+--color-primary-600:#2E7D4F;--color-primary-700:#23653F;--color-primary-900:#123522;
+--color-accent-600:#B45309;
+--color-neutral-0:#FFFFFF;--color-neutral-50:#F8F9FA;--color-neutral-200:#E4E7EA;
+--color-neutral-400:#9AA3AB;--color-neutral-500:#767F87;--color-neutral-600:#5A646D;--color-neutral-900:#1A1F24;
+--color-success-600:#15803D;--color-warning-600:#B45309;--color-danger-600:#B91C1C;--color-danger-700:#991B1B;--color-info-600:#0369A1;
+--font-family-base:"Inter","Noto Sans",system-ui,-apple-system,sans-serif;
+--font-family-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+--text-xs:12px;--leading-xs:16px;--text-sm:14px;--leading-sm:20px;
+--text-base:16px;--leading-base:24px;--text-lg:18px;--leading-lg:28px;
+--text-xl:22px;--leading-xl:30px;--text-2xl:28px;--leading-2xl:36px;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;
+--radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+--header-height:64px;--sidebar-width:260px;
+--control-height:40px;--control-height-touch:48px;
+--row-height:48px;--row-height-compact:36px;--touch-target:44px;--content-max:1440px;
+--shadow-sm:0 1px 2px rgba(26,31,36,.06);--shadow-md:0 4px 12px rgba(26,31,36,.10);
+--focus-ring:0 0 0 2px var(--color-neutral-0),0 0 0 4px var(--color-primary-600);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-family-base);font-size:var(--text-base);line-height:var(--leading-base);
+color:var(--color-neutral-900);background:var(--color-neutral-50)}
+
+/* Every interactive element must show focus: WCAG 2.4.7 */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;
+box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+.note{max-width:var(--content-max);margin:0 auto var(--space-6);padding:var(--space-4) var(--space-6);
+background:var(--color-primary-50);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-md);font-size:var(--text-sm);line-height:var(--leading-sm);
+color:var(--color-primary-900)}
+.note strong{font-weight:var(--weight-semibold)}
+.note p+p{margin-top:var(--space-2)}
+.note .code{font-family:var(--font-family-mono);font-size:var(--text-xs)}
+
+/* ══ Shell: identical to layouts/cabinet.html and pages/worklist.html ══ */
+.shell{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:var(--header-height) 1fr;
+grid-template-areas:"brand header" "sidebar main";min-height:100vh}
+
+.brand{grid-area:brand;background:var(--color-primary-700);color:#fff;display:flex;align-items:center;
+gap:var(--space-3);padding:0 var(--space-4)}
+.brand-mark{width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-primary-300);
+display:grid;place-items:center;font-weight:600;color:var(--color-primary-900);flex:none}
+.brand-name{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-size:12px;line-height:14px;opacity:.75;font-weight:400}
+
+.header{grid-area:header;background:var(--color-neutral-0);border-bottom:1px solid var(--color-neutral-200);
+display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6)}
+.search{flex:1;max-width:420px;position:relative}
+.search input{width:100%;height:var(--control-height);padding:0 var(--space-3) 0 36px;font-size:16px;
+font-family:inherit;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+background:var(--color-neutral-50);color:var(--color-neutral-900)}
+.search input::placeholder{color:var(--color-neutral-400)}
+.search .ico{position:absolute;left:10px;top:11px;color:var(--color-neutral-400)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-2)}
+
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:none;background:none;
+cursor:pointer;border-radius:var(--radius-md);color:var(--color-neutral-600);position:relative}
+.icon-btn:hover{background:var(--color-neutral-50)}
+.badge-dot{position:absolute;top:9px;right:9px;min-width:16px;height:16px;padding:0 4px;
+background:var(--color-danger-600);color:#fff;border-radius:8px;font-size:11px;line-height:16px;font-weight:600}
+
+.lang{display:flex;border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);overflow:hidden}
+.lang button{border:none;background:var(--color-neutral-0);color:var(--color-neutral-600);
+padding:0 10px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.lang button[aria-pressed="true"]{background:var(--color-primary-600);color:#fff}
+
+.user{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);
+border-radius:var(--radius-md);cursor:pointer;border:none;background:none;font-family:inherit;text-align:left}
+.user:hover{background:var(--color-neutral-50)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--color-primary-100);
+color:var(--color-primary-900);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.user-name{font-size:13px;line-height:16px;font-weight:500}
+.user-role{font-size:12px;line-height:14px;color:var(--color-neutral-600)}
+
+.sidebar{grid-area:sidebar;background:var(--color-neutral-0);border-right:1px solid var(--color-neutral-200);
+padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);overflow-y:auto}
+.nav-group{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+color:var(--color-neutral-400);padding:var(--space-4) var(--space-3) var(--space-2)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);height:var(--control-height);
+padding:0 var(--space-3);border-radius:var(--radius-md);color:var(--color-neutral-900);
+text-decoration:none;font-size:14px;font-weight:500}
+.nav-item:hover{background:var(--color-neutral-50)}
+.nav-item .ico{width:20px;text-align:center;flex:none;color:var(--color-neutral-600)}
+.nav-item[aria-current="page"]{background:var(--color-primary-50);color:var(--color-primary-900);
+font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary-600)}
+.nav-item[aria-current="page"] .ico{color:var(--color-primary-600)}
+.nav-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--color-neutral-600);
+background:var(--color-neutral-50);border-radius:10px;padding:2px 8px}
+.nav-item[aria-current="page"] .nav-count{background:var(--color-primary-100);color:var(--color-primary-900)}
+.nav-count.is-late{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.sidebar-foot{margin-top:auto;padding-top:var(--space-4);border-top:1px solid var(--color-neutral-200)}
+
+.main{grid-area:main;padding:var(--space-6);overflow-y:auto}
+.crumbs{display:flex;align-items:center;gap:var(--space-2);font-size:13px;
+color:var(--color-neutral-600);margin-bottom:var(--space-3);flex-wrap:wrap}
+.crumbs a{color:var(--color-neutral-600);text-decoration:none}
+.crumbs a:hover{color:var(--color-primary-600);text-decoration:underline}
+.crumbs span[aria-current]{color:var(--color-neutral-900);font-weight:500}
+
+/* ══ Buttons: same scale as worklist.html ═════════════════ */
+.btn{height:var(--control-height);padding:0 var(--space-4);border-radius:var(--radius-md);
+font-family:inherit;font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;
+border:1px solid transparent;display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap}
+.btn-primary{background:var(--color-primary-600);color:var(--color-neutral-0)}
+.btn-primary:hover{background:var(--color-primary-700)}
+.btn-secondary{background:var(--color-neutral-0);color:var(--color-neutral-900);border-color:var(--color-neutral-500)}
+.btn-secondary:hover{background:var(--color-neutral-50)}
+.btn-danger{background:var(--color-neutral-0);color:var(--color-danger-600);border-color:var(--color-danger-600)}
+.btn-danger:hover{background:var(--color-danger-600);color:var(--color-neutral-0)}
+.btn-sm{height:32px;padding:0 var(--space-3);font-size:var(--text-xs)}
+.btn-block{width:100%;justify-content:center}
+/* Disabled state is spelled out in text next to the button, never colour alone */
+.btn[disabled]{background:var(--color-neutral-50);color:var(--color-neutral-400);
+border-color:var(--color-neutral-500);cursor:not-allowed}
+
+/* ══ Section navigation: real anchors, works without scripts ══ */
+.secnav{display:flex;gap:var(--space-1);flex-wrap:wrap;position:sticky;top:0;z-index:3;
+background:var(--color-neutral-50);border-bottom:1px solid var(--color-neutral-200);
+margin:0 calc(-1 * var(--space-6)) var(--space-4);padding:0 var(--space-6)}
+.secnav a{display:inline-flex;align-items:center;gap:var(--space-2);height:var(--touch-target);
+padding:0 var(--space-3);font-size:var(--text-sm);font-weight:var(--weight-medium);
+color:var(--color-neutral-600);text-decoration:none;border-bottom:2px solid transparent;
+margin-bottom:-1px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;white-space:nowrap}
+.secnav a:hover{color:var(--color-neutral-900);background:var(--color-neutral-0)}
+.secnav a[aria-current="true"]{color:var(--color-primary-900);font-weight:var(--weight-semibold);
+border-bottom-color:var(--color-primary-600)}
+.secnav .n{font-size:var(--text-xs);font-weight:var(--weight-semibold);
+background:var(--color-neutral-200);border-radius:10px;padding:0 var(--space-2);color:var(--color-neutral-600)}
+.secnav .n.is-warn{background:var(--color-warning-600);color:var(--color-neutral-0)}
+
+/* ══ Card header strip ════════════════════════════════════ */
+.appbar{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4) var(--space-6);margin-bottom:var(--space-4)}
+.appbar-top{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap}
+.appbar-id{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;
+font-size:var(--text-2xl);line-height:var(--leading-2xl);font-weight:var(--weight-semibold);letter-spacing:-.01em}
+.appbar-kind{font-size:var(--text-lg);line-height:var(--leading-lg);color:var(--color-neutral-600)}
+.appbar-facts{display:flex;gap:var(--space-8);flex-wrap:wrap;margin-top:var(--space-3);
+padding-top:var(--space-3);border-top:1px solid var(--color-neutral-200)}
+.fact{min-width:150px}
+.fact-l{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+font-weight:var(--weight-semibold);letter-spacing:.04em;text-transform:uppercase;
+color:var(--color-neutral-600);margin-bottom:var(--space-1)}
+.fact-v{display:block;font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.fact-v small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+
+/* ══ Two columns: content and a sticky action rail ════════ */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:var(--space-6);align-items:start}
+@media (max-width:1180px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.col-main{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.rail{display:flex;flex-direction:column;gap:var(--space-4);position:sticky;top:60px}
+
+/* ══ Panel: one section of the card ═══════════════════════ */
+.panel{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);scroll-margin-top:64px}
+.panel-head{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--color-neutral-200)}
+.panel-title{font-size:var(--text-lg);line-height:var(--leading-lg);font-weight:var(--weight-semibold)}
+.panel-sub{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.panel-tools{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+.panel-body{padding:var(--space-6)}
+.panel-body+.panel-body{border-top:1px solid var(--color-neutral-200)}
+.block-title{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-3)}
+.lead{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-600);
+max-width:80ch;margin-bottom:var(--space-4)}
+
+/* ══ Key/value grid ═══════════════════════════════════════ */
+.kv{display:grid;grid-template-columns:210px minmax(0,1fr);gap:var(--space-2) var(--space-4);
+font-size:var(--text-sm);line-height:var(--leading-sm)}
+@media (max-width:700px){.kv{grid-template-columns:minmax(0,1fr)}}
+.kv dt{color:var(--color-neutral-600)}
+.kv dd{font-weight:var(--weight-medium)}
+.kv dd small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.kv-split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-6)}
+@media (max-width:980px){.kv-split{grid-template-columns:minmax(0,1fr)}}
+
+.mono{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.code{font-family:var(--font-family-mono);font-size:var(--text-xs);white-space:nowrap;
+background:var(--color-neutral-50);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-sm);padding:1px var(--space-1)}
+.link{color:var(--color-primary-700);font-weight:var(--weight-semibold);text-decoration:none}
+.link:hover{text-decoration:underline}
+
+/* ══ Data tables inside panels ════════════════════════════ */
+.tbl{width:100%;border-collapse:separate;border-spacing:0}
+.tbl th{text-align:left;font-size:var(--text-xs);line-height:var(--leading-xs);
+font-weight:var(--weight-semibold);letter-spacing:.04em;text-transform:uppercase;
+color:var(--color-neutral-600);background:var(--color-neutral-50);
+padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-neutral-200);white-space:nowrap}
+.tbl td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-neutral-200);
+font-size:var(--text-sm);line-height:var(--leading-sm);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .num{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.tbl th.num{text-align:right}
+.tbl .why{color:var(--color-neutral-600);font-size:var(--text-xs);line-height:var(--leading-xs);white-space:normal}
+.tbl tr.total td{background:var(--color-primary-50);font-weight:var(--weight-semibold);
+border-top:2px solid var(--color-primary-600)}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--color-neutral-200);border-radius:var(--radius-md)}
+.step{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+background:var(--color-primary-600);color:var(--color-neutral-0);font-size:11px;
+font-weight:var(--weight-semibold);line-height:1;flex:none}
+
+/* Formula line: the whole point of the section is that the number is derivable */
+.formula{font-family:var(--font-family-mono);font-size:var(--text-xs);line-height:var(--leading-sm);
+color:var(--color-neutral-900);background:var(--color-neutral-50);
+border:1px solid var(--color-neutral-200);border-left:3px solid var(--color-primary-600);
+border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3);margin-top:var(--space-3);
+overflow-x:auto;white-space:pre}
+
+/* ══ Limit bar: three shares of MaxSB, each also labelled ══ */
+.limitbar{display:flex;height:28px;border-radius:var(--radius-sm);overflow:hidden;
+border:1px solid var(--color-neutral-500);margin-top:var(--space-3)}
+.limitbar span{display:grid;place-items:center;font-size:11px;line-height:1;
+font-weight:var(--weight-semibold);color:var(--color-neutral-0);overflow:hidden}
+.lb-used{background:var(--color-neutral-600)}
+.lb-this{background:var(--color-primary-600)}
+.lb-free{background:var(--color-warning-600)}
+.limit-legend{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-2);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.limit-legend b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:var(--space-1);
+vertical-align:-1px;border:1px solid var(--color-neutral-500)}
+
+/* ══ Verdict line: glyph plus wording, never colour alone ══ */
+.verdict{display:flex;gap:var(--space-2);align-items:flex-start;font-size:var(--text-sm);
+line-height:var(--leading-sm);padding:var(--space-3);border-radius:var(--radius-md);
+border:1px solid;margin-top:var(--space-4)}
+.verdict .vic{flex:none;width:20px;height:20px;border:1px solid currentColor;border-radius:50%;
+display:grid;place-items:center;font-size:var(--text-xs);font-weight:var(--weight-semibold);line-height:1}
+.verdict b{font-weight:var(--weight-semibold)}
+.v-ok{color:var(--color-success-600);border-color:color-mix(in srgb,var(--color-success-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))}
+.v-warn{color:var(--color-warning-600);border-color:color-mix(in srgb,var(--color-warning-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0))}
+.v-danger{color:var(--color-danger-600);border-color:color-mix(in srgb,var(--color-danger-600) 30%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+.verdict .vtext{color:var(--color-neutral-900)}
+
+/* ══ Reproducibility footer, п. 4.2.15 ТЗ ═════════════════ */
+.repro{display:flex;gap:var(--space-6);flex-wrap:wrap;align-items:flex-start;
+background:var(--color-neutral-50);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-top:var(--space-4)}
+.repro-i{min-width:170px}
+.repro-i span{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.repro-i b{font-family:var(--font-family-mono);font-size:var(--text-xs);font-weight:var(--weight-semibold);
+word-break:break-all}
+.repro-act{margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap}
+
+/* ══ Mini map ═════════════════════════════════════════════ */
+.map-wrap{border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);
+overflow:hidden;background:var(--color-neutral-50)}
+.map-svg{display:block;width:100%;height:auto}
+.map-svg .fund{fill:var(--color-neutral-0);stroke:var(--color-neutral-400);stroke-width:1;stroke-dasharray:6 4}
+.map-svg .contour{fill:var(--color-primary-50);stroke:var(--color-primary-600);stroke-width:2.5}
+.map-svg .busy{stroke:var(--color-warning-600);stroke-width:1.5}
+.map-svg .plot{stroke:var(--color-primary-700);stroke-width:3}
+.map-svg .hatch-l{stroke:var(--color-warning-600);stroke-width:2}
+.map-svg .dot-f{fill:var(--color-primary-600)}
+.map-svg .bound{fill:none;stroke:var(--color-neutral-600);stroke-width:1.5;stroke-dasharray:2 5}
+.map-svg .lbl{font-family:var(--font-family-base);font-size:12px;font-weight:600;fill:var(--color-neutral-900)}
+.map-svg .lbl-s{font-family:var(--font-family-base);font-size:11px;fill:var(--color-neutral-600)}
+.map-svg .pin{fill:var(--color-neutral-0);stroke:var(--color-warning-600);stroke-width:1.5}
+.map-svg .pin-t{font-family:var(--font-family-mono);font-size:11px;font-weight:600;fill:var(--color-neutral-900)}
+.map-svg .scale{stroke:var(--color-neutral-900);stroke-width:1.5}
+.map-legend{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-3);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.map-legend b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+.sw-contour{background:var(--color-primary-50);border-color:var(--color-primary-600)}
+.sw-plot{background:var(--color-primary-300);border-color:var(--color-primary-700)}
+.sw-busy{background:repeating-linear-gradient(45deg,var(--color-warning-600) 0 2px,var(--color-neutral-0) 2px 5px);
+border-color:var(--color-warning-600)}
+
+/* ══ External system checks ═══════════════════════════════ */
+.checks{display:grid;gap:var(--space-4)}
+.check{border:1px solid var(--color-neutral-200);border-radius:var(--radius-md);overflow:hidden}
+.check-head{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+padding:var(--space-3) var(--space-4);background:var(--color-neutral-50);
+border-bottom:1px solid var(--color-neutral-200)}
+.check-name{font-size:var(--text-base);line-height:var(--leading-base);font-weight:var(--weight-semibold)}
+.check-body{padding:var(--space-4)}
+.check-meta{display:flex;gap:var(--space-6);flex-wrap:wrap;margin-top:var(--space-3);
+padding-top:var(--space-3);border-top:1px dashed var(--color-neutral-200);
+font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600)}
+.check-meta b{color:var(--color-neutral-900);font-weight:var(--weight-semibold);
+font-family:var(--font-family-mono)}
+.check-act{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4)}
+
+/* Maker-checker pair: two named people, two timestamps, one outcome */
+.mk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3);margin-top:var(--space-4)}
+@media (max-width:700px){.mk{grid-template-columns:minmax(0,1fr)}}
+.mk-cell{border:1px solid var(--color-neutral-500);border-radius:var(--radius-md);padding:var(--space-3)}
+.mk-role{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-1)}
+.mk-who{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.mk-when{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+font-family:var(--font-family-mono)}
+.mk-note{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:var(--space-2)}
+
+/* ══ Auto checks list ═════════════════════════════════════ */
+.autolist{list-style:none;display:grid;gap:var(--space-2)}
+.autolist li{display:flex;gap:var(--space-3);align-items:flex-start;
+font-size:var(--text-sm);line-height:var(--leading-sm);
+padding:var(--space-2) var(--space-3);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-md)}
+.autolist .aic{flex:none;width:20px;height:20px;border:1px solid currentColor;border-radius:50%;
+display:grid;place-items:center;font-size:var(--text-xs);font-weight:var(--weight-semibold);line-height:1}
+.a-ok{color:var(--color-success-600)}
+.a-warn{color:var(--color-warning-600)}
+.a-hold{color:var(--color-neutral-600)}
+.autolist .atext{color:var(--color-neutral-900)}
+.autolist .atext small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600)}
+
+/* ══ Documents ════════════════════════════════════════════ */
+.docs{list-style:none;display:grid;gap:var(--space-2)}
+.doc{display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;
+border:1px solid var(--color-neutral-200);border-radius:var(--radius-md);padding:var(--space-3)}
+.doc-ic{flex:none;width:36px;height:44px;border:1px solid var(--color-neutral-500);
+border-radius:var(--radius-sm);display:grid;place-items:center;
+font-family:var(--font-family-mono);font-size:10px;font-weight:var(--weight-semibold);
+color:var(--color-neutral-600);background:var(--color-neutral-50)}
+.doc-main{min-width:220px;flex:1}
+.doc-name{display:block;font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.doc-meta{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);margin-top:2px}
+.doc-act{display:flex;gap:var(--space-2);margin-left:auto}
+
+/* ══ Status history: the ribbon opened when a case is disputed ══ */
+.tl{list-style:none;position:relative;padding-left:var(--space-8)}
+.tl::before{content:"";position:absolute;left:15px;top:6px;bottom:6px;width:2px;
+background:var(--color-neutral-200)}
+.tl li{position:relative;padding-bottom:var(--space-6)}
+.tl li:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:calc(-1 * var(--space-8));top:0;width:32px;height:32px;
+border-radius:50%;display:grid;place-items:center;font-size:var(--text-sm);line-height:1;
+background:var(--color-neutral-0);border:2px solid var(--color-neutral-500);color:var(--color-neutral-600)}
+.tl-dot.d-primary{border-color:var(--color-primary-600);color:var(--color-primary-700);
+background:var(--color-primary-50)}
+.tl-dot.d-warn{border-color:var(--color-warning-600);color:var(--color-warning-600);
+background:color-mix(in srgb,var(--color-warning-600) 8%,var(--color-neutral-0))}
+.tl-dot.d-danger{border-color:var(--color-danger-600);color:var(--color-danger-600);
+background:color-mix(in srgb,var(--color-danger-600) 8%,var(--color-neutral-0))}
+.tl-dot.d-now{border-color:var(--color-primary-600);background:var(--color-primary-600);
+color:var(--color-neutral-0)}
+.tl-head{display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap}
+.tl-when{font-family:var(--font-family-mono);font-variant-numeric:tabular-nums;
+font-size:var(--text-xs);line-height:var(--leading-sm);color:var(--color-neutral-600);white-space:nowrap}
+.tl-move{font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-semibold)}
+.tl-move .arr{color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.tl-who{font-size:var(--text-sm);line-height:var(--leading-sm);margin-top:2px}
+.tl-who .role{color:var(--color-neutral-600)}
+.tl-audit{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+font-family:var(--font-family-mono);margin-top:var(--space-1)}
+.tl-note{font-size:var(--text-sm);line-height:var(--leading-sm);color:var(--color-neutral-900);
+margin-top:var(--space-2);padding:var(--space-2) var(--space-3);
+background:var(--color-neutral-50);border-left:3px solid var(--color-neutral-500);
+border-radius:var(--radius-sm)}
+
+/* ══ Right rail blocks ════════════════════════════════════ */
+.rail-block{background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:var(--radius-lg);padding:var(--space-4)}
+.rail-title{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-semibold);
+letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:var(--space-3)}
+.rail-actions{display:flex;flex-direction:column;gap:var(--space-2)}
+.hint{font-size:var(--text-xs);line-height:var(--leading-xs);color:var(--color-neutral-600);
+margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px dashed var(--color-neutral-200)}
+.hint b{color:var(--color-neutral-900);font-weight:var(--weight-semibold)}
+.rail-kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--space-2) var(--space-3);
+font-size:var(--text-xs);line-height:var(--leading-xs)}
+.rail-kv dt{color:var(--color-neutral-600)}
+.rail-kv dd{font-weight:var(--weight-medium);text-align:right;font-family:var(--font-family-mono);
+word-break:break-all}
+
+/* ══ SLA mark: four signals at once, same as in worklist.html ══ */
+.sla-mark{display:flex;gap:var(--space-2);align-items:flex-start}
+.sla-ic{width:20px;height:20px;flex:none;border:1px solid currentColor;border-radius:50%;
+display:grid;place-items:center;font-size:var(--text-xs);font-weight:var(--weight-semibold);
+line-height:1;margin-top:1px}
+.sla-text{display:block;font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium)}
+.sla-text small{display:block;font-size:var(--text-xs);line-height:var(--leading-xs);
+color:var(--color-neutral-600);font-weight:var(--weight-regular)}
+.sla-bar{display:block;margin-top:var(--space-2);width:100%;height:6px;border-radius:3px;
+background:var(--color-neutral-200);overflow:hidden}
+.sla-bar i{display:block;height:100%;background:currentColor;border-radius:3px}
+.sla-ok{color:var(--color-success-600)}
+.sla-ok .sla-text{color:var(--color-neutral-900)}
+/* Предупреждение: срок истекает сегодня */
+.sla-warn{color:var(--color-warning-600)}
+.sla-warn .sla-text{color:var(--color-warning-600);font-weight:var(--weight-semibold)}
+.sla-late{color:var(--color-danger-600)}
+.sla-late .sla-text{color:var(--color-danger-600);font-weight:var(--weight-semibold)}
+.sla-hold{color:var(--color-neutral-600)}
+.sla-hold .sla-text{color:var(--color-neutral-600)}
+
+/* ══ Status chip: dot + icon + text, see components/status.html ══ */
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);
+padding:var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+border-radius:var(--radius-sm);border:1px solid;background:var(--color-neutral-0);
+font-size:var(--text-sm);line-height:var(--leading-sm);font-weight:var(--weight-medium);white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.chip .ic{font-size:var(--text-sm);line-height:1;flex:none;width:14px;text-align:center}
+.chip .uz{font-size:var(--text-xs);line-height:var(--leading-xs);font-weight:var(--weight-regular);opacity:.85}
+.chip-lg{font-size:var(--text-base);line-height:var(--leading-base);padding:var(--space-2) var(--space-4)}
+.chip-lg .dot{width:10px;height:10px}
+.tone-neutral{color:var(--color-neutral-600);border-color:var(--color-neutral-200);background:var(--color-neutral-50)}
+.tone-info{color:var(--color-info-600);
+border-color:color-mix(in srgb,var(--color-info-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-info-600) 7%,var(--color-neutral-0))}
+.tone-success{color:var(--color-success-600);
+border-color:color-mix(in srgb,var(--color-success-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-success-600) 7%,var(--color-neutral-0))}
+.tone-warning{color:var(--color-warning-600);
+border-color:color-mix(in srgb,var(--color-warning-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-warning-600) 7%,var(--color-neutral-0))}
+.tone-danger{color:var(--color-danger-600);
+border-color:color-mix(in srgb,var(--color-danger-600) 28%,var(--color-neutral-0));
+background:color-mix(in srgb,var(--color-danger-600) 7%,var(--color-neutral-0))}
+
+/* ══ Second state of the same screen, shown below the shell ══ */
+.state{max-width:var(--content-max);margin:0 auto;padding:var(--space-6)}
+.state-label{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);
+line-height:var(--leading-xs);font-weight:var(--weight-semibold);letter-spacing:.04em;
+text-transform:uppercase;color:var(--color-neutral-600);
+background:var(--color-neutral-0);border:1px solid var(--color-neutral-200);
+border-radius:16px;padding:var(--space-1) var(--space-3);margin-bottom:var(--space-4)}
+</style>
+</head>
+<body>
+
+<div class="note">
+    <p><strong>Карточка заявки — экран рассмотрения.</strong> Сценарии <strong>С4</strong> и <strong>С5</strong>:
+    сотрудник лесхоза открывает её чаще любого другого экрана. Соседний экран —
+    <span class="code">pages/worklist.html</span>, каркас — <span class="code">layouts/cabinet.html</span>,
+    метки — <span class="code">components/status.html</span>.</p>
+    <p><strong>Смысл экрана — не сумма, а её происхождение.</strong> Пункт 4.2.15 ТЗ требует
+    воспроизводимости и объяснимости: одинаковый вход даёт одинаковый результат, и любой расчёт
+    можно объяснить задним числом. Поэтому раздел «Расчёт» показывает всю цепочку —
+    <span class="code">Oz</span>, <span class="code">Oz_eff</span>, <span class="code">MaxSB</span>,
+    <span class="code">UsedSB</span>, <span class="code">RemainingSB</span> — вместе с
+    <span class="code">rule_version</span> и снимком входных данных.</p>
+    <p>Вторая по важности часть — <strong>история статусов</strong>. При разборе спорной заявки
+    прокурор и руководитель открывают именно её: кто, когда, с какого IP и на каком основании
+    выполнил переход. Разделы связаны якорями и работают без скриптов.</p>
+    <p>Ниже каркаса — второе состояние того же экрана: заявка ещё не принята в работу,
+    доступно единственное действие.</p>
+</div>
+
+<div class="shell">
+
+    <div class="brand">
+        <div class="brand-mark">Р</div>
+        <div>
+            <div class="brand-name">RUXSATNOMA</div>
+            <div class="brand-sub">Агентство по лесам</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="search">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Поиск по номеру, ЖШШИР, СТИР" aria-label="Поиск">
+        </div>
+
+        <div class="header-right">
+            <div class="lang" role="group" aria-label="Язык интерфейса">
+                <button aria-pressed="true">Ўз</button>
+                <button aria-pressed="false">Uz</button>
+                <button aria-pressed="false">Ру</button>
+            </div>
+
+            <button class="icon-btn" aria-label="Уведомления, 5 непрочитанных">
+                <span aria-hidden="true">🔔</span>
+                <span class="badge-dot">5</span>
+            </button>
+
+            <button class="user">
+                <span class="avatar">ДА</span>
+                <span>
+                    <span class="user-name">Дилноза Абдуллаева</span><br>
+                    <span class="user-role">Сотрудник · Тошкент ДЎХ</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="sidebar" aria-label="Основное меню">
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▤</span>Обзор</a>
+
+        <div class="nav-group">Процесс</div>
+        <a class="nav-item" href="#" aria-current="page">
+            <span class="ico" aria-hidden="true">✉</span>Заявки<span class="nav-count">24</span>
+        </a>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">◆</span>Разрешения<span class="nav-count">86</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">◉</span>Карта</a>
+
+        <div class="nav-group">Контроль</div>
+        <a class="nav-item" href="#">
+            <span class="ico" aria-hidden="true">◈</span>Задания на выезд
+            <span class="nav-count is-late" aria-label="4 задания, из них просроченные">4</span>
+        </a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">₴</span>Платежи</a>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">▥</span>Отчёты</a>
+
+        <div class="nav-group">Справочники</div>
+        <a class="nav-item" href="#"><span class="ico" aria-hidden="true">☰</span>Классификаторы</a>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" href="#"><span class="ico" aria-hidden="true">?</span>Помощь</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <nav class="crumbs" aria-label="Хлебные крошки">
+            <a href="#">Главная</a><span aria-hidden="true">/</span>
+            <a href="#">Процесс</a><span aria-hidden="true">/</span>
+            <a href="#">Мои заявки</a><span aria-hidden="true">/</span>
+            <span aria-current="page">А-00042</span>
+        </nav>
+
+        <!-- ── Card header strip: identity, status, four facts ── -->
+        <section class="appbar" aria-label="Реквизиты заявки в шапке">
+            <div class="appbar-top">
+                <h1 class="appbar-id">А-00042</h1>
+                <span class="chip chip-lg tone-info">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span class="ic" aria-hidden="true">◷</span>На рассмотрении
+                    <span class="uz" lang="uz-Cyrl">(Кўриб чиқилмоқда)</span>
+                </span>
+                <span class="appbar-kind">Выпас скота <span lang="uz-Cyrl">(Чорва молларини боқиш)</span></span>
+            </div>
+
+            <div class="appbar-facts">
+                <div class="fact">
+                    <span class="fact-l">Заявитель</span>
+                    <span class="fact-v">Азиз Каримов
+                        <small>Физическое лицо · ЖШШИР <span class="mono">31207854315218</span></small>
+                    </span>
+                </div>
+                <div class="fact">
+                    <span class="fact-l">Подана</span>
+                    <span class="fact-v"><span class="mono">22.07.2026, 10:12</span>
+                        <small>Канал my.gov.uz · подписана ЭЦП</small>
+                    </span>
+                </div>
+                <div class="fact">
+                    <span class="fact-l">Исполнитель</span>
+                    <span class="fact-v">Дилноза Абдуллаева
+                        <small>Назначена автоматически 22.07.2026</small>
+                    </span>
+                </div>
+                <div class="fact">
+                    <span class="fact-l">Сумма к оплате</span>
+                    <span class="fact-v"><span class="mono">1 207 324,80 сўм</span>
+                        <small>Расчёт от 04.08.2026, версия нормы R3</small>
+                    </span>
+                </div>
+                <div class="fact">
+                    <span class="fact-l">Срок SLA</span>
+                    <div class="sla-mark sla-warn">
+                        <span class="sla-ic" aria-hidden="true">▲</span>
+                        <span class="sla-text">Истекает сегодня
+                            <small>До 10.08.2026, 18:00 · осталось 8 ч 20 мин</small>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Section navigation. Anchors, not tabs: no scripts here ── -->
+        <nav class="secnav" aria-label="Разделы карточки заявки">
+            <a href="#s-general" aria-current="true">Общие сведения</a>
+            <a href="#s-plot">Участок и карта</a>
+            <a href="#s-calc">Расчёт</a>
+            <a href="#s-checks">Проверки<span class="n is-warn">1</span></a>
+            <a href="#s-docs">Документы<span class="n">6</span></a>
+            <a href="#s-history">История<span class="n">9</span></a>
+        </nav>
+
+        <div class="grid2">
+
+            <div class="col-main">
+
+                <!-- ════ 1. Общие сведения ════════════════════════ -->
+                <section class="panel" id="s-general" aria-labelledby="h-general">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-general">Общие сведения</h2>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Печать карточки</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="kv-split">
+                            <div>
+                                <div class="block-title">Заявитель</div>
+                                <dl class="kv">
+                                    <dt>Фамилия, имя</dt>
+                                    <dd>Азиз Каримов</dd>
+                                    <dt>ЖШШИР</dt>
+                                    <dd><span class="mono">31207854315218</span><small>14 цифр, сверен с реестром населения</small></dd>
+                                    <dt>Паспорт</dt>
+                                    <dd><span class="mono">AA 4310572</span><small>Выдан 19.05.2019, ИИБ Бўстонлиқ тумани</small></dd>
+                                    <dt>Идентификация</dt>
+                                    <dd>OneID<small>Подтверждена 22.07.2026, 09:41</small></dd>
+                                    <dt>Телефон</dt>
+                                    <dd><span class="mono">+998 90 214 41 27</span></dd>
+                                    <dt>Адрес</dt>
+                                    <dd lang="uz-Cyrl">Тошкент вилояти, Бўстонлиқ тумани, Хумсон КФЙ<small lang="ru">Проживает в границах лесхоза</small></dd>
+                                    <dt>Льготная категория</dt>
+                                    <dd>Не заявлена<small>Скидка по ВМҚ 278-сон не применяется</small></dd>
+                                    <dt>Представитель</dt>
+                                    <dd>Нет<small>Заявка подана лично, доверенность не требуется</small></dd>
+                                </dl>
+                            </div>
+
+                            <div>
+                                <div class="block-title">Заявка</div>
+                                <dl class="kv">
+                                    <dt>Номер</dt>
+                                    <dd><span class="mono">А-00042</span><small>Регистрационный номер присвоен при отправке</small></dd>
+                                    <dt>Вид деятельности</dt>
+                                    <dd>Выпас скота<small lang="uz-Cyrl">Чорва молларини боқиш</small></dd>
+                                    <dt>Запрашиваемый период</dt>
+                                    <dd><span class="mono">01.09.2026 — 30.11.2026</span><small>91 день, 3 полных месяца</small></dd>
+                                    <dt>Запрашиваемая площадь</dt>
+                                    <dd><span class="mono">12,50 га</span></dd>
+                                    <dt>Организация</dt>
+                                    <dd lang="uz-Cyrl">Бўстонлиқ давлат ўрмон хўжалиги<small lang="ru">Лесничество Хумсон, обход 3, квартал 14</small></dd>
+                                    <dt>Канал подачи</dt>
+                                    <dd>my.gov.uz<small>Заявка пришла через BFF, не бумажная</small></dd>
+                                    <dt>Подпись ЭЦП</dt>
+                                    <dd>E-IMZO, действительна<small>Сертификат <span class="mono">5E:9A:C4:71</span>, срок до 14.02.2027</small></dd>
+                                    <dt>Риск-индикаторы</dt>
+                                    <dd>Не сформированы<small>SLA пока не нарушен, ручных отметок нет</small></dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="verdict v-warn">
+                            <span class="vic" aria-hidden="true">▲</span>
+                            <span class="vtext"><b>Внимание: остаток лимита на контуре минимальный.</b>
+                            После этой заявки на контуре Бўстонлиқ 14-2 останется <span class="mono">0,40</span>
+                            условных голов из <span class="mono">29</span>. Следующая заявка на тот же период
+                            почти наверняка получит отказ <span class="code">RJ-05</span>. Подробности — в разделе «Расчёт».</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ 2. Участок и карта ═══════════════════════ -->
+                <section class="panel" id="s-plot" aria-labelledby="h-plot">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-plot">Участок и карта</h2>
+                        <span class="panel-sub">Контур <span class="mono">Бўстонлиқ 14-2</span>, версия v4</span>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Открыть в полной карте</button>
+                            <button class="btn btn-secondary btn-sm">Выгрузить GeoJSON</button>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <p class="lead">Схема условная: контур лесфонда, три действующих разрешения
+                        с пересекающимся периодом и участок этой заявки. Заливки различаются не только
+                        цветом — штриховкой и подписью, поэтому картинка читается в оттенках серого.</p>
+
+                        <div class="map-wrap">
+                            <svg class="map-svg" viewBox="0 0 640 340" role="img"
+                                 aria-label="Схема контура Бўстонлиқ 14-2 площадью 41 гектар. Внутри три участка действующих разрешений на 22,3 гектара и участок заявки на 12,5 гектара в юго-восточной части контура.">
+                                <defs>
+                                    <pattern id="p-busy" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                                        <line class="hatch-l" x1="0" y1="0" x2="0" y2="8"></line>
+                                    </pattern>
+                                    <pattern id="p-plot" width="9" height="9" patternUnits="userSpaceOnUse">
+                                        <circle class="dot-f" cx="2.5" cy="2.5" r="1.6"></circle>
+                                    </pattern>
+                                </defs>
+
+                                <rect class="fund" x="12" y="12" width="616" height="316" rx="6"></rect>
+                                <text class="lbl-s" x="24" y="30">Лесной фонд · квартал 14</text>
+
+                                <polygon class="contour" points="60,52 300,38 424,82 502,162 470,262 300,300 142,282 46,192"></polygon>
+                                <text class="lbl" x="62" y="76">Контур 14-2 · 41,00 га</text>
+
+                                <polygon class="busy" fill="url(#p-busy)" points="82,88 204,72 238,152 122,172"></polygon>
+                                <polygon class="busy" fill="url(#p-busy)" points="256,74 404,102 422,182 302,188"></polygon>
+                                <polygon class="busy" fill="url(#p-busy)" points="152,202 302,208 322,276 172,272"></polygon>
+
+                                <polygon class="plot" fill="url(#p-plot)" points="334,198 462,188 466,266 342,280"></polygon>
+                                <text class="lbl" x="346" y="228">Участок заявки</text>
+                                <text class="lbl-s" x="346" y="246">12,50 га · 01.09 — 30.11</text>
+
+                                <path class="bound" d="M46,192 L142,178 L256,196 L334,198"></path>
+                                <text class="lbl-s" x="52" y="212">граница обхода 3</text>
+
+                                <circle class="pin" cx="150" cy="120" r="12"></circle>
+                                <text class="pin-t" x="146" y="124">1</text>
+                                <circle class="pin" cx="336" cy="136" r="12"></circle>
+                                <text class="pin-t" x="332" y="140">2</text>
+                                <circle class="pin" cx="232" cy="240" r="12"></circle>
+                                <text class="pin-t" x="228" y="244">3</text>
+
+                                <path class="scale" d="M496,300 L596,300 M496,294 L496,306 M546,296 L546,304 M596,294 L596,306"></path>
+                                <text class="lbl-s" x="496" y="322">0</text>
+                                <text class="lbl-s" x="566" y="322">1 км</text>
+
+                                <path class="scale" d="M604,64 L604,26 M604,26 L598,38 M604,26 L610,38"></path>
+                                <text class="lbl-s" x="599" y="80">С</text>
+                            </svg>
+                        </div>
+
+                        <div class="map-legend">
+                            <span><span class="sw sw-contour" aria-hidden="true"></span><b>Контур 14-2</b> · 41,00 га, слой «Пастбища», статус Published</span>
+                            <span><span class="sw sw-busy" aria-hidden="true"></span><b>Занято</b> · 3 действующих разрешения, 22,30 га (штриховка)</span>
+                            <span><span class="sw sw-plot" aria-hidden="true"></span><b>Участок заявки</b> · 12,50 га (точки)</span>
+                        </div>
+
+                        <div style="margin-top:var(--space-6)">
+                            <div class="block-title">Действующие разрешения на контуре</div>
+                            <div class="tbl-scroll">
+                                <table class="tbl">
+                                    <caption class="vh">Разрешения с периодом, пересекающимся с периодом заявки</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">№</th>
+                                            <th scope="col">Разрешение</th>
+                                            <th scope="col">Держатель</th>
+                                            <th scope="col">Период</th>
+                                            <th scope="col" class="num">Площадь, га</th>
+                                            <th scope="col" class="num">SB</th>
+                                            <th scope="col">Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="mono">1</td>
+                                            <td class="mono">Р-00871</td>
+                                            <td>«Ипак йўли агросервис» МЧЖ</td>
+                                            <td class="mono">15.04 — 15.11.2026</td>
+                                            <td class="num">9,40</td>
+                                            <td class="num">7,20</td>
+                                            <td><span class="chip tone-success"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◈</span>Действует</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">2</td>
+                                            <td class="mono">Р-00902</td>
+                                            <td>Собир Юсупов</td>
+                                            <td class="mono">01.06 — 30.11.2026</td>
+                                            <td class="num">7,80</td>
+                                            <td class="num">6,40</td>
+                                            <td><span class="chip tone-success"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◈</span>Действует</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">3</td>
+                                            <td class="mono">Р-00915</td>
+                                            <td>Нодира Тошматова</td>
+                                            <td class="mono">01.09 — 31.10.2026</td>
+                                            <td class="num">5,10</td>
+                                            <td class="num">4,00</td>
+                                            <td><span class="chip tone-success"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">◈</span>Действует</span></td>
+                                        </tr>
+                                        <tr class="total">
+                                            <td colspan="4">Итого занято на контуре</td>
+                                            <td class="num">22,30</td>
+                                            <td class="num">17,60</td>
+                                            <td>Двойной учёт устранён</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="verdict v-ok">
+                            <span class="vic" aria-hidden="true">✓</span>
+                            <span class="vtext"><b>Свободной площади достаточно.</b>
+                            <span class="mono">S_available = 41,00 − 22,30 = 18,70 га</span>, запрошено
+                            <span class="mono">12,50 га</span>. Геометрия участка внутри контура,
+                            пересечений со слоями охраны и ограничений нет.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ 3. Расчёт с полной расшифровкой ══════════ -->
+                <section class="panel" id="s-calc" aria-labelledby="h-calc">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-calc">Расчёт</h2>
+                        <span class="panel-sub">Норма <span class="code">NRM-14-2-2026-R3</span> · тариф <span class="code">TRF-278-2026-R1</span></span>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Снимок входных данных</button>
+                            <button class="btn btn-secondary btn-sm">Пересчитать</button>
+                        </div>
+                    </div>
+
+                    <!-- 3.1 Norm chain: where MaxSB comes from -->
+                    <div class="panel-body">
+                        <div class="block-title">Шаг 1. Норма контура — откуда взялся MaxSB</div>
+                        <p class="lead">Цепочка из ВМҚ 689-сон. Промежуточные значения хранятся
+                        без округления; округление до двух знаков применяется только при выводе,
+                        поэтому <span class="mono">MaxSB</span> считается от точного числа, а не от показанного.</p>
+
+                        <div class="tbl-scroll">
+                            <table class="tbl">
+                                <caption class="vh">Расчёт максимума условных голов на контуре</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Шаг</th>
+                                        <th scope="col">Величина</th>
+                                        <th scope="col" class="num">Значение</th>
+                                        <th scope="col">Источник и формула</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="step" aria-hidden="true">1</span><span class="vh">Шаг 1</span></td>
+                                        <td>Урожайность <span class="code">Yield_c_per_ha</span></td>
+                                        <td class="num">5,06 ц/га</td>
+                                        <td class="why">Геоботаническое обследование <span class="mono">ГБ-2026-114</span> от 14.03.2026, утверждено 02.04.2026</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="step" aria-hidden="true">2</span><span class="vh">Шаг 2</span></td>
+                                        <td>Площадь контура <span class="code">Area_ha</span></td>
+                                        <td class="num">41,00 га</td>
+                                        <td class="why">GIS-контур Бўстонлиқ 14-2, версия v4, статус Published, документ <span class="mono">ПД-2026-041</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="step" aria-hidden="true">3</span><span class="vh">Шаг 3</span></td>
+                                        <td>Доля сезона <span class="code">Season_share</span></td>
+                                        <td class="num">0,63</td>
+                                        <td class="why">Календарь выпаса 15.04 — 30.11, 230 дней из 365, ВМҚ 689-сон</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="step" aria-hidden="true">4</span><span class="vh">Шаг 4</span></td>
+                                        <td>Запас корма <span class="code">Oz</span></td>
+                                        <td class="num">130,70 ц</td>
+                                        <td class="why">5,06 × 41,00 × 0,63 = 130,6998 ц (точное значение сохранено в снимке)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="step" aria-hidden="true">5</span><span class="vh">Шаг 5</span></td>
+                                        <td>Эффективный запас <span class="code">Oz_eff</span></td>
+                                        <td class="num">111,09 ц</td>
+                                        <td class="why">130,6998 × 0,85 = 111,09483 ц. Коэффициент 0,85 — страховой фонд 15 %</td>
+                                    </tr>
+                                    <tr class="total">
+                                        <td><span class="step" aria-hidden="true">6</span><span class="vh">Шаг 6</span></td>
+                                        <td>Максимум условных голов <span class="code">MaxSB</span></td>
+                                        <td class="num">29</td>
+                                        <td class="why">floor(111,09483 ÷ 3,74) = floor(29,7045) = 29. Делитель 3,74 — центнеров кормовых единиц на условную голову</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="formula">Oz     = Yield_c_per_ha × Area_ha × Season_share = 5,06 × 41,00 × 0,63 = 130,699800 ц
+Oz_eff = Oz × 0,85                                 = 130,6998 × 0,85   = 111,094830 ц
+MaxSB  = floor(Oz_eff ÷ 3,74)                      = floor(29,704500)  = 29 условных голов</p>
+                    </div>
+
+                    <!-- 3.2 Limit on the contour -->
+                    <div class="panel-body">
+                        <div class="block-title">Шаг 2. Остаточный лимит контура</div>
+
+                        <dl class="kv">
+                            <dt>Занято действующими разрешениями <span class="code">ActivePermitsSB</span></dt>
+                            <dd><span class="mono">17,60 SB</span><small>Три разрешения с пересекающимся периодом: 7,20 + 6,40 + 4,00</small></dd>
+                            <dt>Остаточный лимит <span class="code">RemainingSB</span></dt>
+                            <dd><span class="mono">11,40 SB</span><small>29 − 17,60</small></dd>
+                            <dt>Общая площадь <span class="code">S_total</span></dt>
+                            <dd><span class="mono">41,00 га</span></dd>
+                            <dt>Занятая площадь <span class="code">S_active_overlap</span></dt>
+                            <dd><span class="mono">22,30 га</span><small>Геометрическое объединение, двойной учёт устранён</small></dd>
+                            <dt>Свободная площадь <span class="code">S_available</span></dt>
+                            <dd><span class="mono">18,70 га</span><small>41,00 − 22,30</small></dd>
+                        </dl>
+
+                        <div class="limitbar" role="img"
+                             aria-label="Распределение лимита 29 условных голов: 17,6 занято действующими разрешениями, 11,0 приходится на эту заявку, 0,4 остаётся свободным.">
+                            <span class="lb-used" style="width:60.7%">17,60 занято</span>
+                            <span class="lb-this" style="width:37.9%">11,00 заявка</span>
+                            <span class="lb-free" style="width:1.4%"></span>
+                        </div>
+                        <div class="limit-legend">
+                            <span><span class="sw lb-used" aria-hidden="true"></span><b>17,60 SB</b> — действующие разрешения</span>
+                            <span><span class="sw lb-this" aria-hidden="true"></span><b>11,00 SB</b> — эта заявка</span>
+                            <span><span class="sw lb-free" aria-hidden="true"></span><b>0,40 SB</b> — останется свободно из 29</span>
+                        </div>
+                    </div>
+
+                    <!-- 3.3 Load of this application -->
+                    <div class="panel-body">
+                        <div class="block-title">Шаг 3. Нагрузка заявки — UsedSB</div>
+                        <p class="lead">Поголовье приводится к условным головам коэффициентами
+                        <span class="code">CoefSB</span> из приложения 5 к ВМҚ 689-сон. Значения
+                        коэффициентов версионированы вместе с нормой.</p>
+
+                        <div class="tbl-scroll">
+                            <table class="tbl">
+                                <caption class="vh">Приведение поголовья к условным головам</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Группа скота</th>
+                                        <th scope="col" class="num">Голов</th>
+                                        <th scope="col" class="num">CoefSB</th>
+                                        <th scope="col" class="num">Условных голов</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Крупный рогатый скот, взрослый</td>
+                                        <td class="num">6</td>
+                                        <td class="num">1,00</td>
+                                        <td class="num">6,00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Крупный рогатый скот, молодняк до 2 лет</td>
+                                        <td class="num">4</td>
+                                        <td class="num">0,60</td>
+                                        <td class="num">2,40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Овцы старше 6 месяцев</td>
+                                        <td class="num">16</td>
+                                        <td class="num">0,15</td>
+                                        <td class="num">2,40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ягнята до 6 месяцев</td>
+                                        <td class="num">2</td>
+                                        <td class="num">0,10</td>
+                                        <td class="num">0,20</td>
+                                    </tr>
+                                    <tr class="total">
+                                        <td>Итого <span class="code">UsedSB</span></td>
+                                        <td class="num">28 голов</td>
+                                        <td class="num">—</td>
+                                        <td class="num">11,00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="formula">UsedSB = Σ Count_i × CoefSB_i = 6×1,00 + 4×0,60 + 16×0,15 + 2×0,10 = 11,0000
+Проверка: UsedSB ≤ RemainingSB  →  11,0000 ≤ 11,4000  →  выполнено, запас 0,4000 SB</p>
+
+                        <div class="verdict v-warn">
+                            <span class="vic" aria-hidden="true">▲</span>
+                            <span class="vtext"><b>Лимит соблюдён, но на пределе.</b>
+                            Запас <span class="mono">0,40 SB</span> — это меньше одной овцы старше
+                            6 месяцев. Ошибка на одну голову в исходных данных превратит заявку в
+                            <span class="code">ERR-NORM-002</span> и отказ <span class="code">RJ-05</span>.
+                            Сверьте поголовье с ветеринарной справкой перед отправкой на утверждение.</span>
+                        </div>
+                    </div>
+
+                    <!-- 3.4 Payment -->
+                    <div class="panel-body">
+                        <div class="block-title">Шаг 4. Платёж</div>
+
+                        <div class="tbl-scroll">
+                            <table class="tbl">
+                                <caption class="vh">Расчёт суммы платежа</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Множитель</th>
+                                        <th scope="col" class="num">Значение</th>
+                                        <th scope="col">Источник</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>БҲМ, базовая расчётная величина</td>
+                                        <td class="num">412 000,00 сўм</td>
+                                        <td class="why">Действует с 01.09.2025, история значений версионирована, ретроактивное изменение потребует maker-checker и породит <span class="code">RI-04</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Коэффициент вида деятельности</td>
+                                        <td class="num">0,0888</td>
+                                        <td class="why">Выпас скота, за одну условную голову в месяц, ВМҚ 278-сон, тариф <span class="mono">TRF-278-2026-R1</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Объём <span class="code">quantity</span></td>
+                                        <td class="num">33,00</td>
+                                        <td class="why">UsedSB 11,00 × 3 месяца периода 01.09 — 30.11.2026</td>
+                                    </tr>
+                                    <tr class="total">
+                                        <td>Сумма к оплате <span class="code">Amount</span></td>
+                                        <td class="num">1 207 324,80 сўм</td>
+                                        <td class="why">412 000,00 × 0,0888 × 33,00. Тип <span class="mono">numeric(18,2)</span>, округление ROUND_HALF_UP</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="formula">Amount = БҲМ × coefficient × quantity = 412 000,00 × 0,0888 × 33,00 = 1 207 324,80 сўм
+Распределение 50/50 (allocation ledger):
+    Республиканский бюджет      603 662,40 сўм
+    Фонд развития лесхоза       603 662,40 сўм</p>
+
+                        <div class="repro">
+                            <div class="repro-i">
+                                <span>Версия нормы</span>
+                                <b>NRM-14-2-2026-R3</b>
+                            </div>
+                            <div class="repro-i">
+                                <span>Версия тарифа</span>
+                                <b>TRF-278-2026-R1</b>
+                            </div>
+                            <div class="repro-i">
+                                <span>Снимок входных данных</span>
+                                <b>snap-a00042-20260804T090014Z</b>
+                            </div>
+                            <div class="repro-i">
+                                <span>Контрольная сумма снимка</span>
+                                <b>sha256:9f3c41e7…b280</b>
+                            </div>
+                            <div class="repro-i">
+                                <span>Рассчитано</span>
+                                <b>04.08.2026, 09:00:14 · 1,8 с</b>
+                            </div>
+                            <div class="repro-i">
+                                <span>Пересчётов</span>
+                                <b>0 · исходный расчёт не изменялся</b>
+                            </div>
+                            <div class="repro-act">
+                                <button class="btn btn-secondary btn-sm">Показать снимок целиком</button>
+                                <button class="btn btn-secondary btn-sm">Сравнить с версией R2</button>
+                            </div>
+                        </div>
+
+                        <p class="lead" style="margin:var(--space-3) 0 0">Пункт 4.2.15 ТЗ: расчёт
+                        воспроизводим и объясним. При изменении нормы этот расчёт не пересчитывается —
+                        он держится за <span class="code">rule_version</span> и снимок входа.</p>
+                    </div>
+                </section>
+
+                <!-- ════ 4. Проверки ══════════════════════════════ -->
+                <section class="panel" id="s-checks" aria-labelledby="h-checks">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-checks">Проверки</h2>
+                        <span class="panel-sub">8 автоматических пройдено · 1 внешняя система недоступна</span>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Повторить все проверки</button>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="block-title">Автоматические проверки GIS и нормы</div>
+                        <ul class="autolist">
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Геометрия корректна
+                                    <small>Проверка <span class="mono">ST_IsValid</span>, самопересечений нет</small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Участок внутри границ лесного фонда
+                                    <small>Иначе — <span class="code">ERR-GIS-002</span> и отказ <span class="code">RJ-03</span></small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Нет пересечения со слоями охраны и ограничений
+                                    <small>Проверены заповедная зона, водоохранная полоса, санитарная зона</small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Свободной площади достаточно: 12,50 ≤ 18,70 га
+                                    <small>Иначе — <span class="code">ERR-APP-002</span> и отказ <span class="code">RJ-04</span></small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">По контуру есть утверждённая норма
+                                    <small><span class="mono">NRM-14-2-2026-R3</span>, действует с 02.04.2026</small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-warn" aria-hidden="true">▲</span>
+                                <span class="atext">Нагрузка в пределах лимита, запас минимальный: 11,00 ≤ 11,40 SB
+                                    <small>Предупреждение, не ошибка. Остаток 0,40 SB</small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Период укладывается в календарь сезона и ротации
+                                    <small>01.09 — 30.11 целиком внутри сезона выпаса 15.04 — 30.11. Иначе — <span class="code">ERR-NORM-003</span> и отказ <span class="code">RJ-07</span></small>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="aic a-ok" aria-hidden="true">✓</span>
+                                <span class="atext">Период пожарного запрета не затронут
+                                    <small>ВМҚ 506-сон, запрет действовал 15.06 — 20.08.2026</small>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="block-title">Ответы внешних систем</div>
+
+                        <div class="checks">
+
+                            <!-- Successful integration: Cadastre answered in time -->
+                            <div class="check">
+                                <div class="check-head">
+                                    <span class="check-name">Кадастр и источники GIS</span>
+                                    <span class="chip tone-success">
+                                        <span class="dot" aria-hidden="true"></span>
+                                        <span class="ic" aria-hidden="true">✓</span>Ответ получен
+                                    </span>
+                                </div>
+                                <div class="check-body">
+                                    <dl class="kv">
+                                        <dt>Что спрашивали</dt>
+                                        <dd>Правовое состояние контура 14-2<small>Обременения, права третьих лиц, соответствие кадастровому учёту</small></dd>
+                                        <dt>Ответ</dt>
+                                        <dd>Контур числится за лесным фондом, обременений нет<small>Кадастровый номер <span class="mono">10:04:0301:14-2</span>, площадь по кадастру 41,00 га</small></dd>
+                                        <dt>Расхождения с GIS-контуром</dt>
+                                        <dd>Не выявлены<small>Иначе формируется задание GIS-специалисту, сценарий С17</small></dd>
+                                    </dl>
+
+                                    <div class="check-meta">
+                                        <span>Запрос <b>10.08.2026, 09:12:03</b></span>
+                                        <span>Ответ <b>10.08.2026, 09:12:05</b></span>
+                                        <span>Время <b>2,1 с</b> при регламенте 10 с</span>
+                                        <span>Код ответа <b>200</b></span>
+                                        <span>ID запроса <b>KAD-REQ-2026-0810-4417</b></span>
+                                    </div>
+
+                                    <div class="check-act">
+                                        <button class="btn btn-secondary btn-sm">Открыть ответ целиком</button>
+                                        <button class="btn btn-secondary btn-sm">Повторить запрос</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Degraded mode: the service is down, the decision goes manual -->
+                            <div class="check">
+                                <div class="check-head">
+                                    <span class="check-name">Ветеринарная АТ</span>
+                                    <span class="chip tone-danger">
+                                        <span class="dot" aria-hidden="true"></span>
+                                        <span class="ic" aria-hidden="true">✕</span>Система недоступна
+                                    </span>
+                                    <span class="chip tone-warning">
+                                        <span class="dot" aria-hidden="true"></span>
+                                        <span class="ic" aria-hidden="true">‖</span>Решение вручную
+                                    </span>
+                                </div>
+                                <div class="check-body">
+                                    <div class="verdict v-danger">
+                                        <span class="vic" aria-hidden="true">!</span>
+                                        <span class="vtext"><b>Сервис не ответил, код <span class="code">ERR-INT-001</span>.</b>
+                                        Запрос по поголовью и ветеринарному состоянию поставлен в очередь,
+                                        выполнена попытка 3 из 5, следующая — в 09:58. Работа не остановлена:
+                                        по ТЗ применяется бумажный подтверждающий документ и порядок maker-checker,
+                                        а вся ситуация записывается в аудит.</span>
+                                    </div>
+
+                                    <dl class="kv" style="margin-top:var(--space-4)">
+                                        <dt>Что спрашивали</dt>
+                                        <dd>Поголовье и ветеринарное состояние<small>28 голов по четырём группам, владелец — ЖШШИР 31207854315218</small></dd>
+                                        <dt>Замещающий документ</dt>
+                                        <dd>Ветеринарная справка формы 1 <span class="mono">ВС-2026-7741</span><small>Выдана 03.08.2026, Бўстонлиқ туман ветеринария бўлими, подписана ЭЦП ветврача</small></dd>
+                                        <dt>Что будет при ответе системы</dt>
+                                        <dd>Автоматическая сверка с бумажной справкой<small>При расхождении заявка возвращается на рассмотрение, решение отменяется</small></dd>
+                                    </dl>
+
+                                    <div class="mk">
+                                        <div class="mk-cell">
+                                            <div class="mk-role">Maker · вносит решение</div>
+                                            <div class="mk-who">Дилноза Абдуллаева</div>
+                                            <div class="mk-when">10.08.2026, 09:35:12</div>
+                                            <p class="mk-note">«Ветеринарное состояние подтверждено бумажной справкой
+                                            ВС-2026-7741. Поголовье совпадает с заявленным: 28 голов».</p>
+                                        </div>
+                                        <div class="mk-cell">
+                                            <div class="mk-role">Checker · подтверждает</div>
+                                            <div class="mk-who">Рустам Ҳакимов · руководитель</div>
+                                            <div class="mk-when">Ожидает подтверждения</div>
+                                            <p class="mk-note">Без второй подписи заявка не уйдёт на утверждение.
+                                            Оба действия и оба IP-адреса попадают в журнал аудита.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="check-meta">
+                                        <span>Первая попытка <b>10.08.2026, 09:28:11</b></span>
+                                        <span>Таймаут <b>10 с</b></span>
+                                        <span>Попытка <b>3 из 5</b></span>
+                                        <span>Следующая <b>10.08.2026, 09:58</b></span>
+                                        <span>Очередь <b>vet.livestock.check</b></span>
+                                    </div>
+
+                                    <div class="check-act">
+                                        <button class="btn btn-secondary btn-sm">Повторить запрос сейчас</button>
+                                        <button class="btn btn-secondary btn-sm">Открыть бумажную справку</button>
+                                        <button class="btn btn-secondary btn-sm">Запросить подтверждение у руководителя</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ 5. Документы ═════════════════════════════ -->
+                <section class="panel" id="s-docs" aria-labelledby="h-docs">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-docs">Документы</h2>
+                        <span class="panel-sub">6 файлов · 7,5 МБ</span>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Скачать все одним архивом</button>
+                            <button class="btn btn-secondary btn-sm">Приложить документ</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="docs">
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">PDF</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Заявление по форме приложения 1</span>
+                                    <span class="doc-meta">PDF/A · 340 КБ · 22.07.2026, 10:12 · заявитель · подписано ЭЦП</span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">Просмотр</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, заявление по форме приложения 1</span></button>
+                                </span>
+                            </li>
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">PDF</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Ветеринарная справка формы 1 <span class="mono">ВС-2026-7741</span></span>
+                                    <span class="doc-meta">PDF · 1,2 МБ · 04.08.2026, 08:52 · заявитель · подписана ЭЦП ветврача</span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">Просмотр</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, ветеринарная справка формы 1</span></button>
+                                </span>
+                            </li>
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">PDF</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Выписка из паспорта скота</span>
+                                    <span class="doc-meta">PDF · 2,8 МБ · 22.07.2026, 10:08 · заявитель</span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">Просмотр</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, выписка из паспорта скота</span></button>
+                                </span>
+                            </li>
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">GEO</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Схема размещения выпаса</span>
+                                    <span class="doc-meta">GeoJSON · 46 КБ · 22.07.2026, 10:05 · заявитель · геометрия проверена</span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">На карте</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, схема размещения выпаса</span></button>
+                                </span>
+                            </li>
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">JSON</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Ответ Кадастра <span class="mono">KAD-REQ-2026-0810-4417</span></span>
+                                    <span class="doc-meta">JSON · 12 КБ · 10.08.2026, 09:12 · сформирован системой · только для аудита</span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">Просмотр</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, ответ Кадастра</span></button>
+                                </span>
+                            </li>
+                            <li class="doc">
+                                <span class="doc-ic" aria-hidden="true">PDF</span>
+                                <span class="doc-main">
+                                    <span class="doc-name">Скан бумажного подтверждения ветеринарного состояния</span>
+                                    <span class="doc-meta">PDF · 3,1 МБ · 10.08.2026, 09:35 · сотрудник Дилноза Абдуллаева ·
+                                        <span class="chip tone-warning"><span class="dot" aria-hidden="true"></span><span class="ic" aria-hidden="true">‖</span>Ожидает подтверждения checker</span>
+                                    </span>
+                                </span>
+                                <span class="doc-act">
+                                    <button class="btn btn-secondary btn-sm">Просмотр</button>
+                                    <button class="btn btn-secondary btn-sm"><span aria-hidden="true">↓</span>Скачать<span class="vh">, скан бумажного подтверждения</span></button>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- ════ 6. История статусов ══════════════════════ -->
+                <section class="panel" id="s-history" aria-labelledby="h-history">
+                    <div class="panel-head">
+                        <h2 class="panel-title" id="h-history">История статусов</h2>
+                        <span class="panel-sub">9 событий · журнал аудита неизменяем</span>
+                        <div class="panel-tools">
+                            <button class="btn btn-secondary btn-sm">Выгрузить журнал</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <p class="lead">Каждый переход записан с указанием: кто, когда, с какого IP
+                        и на каком основании. Это требование ТЗ к любому переходу статуса —
+                        и первое, что открывают при разборе спорной заявки.</p>
+
+                        <ol class="tl">
+
+                            <li>
+                                <span class="tl-dot" aria-hidden="true">✎</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">22.07.2026, 09:48</span>
+                                    <span class="tl-move">Создана · <span class="code">DRAFT</span></span>
+                                </div>
+                                <div class="tl-who">Азиз Каримов <span class="role">· заявитель</span></div>
+                                <div class="tl-audit">IP 84.54.121.19 · my.gov.uz · веб</div>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-primary" aria-hidden="true">✉</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">22.07.2026, 10:12</span>
+                                    <span class="tl-move"><span class="code">DRAFT</span> <span class="arr" aria-hidden="true">→</span> <span class="code">SUBMITTED</span></span>
+                                </div>
+                                <div class="tl-who">Азиз Каримов <span class="role">· заявитель</span></div>
+                                <div class="tl-audit">IP 84.54.121.19 · ЭЦП E-IMZO, сертификат 5E:9A:C4:71, действителен до 14.02.2027</div>
+                                <p class="tl-note">Заявка зарегистрирована под номером А-00042. Подпись проверена,
+                                отзыв сертификата по списку CRL не найден.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot" aria-hidden="true">⚙</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">22.07.2026, 10:12</span>
+                                    <span class="tl-move">Назначен исполнитель</span>
+                                </div>
+                                <div class="tl-who">Система <span class="role">· автоматически</span></div>
+                                <div class="tl-audit">Правило: территория Бўстонлиқ + вид «Выпас скота» → Дилноза Абдуллаева</div>
+                                <p class="tl-note">SLA-таймер запущен. Базовый срок рассмотрения — 15 дней,
+                                до 06.08.2026, 18:00.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-primary" aria-hidden="true">◷</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">23.07.2026, 09:06</span>
+                                    <span class="tl-move"><span class="code">SUBMITTED</span> <span class="arr" aria-hidden="true">→</span> <span class="code">IN_REVIEW</span></span>
+                                </div>
+                                <div class="tl-who">Дилноза Абдуллаева <span class="role">· сотрудник, Тошкент ДЎХ</span></div>
+                                <div class="tl-audit">IP 10.24.8.61 · рабочая станция ДЎХ-14 · основание: назначение от 22.07.2026</div>
+                                <p class="tl-note">Принята в работу.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-warn" aria-hidden="true">?</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">31.07.2026, 09:00</span>
+                                    <span class="tl-move"><span class="code">IN_REVIEW</span> <span class="arr" aria-hidden="true">→</span> <span class="code">PENDING_INFO</span></span>
+                                </div>
+                                <div class="tl-who">Дилноза Абдуллаева <span class="role">· сотрудник</span></div>
+                                <div class="tl-audit">IP 10.24.8.61 · основание: п. 5.3 сценария С5</div>
+                                <p class="tl-note">Запрошена ветеринарная справка формы 1 на всё поголовье.
+                                <strong>SLA-таймер остановлен</strong> — это обязательное поведение по приложению 5 ТЗ.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-primary" aria-hidden="true">◷</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">04.08.2026, 09:00</span>
+                                    <span class="tl-move"><span class="code">PENDING_INFO</span> <span class="arr" aria-hidden="true">→</span> <span class="code">IN_REVIEW</span></span>
+                                </div>
+                                <div class="tl-who">Азиз Каримов <span class="role">· заявитель</span></div>
+                                <div class="tl-audit">IP 84.54.121.19 · приложен файл ВС-2026-7741.pdf, 1,2 МБ</div>
+                                <p class="tl-note">Таймер возобновлён. Пауза составила ровно 4 суток,
+                                срок сдвинут с 06.08.2026 на <strong>10.08.2026, 18:00</strong>.
+                                Расчёт выполнен заново на актуальном поголовье.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot" aria-hidden="true">⚙</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">10.08.2026, 09:12</span>
+                                    <span class="tl-move">Ответ внешней системы · Кадастр</span>
+                                </div>
+                                <div class="tl-who">Система <span class="role">· интеграционный сервис</span></div>
+                                <div class="tl-audit">KAD-REQ-2026-0810-4417 · код ответа 200 · 2,1 с</div>
+                                <p class="tl-note">Правовое состояние контура подтверждено, расхождений с
+                                GIS-контуром нет.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-danger" aria-hidden="true">!</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">10.08.2026, 09:28</span>
+                                    <span class="tl-move">Сбой внешней системы · Ветеринарная АТ</span>
+                                </div>
+                                <div class="tl-who">Система <span class="role">· интеграционный сервис</span></div>
+                                <div class="tl-audit">ERR-INT-001 · таймаут 10 с · запрос в очереди vet.livestock.check</div>
+                                <p class="tl-note">Включён ограниченный режим по этой проверке: решение
+                                принимается по бумажной справке в порядке maker-checker. Maker внёс решение
+                                в 09:35, подтверждение checker ожидается.</p>
+                            </li>
+
+                            <li>
+                                <span class="tl-dot d-now" aria-hidden="true">▶</span>
+                                <div class="tl-head">
+                                    <span class="tl-when">10.08.2026, 09:40</span>
+                                    <span class="tl-move">Сейчас · ожидает решения исполнителя</span>
+                                </div>
+                                <div class="tl-who">Дилноза Абдуллаева <span class="role">· сотрудник</span></div>
+                                <div class="tl-audit">До нарушения SLA осталось 8 ч 20 мин · при нарушении формируется RI-07</div>
+                            </li>
+
+                        </ol>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- ════ Right rail: actions and the numbers you decide by ════ -->
+            <aside class="rail" aria-label="Действия и сводка по заявке">
+
+                <div class="rail-block">
+                    <div class="rail-title">Действия · статус IN_REVIEW</div>
+                    <div class="rail-actions">
+                        <button class="btn btn-primary btn-block">Отправить на утверждение</button>
+                        <button class="btn btn-secondary btn-block">Запросить информацию</button>
+                        <button class="btn btn-secondary btn-block">Вернуть заявителю</button>
+                        <button class="btn btn-danger btn-block">Отклонить</button>
+                    </div>
+                    <p class="hint"><b>Набор действий зависит от роли и статуса.</b>
+                    Сотрудник готовит решение; утверждает и отказывает руководитель.
+                    При возврате обязателен код <span class="code">RJ-01</span> или <span class="code">RJ-02</span>,
+                    при отказе — код <span class="code">RJ-*</span> и правовое основание.
+                    «Запросить информацию» останавливает SLA-таймер.</p>
+                </div>
+
+                <div class="rail-block">
+                    <div class="rail-title">Срок рассмотрения</div>
+                    <div class="sla-mark sla-warn">
+                        <span class="sla-ic" aria-hidden="true">▲</span>
+                        <span class="sla-text">Истекает сегодня
+                            <small>10.08.2026, 18:00 · осталось 8 ч 20 мин</small>
+                        </span>
+                    </div>
+                    <div class="sla-mark sla-warn" style="display:block">
+                        <span class="sla-bar" aria-hidden="true"><i style="width:97%"></i></span>
+                    </div>
+                    <dl class="rail-kv" style="margin-top:var(--space-3)">
+                        <dt>Регламент</dt><dd>15 дней</dd>
+                        <dt>Пауза PENDING_INFO</dt><dd>4 сут</dd>
+                        <dt>Израсходовано</dt><dd>97 %</dd>
+                        <dt>При нарушении</dt><dd>RI-07</dd>
+                    </dl>
+                    <p class="hint">Нарушение срока уходит в поток цифрового надзора
+                    автоматически, не дожидаясь запроса прокурора.</p>
+                </div>
+
+                <div class="rail-block">
+                    <div class="rail-title">Ключевые числа</div>
+                    <dl class="rail-kv">
+                        <dt>MaxSB</dt><dd>29</dd>
+                        <dt>ActivePermitsSB</dt><dd>17,60</dd>
+                        <dt>RemainingSB</dt><dd>11,40</dd>
+                        <dt>UsedSB заявки</dt><dd>11,00</dd>
+                        <dt>Останется</dt><dd>0,40</dd>
+                        <dt>S_available</dt><dd>18,70 га</dd>
+                        <dt>Сумма</dt><dd>1 207 324,80</dd>
+                    </dl>
+                    <p class="hint"><b>Запас 0,40 SB.</b> Проверьте поголовье до отправки
+                    на утверждение — <a class="link" href="#s-calc">перейти к расчёту</a>.</p>
+                </div>
+
+                <div class="rail-block">
+                    <div class="rail-title">Состояние проверок</div>
+                    <ul class="autolist">
+                        <li>
+                            <span class="aic a-ok" aria-hidden="true">✓</span>
+                            <span class="atext">8 автопроверок пройдено</span>
+                        </li>
+                        <li>
+                            <span class="aic a-ok" aria-hidden="true">✓</span>
+                            <span class="atext">Кадастр ответил
+                                <small>10.08.2026, 09:12</small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="aic a-warn" aria-hidden="true">!</span>
+                            <span class="atext">Ветеринарная АТ недоступна
+                                <small>Решение вручную, ждёт checker</small>
+                            </span>
+                        </li>
+                    </ul>
+                    <p class="hint"><a class="link" href="#s-checks">Открыть раздел «Проверки»</a></p>
+                </div>
+
+                <div class="rail-block">
+                    <div class="rail-title">Воспроизводимость</div>
+                    <dl class="rail-kv">
+                        <dt>rule_version</dt><dd>NRM-14-2-2026-R3</dd>
+                        <dt>tariff_version</dt><dd>TRF-278-2026-R1</dd>
+                        <dt>input_snapshot</dt><dd>20260804T090014Z</dd>
+                        <dt>sha256</dt><dd>9f3c41e7…b280</dd>
+                    </dl>
+                    <p class="hint">Пункт 4.2.15 ТЗ: расчёт объясним задним числом и
+                    не пересчитывается при изменении нормы.</p>
+                </div>
+
+                <div class="rail-block">
+                    <div class="rail-title">Исполнитель</div>
+                    <dl class="rail-kv">
+                        <dt>Назначена</dt><dd>Дилноза Абдуллаева</dd>
+                        <dt>Когда</dt><dd>22.07.2026</dd>
+                        <dt>Как</dt><dd>автоматически</dd>
+                    </dl>
+                    <p class="hint" style="border-top:none;padding-top:0">
+                        <button class="btn btn-secondary btn-sm btn-block" style="margin-top:var(--space-2)">Передать другому исполнителю</button>
+                    </p>
+                </div>
+
+            </aside>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- ══ Second state of the same screen: the application is not taken in yet ══ -->
+<div class="state">
+    <span class="state-label"><span aria-hidden="true">◻</span>Состояние того же экрана · заявка ещё не принята в работу</span>
+
+    <section class="appbar" aria-label="Реквизиты заявки, статус «Отправлена»">
+        <div class="appbar-top">
+            <h2 class="appbar-id">А-00044</h2>
+            <span class="chip chip-lg tone-info">
+                <span class="dot" aria-hidden="true"></span>
+                <span class="ic" aria-hidden="true">✉</span>Отправлена
+                <span class="uz" lang="uz-Cyrl">(Юборилган)</span>
+            </span>
+            <span class="appbar-kind">Размещение пчелиных ульев <span lang="uz-Cyrl">(Асалари уяларини жойлаштириш)</span></span>
+        </div>
+
+        <div class="appbar-facts">
+            <div class="fact">
+                <span class="fact-l">Заявитель</span>
+                <span class="fact-v">Дилшод Раҳимов
+                    <small>Физическое лицо · ЖШШИР <span class="mono">32309901740326</span></small>
+                </span>
+            </div>
+            <div class="fact">
+                <span class="fact-l">Подана</span>
+                <span class="fact-v"><span class="mono">06.08.2026, 16:31</span>
+                    <small>Канал my.gov.uz · подписана ЭЦП</small>
+                </span>
+            </div>
+            <div class="fact">
+                <span class="fact-l">Исполнитель</span>
+                <span class="fact-v">Дилноза Абдуллаева
+                    <small>Назначена автоматически, в работу не принята</small>
+                </span>
+            </div>
+            <div class="fact">
+                <span class="fact-l">Сумма к оплате</span>
+                <span class="fact-v"><span class="mono">480 000,00 сўм</span>
+                    <small>Предварительный расчёт заявителя</small>
+                </span>
+            </div>
+            <div class="fact">
+                <span class="fact-l">Срок SLA</span>
+                <div class="sla-mark sla-ok">
+                    <span class="sla-ic" aria-hidden="true">◷</span>
+                    <span class="sla-text">Осталось 11 дней
+                        <small>До 21.08.2026, 18:00</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="grid2">
+        <div class="col-main">
+            <section class="panel" aria-labelledby="h-locked">
+                <div class="panel-head">
+                    <h3 class="panel-title" id="h-locked">Разделы карточки заблокированы до принятия в работу</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="autolist">
+                        <li>
+                            <span class="aic a-ok" aria-hidden="true">✓</span>
+                            <span class="atext">Общие сведения и документы доступны для чтения
+                                <small>Сотрудник должен видеть, что именно он принимает</small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="aic a-hold" aria-hidden="true">‖</span>
+                            <span class="atext">Расчёт показан как предварительный
+                                <small>Окончательный выполняется при переходе в <span class="code">IN_REVIEW</span> на актуальной норме</small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="aic a-hold" aria-hidden="true">‖</span>
+                            <span class="atext">Запросы во внешние системы не отправлены
+                                <small>Кадастр и ветеринарная АТ опрашиваются после принятия в работу, сценарий С5</small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="aic a-hold" aria-hidden="true">‖</span>
+                            <span class="atext">Решения недоступны
+                                <small>По приложению 5 ТЗ из <span class="code">SUBMITTED</span> возможны только <span class="code">IN_REVIEW</span>, <span class="code">RETURNED</span> и <span class="code">REJECTED</span></small>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <aside class="rail" aria-label="Действия для заявки в статусе «Отправлена»">
+            <div class="rail-block">
+                <div class="rail-title">Действия · статус SUBMITTED</div>
+                <div class="rail-actions">
+                    <button class="btn btn-primary btn-block">Принять в работу</button>
+                    <button class="btn btn-secondary btn-block">Вернуть заявителю</button>
+                    <button class="btn btn-block" disabled>Отправить на утверждение</button>
+                    <button class="btn btn-block" disabled>Запросить информацию</button>
+                </div>
+                <p class="hint"><b>Два действия недоступны — и это написано словами, а не показано
+                одним цветом.</b> «Отправить на утверждение» и «Запросить информацию» включатся
+                после перехода <span class="code">SUBMITTED</span> → <span class="code">IN_REVIEW</span>:
+                оба меняют состояние заявки, которую сотрудник ещё не взял на себя.</p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+</body>
+</html>
