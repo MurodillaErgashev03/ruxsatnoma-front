@@ -6,7 +6,7 @@ Ushbu hujjat tizimning 10 ta rolining har biri uchun autentifikatsiya qilishga m
 
 | № | Rol kodi | Rol nomi (Oʻzbekcha) | JSHSHIR / STIR (Login) | Parol (Password) | F.I.SH (FIO) | Tashkilot / Lavozim | Boshlangʻich sahifa |
 |---|---|---|---|---|---|---|---|
-| 1 | `sys_admin` | **Tizim administrator** | `11111111111111` | `   !` | Ergashov Sardor Anvarovich | "Oʻzmon texno" DUK / Bosh administrator | `admin_settings` |
+| 1 | `sys_admin` | **Tizim administrator** | `11111111111111` | `Admin123!` | Ergashov Sardor Anvarovich | "Oʻzmon texno" DUK / Bosh administrator | `admin_settings` |
 | 2 | `central_admin` | **Markaziy apparat xodimi** | `22222222222222` | `Central123!` | Karimov Jamshid Botirovich | Oʻrmon xoʻjaligi agentligi / Boʻlim boshligʻi | `leskhoz_inbox` |
 | 3 | `management` | **Rahbariyat** | `33333333333333` | `Director123!` | Tashpulatova Nodira Rustamovna | Agentlik Direktori oʻrinbosari | `manager_decision` |
 | 4 | `executor_staff` | **Ijrochi tashkilot xodimi** | `44444444444444` | `Staff123!` | Rahimov Jasur Umidovich | Boʻstonliq DЎX / Katta mutaxassis | `leskhoz_inbox` |
