@@ -6,12 +6,12 @@ import {
   Download,
   Search,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { DataTable, type Column } from '../../../components/ui/DataTable';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { DataTable, type Column } from '../../components/ui/DataTable';
 
-export interface GeobotanicNormsPageProps {
+export interface NormsPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -29,7 +29,7 @@ export interface GeobotanicNormItem {
   lastAuditDate: string;
 }
 
-export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = ({ userRole = '' }) => {
+export const NormsPage: React.FC<NormsPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: entering and versioning a norm is Я+Ў for the GIS/normative
    * specialist alone. Monitoring roles read the calculation and export it.

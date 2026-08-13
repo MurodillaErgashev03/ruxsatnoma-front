@@ -17,12 +17,12 @@ import {
   FileDown,
   Info,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Modal } from '../../../components/ui/Overlay';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Modal } from '../../components/ui/Overlay';
 
-export interface AdminAuditLogsPageProps {
+export interface AuditLogsPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -64,7 +64,7 @@ interface AuditRecord {
   hash: string;
 }
 
-export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = ({ userRole = '' }) => {
+export const AuditLogsPage: React.FC<AuditLogsPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: the audit journal is К for the administrator, the central
    * apparatus and management; only the prosecutor also holds Э.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Filter, RotateCcw, Plus, Check } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../components/ui/button';
 
 export interface WorklistFilterValues {
   status: string;

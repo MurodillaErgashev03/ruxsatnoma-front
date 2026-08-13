@@ -18,10 +18,10 @@ import {
   Archive,
   Info,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Modal } from '../../../components/ui/Overlay';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Modal } from '../../components/ui/Overlay';
 
 interface LeskhozRecord {
   id: string;
@@ -40,12 +40,12 @@ interface LeskhozRecord {
   status: string;
 }
 
-export interface AdminOrganizationsPageProps {
+export interface OrganizationsPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
 
-export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ userRole = '' }) => {
+export const OrganizationsPage: React.FC<OrganizationsPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: organisations are administered together with users and roles.
    * Only the system administrator creates, edits and archives them; every other

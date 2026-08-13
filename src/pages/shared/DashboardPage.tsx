@@ -1,21 +1,21 @@
 import React from 'react';
 import { Download, FileText, BookmarkPlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { DashboardFiltersBar } from './DashboardFiltersBar';
-import { KpiGridSection } from './KpiGridSection';
-import { ChartsSection } from './ChartsSection';
-import { RiskIndicatorsGrid } from './RiskIndicatorsGrid';
-import { DrillDownTable } from './DrillDownTable';
-import { RegionsBreakdownSection } from './RegionsBreakdownSection';
-import { ActivityMatrixSection } from './ActivityMatrixSection';
-import { OverdueLeskhozSection } from './OverdueLeskhozSection';
+import { Button } from '../../components/ui/button';
+import { DashboardFiltersBar } from './dashboard/DashboardFiltersBar';
+import { KpiGridSection } from './dashboard/KpiGridSection';
+import { ChartsSection } from './dashboard/ChartsSection';
+import { RiskIndicatorsGrid } from './dashboard/RiskIndicatorsGrid';
+import { DrillDownTable } from './dashboard/DrillDownTable';
+import { RegionsBreakdownSection } from './dashboard/RegionsBreakdownSection';
+import { ActivityMatrixSection } from './dashboard/ActivityMatrixSection';
+import { OverdueLeskhozSection } from './dashboard/OverdueLeskhozSection';
 
-export interface ExecutiveDashboardPageProps {
+export interface DashboardPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
 
-export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = ({ onNavigate, userRole = '' }) => {
+export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, userRole = '' }) => {
   const isManagement =
     userRole.includes('management') ||
     userRole.includes('Rahbariyat') ||
@@ -108,4 +108,4 @@ export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = ({ 
   );
 };
 
-export default ExecutiveDashboardPage;
+export default DashboardPage;

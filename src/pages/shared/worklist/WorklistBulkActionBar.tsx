@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckSquare, UserPlus, HelpCircle, Download, RotateCcw } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../components/ui/button';
 
 export interface WorklistBulkActionBarProps {
   selectedCount: number;

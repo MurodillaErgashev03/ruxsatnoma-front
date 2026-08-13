@@ -9,30 +9,41 @@ import { LoginPage, RegisterPage } from './pages/auth';
 // 10 Role Specific Pages
 import {
   AdminSettingsPage,
-  AdminUsersPage,
   AdminRolesPage,
-  AdminOrganizationsPage,
-  AdminClassifiersPage,
   AdminAnnouncementsPage,
   AdminSystemSettingsPage,
-  AdminAuditLogsPage,
   AdminBackupsPage,
-  AdminReportsPage,
   AdminHelpPage,
 } from './pages/roles/sys_admin';
 import { CentralAdminDashboardPage } from './pages/roles/central_admin';
-import { ExecutiveDashboardPage } from './pages/roles/management';
 import { ExecutorHeadDashboardPage } from './pages/roles/executor_head';
-import { WorklistPage, LeskhozReviewPage } from './pages/roles/executor_staff';
-import { GisEditorPage, GisImportPage, GeobotanicNormsPage } from './pages/roles/gis_specialist';
+import { LeskhozReviewPage } from './pages/roles/executor_staff';
+import { GisImportPage } from './pages/roles/gis_specialist';
 import { InspectorTasksPage, InspectorScanPage, InspectorInspectionPage } from './pages/roles/inspector';
-import { AccountantReconciliationPage } from './pages/roles/accountant';
-import { ApplicantDashboard, PermitWizardPage, ApplicationDetailPage, MyPermitsPage, ApplicantHelpPage } from './pages/roles/applicant';
+import { ApplicantDashboard, PermitWizardPage, ApplicationDetailPage, ApplicantHelpPage } from './pages/roles/applicant';
 import { ProsecutorPortalPage } from './pages/roles/prosecutor';
 
-// Profile & Shared Pages
+// Profile pages
 import { UserProfileSettingsPage, EimzoProfilePage, AdminNotificationsPage } from './pages/profile';
-import { ApplicationCardPage, PermitDocumentPage, ArchivePage, InspectionActsRegistryPage } from './pages/shared';
+
+// Pages more than one role opens — kept out of any single role folder
+import {
+  ApplicationCardPage,
+  PermitDocumentPage,
+  ArchivePage,
+  InspectionActsRegistryPage,
+  DashboardPage,
+  WorklistPage,
+  PermitsRegistryPage,
+  ReportsPage,
+  GisMapPage,
+  NormsPage,
+  PaymentsPage,
+  OrganizationsPage,
+  ClassifiersPage,
+  UsersPage,
+  AuditLogsPage,
+} from './pages/shared';
 
 import { UIKitShowcase } from './components/ui-kit/UIKitShowcase';
 import { MOCK_USERS, type MockUser } from './data/mockUsers';
@@ -140,19 +151,19 @@ export function App() {
             <ApplicationDetailPage applicationId={pageParams?.id || 1} onNavigate={handleNavigate} />
           )}
           {currentPage === 'applicant_permits' && (
-            <MyPermitsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            <PermitsRegistryPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'applicant_help' && (
             <ApplicantHelpPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'gis_editor' && (
-            <GisEditorPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            <GisMapPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'gis_import' && (
             <GisImportPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'normative_norms' && (
-            <GeobotanicNormsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+            <NormsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {currentPage === 'leskhoz_inbox' && (
             <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
@@ -175,7 +186,7 @@ export function App() {
             ) : currentUser?.role === 'executor_head' ? (
               <ExecutorHeadDashboardPage onNavigate={handleNavigate} />
             ) : (
-              <ExecutiveDashboardPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+              <DashboardPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
             )
           )}
           {currentPage === 'field_tasks' && (
@@ -188,16 +199,16 @@ export function App() {
             <InspectorInspectionPage permitNo={pageParams?.permitNo || 'RX-2026-0089'} onNavigate={handleNavigate} />
           )}
           {(currentPage === 'reports' || currentPage === 'reports_management') && (
-            <AdminReportsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            <ReportsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'accountant_reconciliation' && (
-            <AccountantReconciliationPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+            <PaymentsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {currentPage === 'admin_settings' && (
             <AdminSettingsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'admin_users' && (
-            <AdminUsersPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+            <UsersPage onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {currentPage === 'archive' && (
             <ArchivePage onNavigate={handleNavigate} userRole={currentUser?.role} />
@@ -212,16 +223,16 @@ export function App() {
             <AdminAnnouncementsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'admin_orgs' && (
-            <AdminOrganizationsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            <OrganizationsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'admin_classifiers' && (
-            <AdminClassifiersPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            <ClassifiersPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
           {currentPage === 'admin_system_settings' && (
             <AdminSystemSettingsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'admin_audit_logs' && (
-            <AdminAuditLogsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+            <AuditLogsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {currentPage === 'admin_backups' && (
             <AdminBackupsPage onNavigate={handleNavigate} />

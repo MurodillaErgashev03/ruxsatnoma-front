@@ -3,11 +3,11 @@ import {
   Upload,
   Download,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { DataTable, type Column } from '../../../components/ui/DataTable';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { DataTable, type Column } from '../../components/ui/DataTable';
 
-export interface AccountantReconciliationPageProps {
+export interface PaymentsPageProps {
   userRole?: string;
   onNavigate?: (page: string, params?: any) => void;
 }
@@ -24,7 +24,7 @@ export interface BankTransactionItem {
   date: string;
 }
 
-export const AccountantReconciliationPage: React.FC<AccountantReconciliationPageProps> = ({ userRole = '' }) => {
+export const PaymentsPage: React.FC<PaymentsPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: only the accountant holds Я and Ў on payments; monitoring
    * roles read and export.

@@ -20,13 +20,13 @@ import {
   UserCheck,
   Puzzle,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Modal } from '../../../components/ui/Overlay';
-import { SYSTEM_FUNCTIONS, groupSystemFunctions } from './systemFunctions';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Modal } from '../../components/ui/Overlay';
+import { SYSTEM_FUNCTIONS, groupSystemFunctions } from '../../lib/systemFunctions';
 
-export interface AdminUsersPageProps {
+export interface UsersPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -114,7 +114,7 @@ const generateOneTimePassword = (seed: number) => {
   return `${result.slice(0, 10)}${special[seed % special.length]}`;
 };
 
-export const AdminUsersPage: React.FC<AdminUsersPageProps> = ({ userRole = '' }) => {
+export const UsersPage: React.FC<UsersPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: "Пользователи и роли" is К for the central apparatus and
    * management — the registry is visible, but creating, editing, blocking and

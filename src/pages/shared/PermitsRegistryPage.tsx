@@ -8,14 +8,14 @@ import {
   MapPin,
   Trees,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Tabs } from '../../../components/ui/Navigation';
-import { StatusBadge } from '../../../components/ui/StatusBadge';
-import { Modal } from '../../../components/ui/Overlay';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Tabs } from '../../components/ui/Navigation';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { Modal } from '../../components/ui/Overlay';
 
-export interface MyPermitsPageProps {
+export interface PermitsRegistryPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -37,7 +37,7 @@ export interface PermitCardItem {
   daysLeft: number;
 }
 
-export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRole = '' }) => {
+export const PermitsRegistryPage: React.FC<PermitsRegistryPageProps> = ({ onNavigate, userRole = '' }) => {
   /**
    * TZ appendix 4: the permit registry is К+Э for every monitoring role. Only the
    * applicant may start a new application from here; management previously fell

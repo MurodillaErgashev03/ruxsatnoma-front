@@ -18,7 +18,7 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/FormControls';
 import { Tabs } from '../../../components/ui/Navigation';
 import { Modal } from '../../../components/ui/Overlay';
-import { SYSTEM_FUNCTIONS, groupSystemFunctions } from './systemFunctions';
+import { SYSTEM_FUNCTIONS, groupSystemFunctions } from '../../../lib/systemFunctions';
 
 export interface AdminRolesPageProps {
   onNavigate?: (page: string, params?: any) => void;

@@ -18,10 +18,10 @@ import {
   Edit,
   Check,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Modal } from '../../../components/ui/Overlay';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Modal } from '../../components/ui/Overlay';
 
 interface ClassifierRecord {
   id: string;
@@ -38,12 +38,12 @@ interface ClassifierRecord {
   sampleItems: string[];
 }
 
-export interface AdminClassifiersPageProps {
+export interface ClassifiersPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
 
-export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ userRole = '' }) => {
+export const ClassifiersPage: React.FC<ClassifiersPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: classifiers are К for everyone except the system
    * administrator, who alone holds Я and Ў.

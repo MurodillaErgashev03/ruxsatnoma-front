@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, PlusCircle, AlertTriangle } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../components/ui/button';
 
 export interface WorklistHeaderSectionProps {
   totalAssigned?: number;

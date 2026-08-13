@@ -10,12 +10,12 @@ import {
   Printer,
   Maximize2,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Select } from '../../../components/ui/FormControls';
-import { DataTable, type Column } from '../../../components/ui/DataTable';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Select } from '../../components/ui/FormControls';
+import { DataTable, type Column } from '../../components/ui/DataTable';
 
-export interface GisEditorPageProps {
+export interface GisMapPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -32,7 +32,7 @@ interface ContourItem {
   lastUpdated: string;
 }
 
-export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRole = '' }) => {
+export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '' }) => {
   /**
    * Only the GIS/normative specialist may draw or import a contour (Я, Ў).
    * Everyone else — including management, which previously fell through to the

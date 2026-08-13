@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { WorklistHeaderSection } from './components/WorklistHeaderSection';
-import { WorklistTabs } from './components/WorklistTabs';
-import { WorklistFiltersPanel, type WorklistFilterValues } from './components/WorklistFiltersPanel';
-import { WorklistAppliedFiltersBar } from './components/WorklistAppliedFiltersBar';
-import { WorklistBulkActionBar } from './components/WorklistBulkActionBar';
-import { WorklistApplicationsTable, type WorklistApplicationRow } from './components/WorklistApplicationsTable';
-import { WorklistEmptyState } from './components/WorklistEmptyState';
+import { WorklistHeaderSection } from './worklist/WorklistHeaderSection';
+import { WorklistTabs } from './worklist/WorklistTabs';
+import { WorklistFiltersPanel, type WorklistFilterValues } from './worklist/WorklistFiltersPanel';
+import { WorklistAppliedFiltersBar } from './worklist/WorklistAppliedFiltersBar';
+import { WorklistBulkActionBar } from './worklist/WorklistBulkActionBar';
+import { WorklistApplicationsTable, type WorklistApplicationRow } from './worklist/WorklistApplicationsTable';
+import { WorklistEmptyState } from './worklist/WorklistEmptyState';
 
 export interface WorklistPageProps {
   onNavigate?: (page: string, params?: any) => void;

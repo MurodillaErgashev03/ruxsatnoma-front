@@ -10,13 +10,13 @@ import {
   Send,
   FileSpreadsheet,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { hasRight } from '../../../lib/permissions';
-import { Input } from '../../../components/ui/FormControls';
-import { Tabs } from '../../../components/ui/Navigation';
-import { Modal } from '../../../components/ui/Overlay';
+import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
+import { Input } from '../../components/ui/FormControls';
+import { Tabs } from '../../components/ui/Navigation';
+import { Modal } from '../../components/ui/Overlay';
 
-export interface AdminReportsPageProps {
+export interface ReportsPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
@@ -35,7 +35,7 @@ export interface ReportItem {
   returnReason?: string;
 }
 
-export const AdminReportsPage: React.FC<AdminReportsPageProps> = ({ userRole = '' }) => {
+export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
   /**
    * Only the central apparatus manages report forms and accepts or returns reports
    * (TZ appendix 4: "Отчёты" = К, Я, Ў, Т, Э for central_admin only).
