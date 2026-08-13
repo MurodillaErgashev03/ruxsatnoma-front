@@ -14,11 +14,31 @@ import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';
 import { Select } from '../../components/ui/FormControls';
 import { DataTable, type Column } from '../../components/ui/DataTable';
+import { Modal } from '../../components/ui/Overlay';
 
 export interface GisMapPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
+
+/** Contour lifecycle of TZ module 10.2, in order. */
+type ContourStatus = 'draft' | 'review' | 'approved' | 'published' | 'archived';
+
+const STATUS_LABELS: Record<ContourStatus, string> = {
+  draft: 'Qoralama',
+  review: 'Koʻrib chiqishda',
+  approved: 'Tasdiqlangan',
+  published: 'Eʼlon qilingan',
+  archived: 'Arxivlangan',
+};
+
+const STATUS_STYLES: Record<ContourStatus, string> = {
+  draft: 'bg-[#F8F9FA] text-[#767F87] border-[#E4E7EA]',
+  review: 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]',
+  approved: 'bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]',
+  published: 'bg-[#F0F7F1] text-[#2E7D4F] border-[#D9EBDC]',
+  archived: 'bg-gray-100 text-gray-600 border-gray-300',
+};
 
 interface ContourItem {
   id: string;
@@ -28,8 +48,15 @@ interface ContourItem {
   maxSB: number; // Maximum livestock capacity
   currentSB: number; // Currently used
   layer: string;
-  status: 'published' | 'review' | 'draft' | 'archived';
+  status: ContourStatus;
   lastUpdated: string;
+  /** Version attributes required by TZ module 10.2. */
+  source: string;
+  accuracy: string;
+  surveyDate: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  approvalDocId: string;
 }
 
 export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '' }) => {
@@ -44,22 +71,34 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
   const [activeTool, setActiveTool] = useState<'select' | 'polygon' | 'measure' | 'vertex'>('select');
   const [selectedRegion, setSelectedRegion] = useState('all');
 
-  // 13 GIS Layers List
+  // Map settings required by TZ module 10.2
+  const [baseMap, setBaseMap] = useState<'osm' | 'satellite'>('osm');
+  const [srid, setSrid] = useState('4326');
+  const [layerOpacity, setLayerOpacity] = useState(80);
+  const [contourCard, setContourCard] = useState<ContourItem | null>(null);
+
+  /** The thirteen layers named in TZ module 10.2, in the order the TZ lists them. */
   const gisLayers = [
-    { id: 'grazing', name: 'Yaylov konturlari', count: 142, visible: true, color: '#2E7D4F' },
-    { id: 'haymaking', name: 'Pichan oʻrish maydonlari', count: 58, visible: true, color: '#B45309' },
-    { id: 'protected', name: 'Qoʻriqxona hududlari', count: 12, visible: true, color: '#B91C1C' },
-    { id: 'leskhoz_bounds', name: 'Oʻrmon xoʻjaligi chegaralari', count: 84, visible: true, color: '#0369A1' },
-    { id: 'water_bodies', name: 'Suv obʼyektlari va daryolar', count: 34, visible: false, color: '#0284C7' },
-    { id: 'roads', name: 'Oʻrmon yoʻllari va yoʻlaklar', count: 110, visible: false, color: '#767F87' },
-    { id: 'erosion', name: 'Eroziya xavfi zonasi', count: 19, visible: false, color: '#D97706' },
+    { id: 'forest_fund', name: 'Oʻrmon fondi', count: 1204, visible: true, color: '#123522' },
+    { id: 'org_bounds', name: 'Tashkilot chegaralari', count: 84, visible: true, color: '#0369A1' },
+    { id: 'contours', name: 'Konturlar', count: 642, visible: true, color: '#2E7D4F' },
+    { id: 'pasture', name: 'Yaylovlar', count: 142, visible: true, color: '#7FB98A' },
+    { id: 'haymaking', name: 'Pichanzorlar', count: 58, visible: true, color: '#B45309' },
+    { id: 'bees', name: 'Asalari uyalari uchastkalari', count: 26, visible: false, color: '#D97706' },
+    { id: 'recreation', name: 'Rekreatsiya zonalari', count: 31, visible: false, color: '#0284C7' },
+    { id: 'restrictions', name: 'Cheklovlar va taqiqlar', count: 47, visible: true, color: '#B91C1C' },
+    { id: 'protection', name: 'Muhofaza zonalari', count: 12, visible: true, color: '#991B1B' },
+    { id: 'rotation', name: 'Rotatsiya uchastkalari', count: 38, visible: false, color: '#15803D' },
+    { id: 'rest', name: 'Dam olish maydonlari', count: 19, visible: false, color: '#0891B2' },
+    { id: 'water_points', name: 'Suv nuqtalari', count: 34, visible: false, color: '#0EA5E9' },
+    { id: 'cattle_route', name: 'Mol yoʻllari', count: 22, visible: false, color: '#767F87' },
   ];
 
   const contoursList: ContourItem[] = [
-    { id: 'K-042', name: 'Kontur №42 (Chorva boqish)', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', areaHa: 450, maxSB: 500, currentSB: 120, layer: 'Yaylov konturlari', status: 'published', lastUpdated: '10.08.2026' },
-    { id: 'K-015', name: 'Kontur №15 (Pichangoh)', leskhoz: 'Zomin davlat qoʻriqxonasi', areaHa: 180, maxSB: 200, currentSB: 180, layer: 'Pichan oʻrish maydonlari', status: 'published', lastUpdated: '08.08.2026' },
-    { id: 'K-088', name: 'Kontur №88 (Yangi chegara)', leskhoz: 'Kitob baland togʻ boʻlimi', areaHa: 320, maxSB: 350, currentSB: 0, layer: 'Yaylov konturlari', status: 'review', lastUpdated: '05.08.2026' },
-    { id: 'K-099', name: 'Kontur №99 (Qoralama)', leskhoz: 'Pop oʻrmon boʻlimi', areaHa: 95, maxSB: 100, currentSB: 0, layer: 'Yaylov konturlari', status: 'draft', lastUpdated: '01.08.2026' },
+    { id: 'K-042', name: 'Kontur №42 (Chorva boqish)', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', areaHa: 450, maxSB: 500, currentSB: 120, layer: 'Yaylov konturlari', status: 'published', lastUpdated: '10.08.2026', source: 'Yerqurilish loyihasi 2024', accuracy: '±0.5 m', surveyDate: '12.03.2024', effectiveFrom: '01.01.2025', effectiveTo: '—', approvalDocId: 'TAS-2024-118' },
+    { id: 'K-015', name: 'Kontur №15 (Pichangoh)', leskhoz: 'Zomin davlat qoʻriqxonasi', areaHa: 180, maxSB: 200, currentSB: 180, layer: 'Pichan oʻrish maydonlari', status: 'published', lastUpdated: '08.08.2026', source: 'Aerofotosuratga asoslangan', accuracy: '±1.2 m', surveyDate: '05.06.2023', effectiveFrom: '01.09.2023', effectiveTo: '—', approvalDocId: 'TAS-2023-076' },
+    { id: 'K-088', name: 'Kontur №88 (Yangi chegara)', leskhoz: 'Kitob baland togʻ boʻlimi', areaHa: 320, maxSB: 350, currentSB: 0, layer: 'Yaylov konturlari', status: 'review', lastUpdated: '05.08.2026', source: 'Dala geodezik oʻlchovi', accuracy: '±0.3 m', surveyDate: '28.07.2026', effectiveFrom: '—', effectiveTo: '—', approvalDocId: '—' },
+    { id: 'K-099', name: 'Kontur №99 (Qoralama)', leskhoz: 'Pop oʻrmon boʻlimi', areaHa: 95, maxSB: 100, currentSB: 0, layer: 'Yaylov konturlari', status: 'draft', lastUpdated: '01.08.2026', source: 'Qoʻlda chizilgan qoralama', accuracy: 'aniqlanmagan', surveyDate: '—', effectiveFrom: '—', effectiveTo: '—', approvalDocId: '—' },
   ];
 
   const columns: Column<ContourItem>[] = [
@@ -80,21 +119,26 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
     },
     {
       key: 'status',
-      header: 'Status',
+      header: 'Holati',
       sortable: true,
-      width: '130px',
+      width: '150px',
       accessor: (row) => (
-        <span
-          className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-            row.status === 'published'
-              ? 'bg-[#F0F7F1] text-[#2E7D4F] border border-[#D9EBDC]'
-              : row.status === 'review'
-              ? 'bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]'
-              : 'bg-[#F8F9FA] text-[#767F87] border border-[#E4E7EA]'
-          }`}
-        >
-          {row.status.toUpperCase()}
+        <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${STATUS_STYLES[row.status]}`}>
+          {STATUS_LABELS[row.status]}
         </span>
+      ),
+    },
+    {
+      key: 'id',
+      header: 'Versiya',
+      width: '110px',
+      accessor: (row) => (
+        <button
+          onClick={() => setContourCard(row)}
+          className="text-[11px] font-bold text-[#2E7D4F] hover:underline"
+        >
+          Maʼlumotlari
+        </button>
       ),
     },
   ];
@@ -143,10 +187,10 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 variant="primary"
                 size="sm"
                 leftIcon={<Printer className="w-4 h-4" />}
-                onClick={() => alert('Xarita kadri PDF formatida chop etishga tayyorlandi.')}
+                onClick={() => alert('Xarita PDF va PNG formatlarida eksportga tayyorlandi.')}
                 className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer shadow-xs whitespace-nowrap shrink-0"
               >
-                Xarita kadrini chop etish
+                Xaritani eksport (PDF/PNG)
               </Button>
             </>
           ) : (
@@ -252,10 +296,69 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
             </div>
           </div>
 
+          {/* Base map, coordinate system and layer transparency — TZ module 10.2 */}
+          <div className="space-y-3 pb-4 border-b border-[#E4E7EA]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#767F87]">Xarita sozlamalari</span>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#5A646D]">Asosiy xarita:</label>
+              <div className="bg-[#F8F9FA] p-1 border border-[#E4E7EA] rounded-xl flex items-center gap-1 text-xs font-bold">
+                <button
+                  onClick={() => setBaseMap('osm')}
+                  className={`flex-1 px-2 py-1.5 rounded-lg transition-colors ${
+                    baseMap === 'osm' ? 'bg-white shadow-xs text-[#2E7D4F]' : 'text-[#5A646D]'
+                  }`}
+                >
+                  OSM
+                </button>
+                <button
+                  onClick={() => setBaseMap('satellite')}
+                  className={`flex-1 px-2 py-1.5 rounded-lg transition-colors ${
+                    baseMap === 'satellite' ? 'bg-white shadow-xs text-[#2E7D4F]' : 'text-[#5A646D]'
+                  }`}
+                >
+                  Sputnik
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#5A646D]">Koordinata tizimi (SRID):</label>
+              <select
+                value={srid}
+                onChange={(e) => setSrid(e.target.value)}
+                className="w-full bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-xs font-semibold px-3 py-2 text-[#1A1F24] focus:outline-none focus:border-[#2E7D4F]"
+              >
+                <option value="4326">EPSG:4326 — WGS 84</option>
+                <option value="3857">EPSG:3857 — Web Mercator</option>
+                <option value="32642">EPSG:32642 — UTM 42N</option>
+                <option value="32641">EPSG:32641 — UTM 41N</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#5A646D] flex items-center justify-between">
+                <span>Qatlam shaffofligi:</span>
+                <span className="font-mono text-[#1A1F24]">{layerOpacity}%</span>
+              </label>
+              <input
+                type="range"
+                min={20}
+                max={100}
+                step={5}
+                value={layerOpacity}
+                onChange={(e) => setLayerOpacity(Number(e.target.value))}
+                className="w-full accent-[#2E7D4F]"
+              />
+            </div>
+          </div>
+
           {/* GIS Layers Switcher List */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#767F87]">GIS Qatlamlar (13 ta)</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#767F87]">
+                GIS qatlamlar ({gisLayers.length} ta)
+              </span>
               <Layers className="w-4 h-4 text-[#2E7D4F]" />
             </div>
 
@@ -350,6 +453,66 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
 
         <DataTable columns={columns} data={contoursList} selectable />
       </div>
+
+      {/* Contour information card — TZ module 10.2 */}
+      <Modal
+        isOpen={!!contourCard}
+        onClose={() => setContourCard(null)}
+        title={contourCard ? `${contourCard.id} — ${contourCard.name}` : ''}
+        subtitle={contourCard?.leskhoz}
+        maxWidth="lg"
+        footer={
+          <div className="flex items-center justify-between w-full gap-2">
+            <span className="text-xs text-[#5A646D]">
+              Holati:{' '}
+              {contourCard && (
+                <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${STATUS_STYLES[contourCard.status]}`}>
+                  {STATUS_LABELS[contourCard.status]}
+                </span>
+              )}
+            </span>
+            <Button variant="primary" size="sm" onClick={() => setContourCard(null)}>
+              Yopish
+            </Button>
+          </div>
+        }
+      >
+        {contourCard && (
+          <div className="space-y-4 py-1 text-xs">
+            <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl grid grid-cols-2 gap-2 text-[#5A646D]">
+              <div>Qatlam: <b className="text-[#1A1F24]">{contourCard.layer}</b></div>
+              <div>Maydon: <b className="text-[#1A1F24] font-mono">{contourCard.areaHa} ga</b></div>
+              <div>Sigʻim (MaxSB): <b className="text-[#1A1F24] font-mono">{contourCard.maxSB} bosh</b></div>
+              <div>Band qilingan: <b className="text-[#2E7D4F] font-mono">{contourCard.currentSB} bosh</b></div>
+            </div>
+
+            {/* Version attributes the TZ names explicitly */}
+            <div className="space-y-2">
+              <span className="font-bold text-[#1A1F24] block">Versiya atributlari:</span>
+              <div className="border border-[#E4E7EA] rounded-xl divide-y divide-[#E4E7EA]">
+                {[
+                  ['Manba (source)', contourCard.source],
+                  ['Aniqlik (accuracy)', contourCard.accuracy],
+                  ['Oʻlchov sanasi (survey_date)', contourCard.surveyDate],
+                  ['Amal qilish boshlanishi (effective_from)', contourCard.effectiveFrom],
+                  ['Amal qilish tugashi (effective_to)', contourCard.effectiveTo],
+                  ['Tasdiqlovchi hujjat (approval_doc_id)', contourCard.approvalDocId],
+                ].map(([label, value]) => (
+                  <div key={label} className="p-2.5 flex items-center justify-between gap-3">
+                    <span className="text-[#5A646D]">{label}</span>
+                    <b className="text-[#1A1F24] font-mono text-right">{value}</b>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl text-[#2E7D4F]">
+              Kontur hayot sikli: Qoralama → Koʻrib chiqishda → Tasdiqlangan → Eʼlon qilingan → Arxivlangan.
+              Ariza faqat <b>eʼlon qilingan</b> konturga topshiriladi.
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

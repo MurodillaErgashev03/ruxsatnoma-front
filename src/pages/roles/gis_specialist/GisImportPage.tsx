@@ -52,7 +52,7 @@ export const GisImportPage: React.FC<GisImportPageProps> = ({ onNavigate }) => {
         >
           GIS Xarita muharririga qaytish
         </Button>
-        <span className="text-xs font-mono text-[#767F87]">GIS Fayl Formatlari: SHP, GeoJSON, KML, GPKG</span>
+        <span className="text-xs font-mono text-[#767F87]">Fayl formatlari: SHP, GeoJSON, KML, KMZ, GPKG, CSV, ZIP · Servislar: WMS, WFS, API</span>
       </div>
 
       <div className="text-center space-y-2">
@@ -75,7 +75,7 @@ export const GisImportPage: React.FC<GisImportPageProps> = ({ onNavigate }) => {
 
         <div className="space-y-1">
           <h3 className="font-bold text-base text-[#1A1F24]">GIS Faylini Tanlang yoki Suvrib Oling</h3>
-          <p className="text-xs text-[#5A646D]">Maksimal fayl hajmi: 50MB (.zip SHP, .geojson, .kml)</p>
+          <p className="text-xs text-[#5A646D]">Maksimal hajm 50 MB · .zip (SHP), .geojson, .kml, .kmz, .gpkg, .csv</p>
         </div>
 
         <Button

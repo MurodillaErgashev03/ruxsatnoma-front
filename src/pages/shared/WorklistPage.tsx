@@ -16,14 +16,13 @@ export interface WorklistPageProps {
 export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole }) => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const isCentralAdmin =
-    Boolean(userRole?.includes('central_admin')) ||
-    Boolean(userRole?.includes('Markaziy')) ||
-    Boolean(userRole?.includes('Центральный')) ||
-    Boolean(userRole?.includes('management')) ||
-    Boolean(userRole?.includes('Rahbariyat')) ||
-    Boolean(userRole?.includes('Руководство')) ||
-    Boolean(userRole?.includes('Direktor'));
+  /**
+   * Acting on an application is Я and Ў — staff of the executing organisation and
+   * the applicant. Every other role reaching this registry, including the GIS
+   * specialist and the inspector, reads and exports only (TZ appendix 4).
+   */
+  const canActOnApplications = hasRight(userRole, 'application', 'edit');
+  const isCentralAdmin = !canActOnApplications;
 
   const [filters, setFilters] = useState<WorklistFilterValues>({
     status: 'under_review',

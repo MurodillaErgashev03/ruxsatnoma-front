@@ -281,6 +281,8 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     helpGroup('Yordam va yoʻriqnoma'),
   ],
 
+  // Enters and versions GIS contours, enters norm, limit and tariff, and issues
+  // the GIS conclusion on an application.
   gis_specialist: [
     homeGroup('Bosh sahifa (GIS modul)', 'gis_editor'),
     {
@@ -288,8 +290,17 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
       items: [
         { id: 'map', label: 'Uchastkalar xaritasi (muharrir)', page: 'gis_editor', icon: <Map className={ICON} /> },
         { id: 'gis_import', label: 'Qatlamlarni import qilish', page: 'gis_import', icon: <Layers className={ICON} /> },
-        { id: 'normative', label: 'Geobotanik meʼyorlar', page: 'normative_norms', icon: <Sliders className={ICON} /> },
-        { id: 'applications', label: 'Arizalar reyestri', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
+        { id: 'normative', label: 'Meʼyor, limit va tarif', page: 'normative_norms', icon: <Calculator className={ICON} /> },
+        { id: 'applications', label: 'Arizalar — GIS xulosasi', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
+      ],
+    },
+    {
+      group: 'Maʼlumot (faqat koʻrish)',
+      items: [
+        { id: 'reports', label: 'Hisobotlar', page: 'reports', icon: <FileBarChart className={ICON} /> },
+        { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
+        { id: 'dashboard_view', label: 'Dashboard', page: 'executive_dashboard', icon: <Eye className={ICON} /> },
       ],
     },
     profileGroup(),

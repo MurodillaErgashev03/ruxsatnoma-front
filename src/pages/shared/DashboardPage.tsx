@@ -1,6 +1,7 @@
 import React from 'react';
 import { Download, FileText, BookmarkPlus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
 import { DashboardFiltersBar } from './dashboard/DashboardFiltersBar';
 import { KpiGridSection } from './dashboard/KpiGridSection';
 import { ChartsSection } from './dashboard/ChartsSection';
@@ -16,6 +17,11 @@ export interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, userRole = '' }) => {
+  /**
+   * The dashboard is К for every internal role, but only the central apparatus,
+   * management and the prosecutor also hold Э (TZ appendix 4).
+   */
+  const canExport = hasRight(userRole, 'dashboard', 'export');
   const isManagement =
     userRole.includes('management') ||
     userRole.includes('Rahbariyat') ||
@@ -44,25 +50,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, userRo
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<FileText className="w-4 h-4 text-[#15803D]" />}
-            onClick={() => alert('Excel hisoboti yuklab olindi!')}
-            className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold cursor-pointer text-xs"
-          >
-            Excel
-          </Button>
+          {canExport && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<FileText className="w-4 h-4 text-[#15803D]" />}
+                onClick={() => alert('Excel hisoboti tayyorlanmoqda.')}
+                className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold cursor-pointer text-xs"
+              >
+                Excel
+              </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Download className="w-4 h-4 text-[#B91C1C]" />}
-            onClick={() => alert('PDF analitika yuklab olindi!')}
-            className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold cursor-pointer text-xs"
-          >
-            PDF
-          </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Download className="w-4 h-4 text-[#B91C1C]" />}
+                onClick={() => alert('PDF analitika tayyorlanmoqda.')}
+                className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold cursor-pointer text-xs"
+              >
+                PDF
+              </Button>
+            </>
+          )}
 
           <Button
             variant="primary"

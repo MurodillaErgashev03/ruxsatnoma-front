@@ -10,6 +10,7 @@ import { ChecksAndIntegrationsPanel } from './components/ChecksAndIntegrationsPa
 import { DocumentsPanel } from './components/DocumentsPanel';
 import { HistoryTimelinePanel } from './components/HistoryTimelinePanel';
 import { ActionRail } from './components/ActionRail';
+import { GisConclusionPanel } from './components/GisConclusionPanel';
 import { UnclaimedStatePanel } from './components/UnclaimedStatePanel';
 
 export interface ApplicationCardPageProps {
@@ -71,12 +72,15 @@ export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
           </div>
 
           {/* Right Action Rail (5 Blocks) */}
-          <ActionRail
+          <div className="space-y-4">
+            <GisConclusionPanel userRole={userRole} />
+            <ActionRail
             userRole={userRole}
             onApprove={() => alert('Ariza tasdiqlandi va toʻlov xabarnomasi yuborildi.')}
             onReturn={() => alert('Ariza arizachiga tuzatish uchun qaytarildi.')}
             onReject={() => alert('Ariza rad etildi va rasmiy bildirishnoma yuborildi.')}
-          />
+            />
+          </div>
         </div>
       </div>
 
