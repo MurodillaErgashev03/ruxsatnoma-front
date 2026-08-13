@@ -254,14 +254,27 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     helpGroup('Yordam va yoʻriqnoma'),
   ],
 
+  // Receives and reviews applications, draws up documents and fills in reports.
   executor_staff: [
-    homeGroup('Bosh sahifa (kelib tushgan)', 'leskhoz_inbox'),
+    homeGroup('Bosh sahifa (ish navbati)', 'leskhoz_inbox'),
     {
       group: 'Hujjatlar va amallar',
       items: [
         { id: 'applications', label: 'Kelib tushgan arizalar', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
+        { id: 'permits', label: 'Ruxsatnomalarni rasmiylashtirish', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
+        { id: 'reports', label: 'Hisobotlarni toʻldirish', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+      ],
+    },
+    {
+      group: 'Maʼlumot va nazorat (faqat koʻrish)',
+      items: [
         { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className={ICON} /> },
-        { id: 'normative', label: 'Geobotanik meʼyorlar', page: 'normative_norms', icon: <Sliders className={ICON} /> },
+        { id: 'normative', label: 'Geobotanik meʼyorlar', page: 'normative_norms', icon: <Calculator className={ICON} /> },
+        { id: 'payments', label: 'Toʻlovlar holati', page: 'accountant_reconciliation', icon: <CreditCard className={ICON} /> },
+        { id: 'inspections', label: 'Inspeksiya dalolatnomalari', page: 'inspection_acts', icon: <CheckSquare className={ICON} /> },
+        { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
+        { id: 'dashboard_view', label: 'Hudud boʻyicha dashboard', page: 'executive_dashboard', icon: <Eye className={ICON} /> },
       ],
     },
     profileGroup(),

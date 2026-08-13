@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { hasRight } from '../../lib/permissions';
 import { WorklistHeaderSection } from './worklist/WorklistHeaderSection';
 import { WorklistTabs } from './worklist/WorklistTabs';
 import { WorklistFiltersPanel, type WorklistFilterValues } from './worklist/WorklistFiltersPanel';
@@ -189,8 +190,17 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
     }
   };
 
+  /**
+   * Staff of the executing organisation open the review screen, where an application
+   * is rejected, sent to an inspector or passed to the head with a positive
+   * conclusion. Every other role opens the read-only card (TZ appendix 4).
+   */
   const handleRowClick = (appNo: string) => {
-    onNavigate?.('application_card', { id: appNo });
+    if (hasRight(userRole, 'application', 'edit')) {
+      onNavigate?.('leskhoz_review', { id: appNo });
+    } else {
+      onNavigate?.('application_card', { id: appNo });
+    }
   };
 
   return (

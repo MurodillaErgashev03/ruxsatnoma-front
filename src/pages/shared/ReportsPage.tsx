@@ -31,19 +31,25 @@ export interface ReportItem {
   deadline: string;
   submittedDate: string;
   author: string;
-  status: 'submitted' | 'approved' | 'returned' | 'overdue';
+  /** "draft" is the «Создана» state of TZ 4.2.6.1 — filled in but not yet sent. */
+  status: 'draft' | 'submitted' | 'approved' | 'returned' | 'overdue';
   returnReason?: string;
+  /** Editing a form is limited to its author while it is still a draft (TZ 4.2.6.2). */
+  isOwn?: boolean;
 }
 
 export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
   /**
-   * Only the central apparatus manages report forms and accepts or returns reports
-   * (TZ appendix 4: "Отчёты" = К, Я, Ў, Т, Э for central_admin only).
-   * Every other role that reaches this page — sys_admin, management, accountant,
-   * prosecutor — is view-and-export only, so the acting controls are not rendered at all
-   * (TZ 4.1.7: a control the user has no right to must not be shown).
+   * TZ appendix 4 splits this page three ways:
+   *   Т — accept and return an incoming report, and publish a new form: central apparatus
+   *   Я, Ў — fill a form in and correct one's own draft: staff of the executing
+   *          organisation and the accountant
+   *   К, Э — everyone else who reaches the page
+   * Controls outside the role's rights are not rendered at all (TZ 4.1.7).
    */
   const canManageReports = hasRight(userRole, 'report', 'approve');
+  const canFillReports = hasRight(userRole, 'report', 'create');
+  const canEditOwnDraft = hasRight(userRole, 'report', 'edit');
 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +59,17 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
   const [returnNote, setReturnNote] = useState('');
   const [selectedReportDetail, setSelectedReportDetail] = useState<ReportItem | null>(null);
   const [isAddFormModalOpen, setIsAddFormModalOpen] = useState(false);
+
+  // Fill-in flow — TZ 4.2.6.1 and 4.2.6.2
+  const [draftBeingEdited, setDraftBeingEdited] = useState<ReportItem | null>(null);
+  const [isFillModalOpen, setIsFillModalOpen] = useState(false);
+  const [fillTitle, setFillTitle] = useState('');
+  const [fillPeriod, setFillPeriod] = useState('2026 III-Kvartal');
+  const [fillArea, setFillArea] = useState('');
+  const [fillLivestock, setFillLivestock] = useState('');
+  const [fillRevenue, setFillRevenue] = useState('');
+  const [fillNote, setFillNote] = useState('');
+  const [fillError, setFillError] = useState<string | null>(null);
 
   // Mock reports list based on TZ 4.2.6 requirements
   const [reportsList, setReportsList] = useState<ReportItem[]>([
@@ -131,6 +148,67 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
     },
   ]);
 
+  const openFillForm = (draft?: ReportItem) => {
+    setDraftBeingEdited(draft ?? null);
+    setFillTitle(draft?.title ?? '');
+    setFillPeriod(draft?.period ?? '2026 III-Kvartal');
+    setFillArea('');
+    setFillLivestock('');
+    setFillRevenue('');
+    setFillNote('');
+    setFillError(null);
+    setIsFillModalOpen(true);
+  };
+
+  /** TZ 4.2.6.1: a filled-in form is saved and takes the «Created» state. */
+  const handleSaveDraft = () => {
+    if (!fillTitle.trim()) {
+      setFillError('Hisobot nomi kiritilishi shart.');
+      return;
+    }
+    if (!fillArea.trim() || !fillLivestock.trim() || !fillRevenue.trim()) {
+      setFillError('Barcha majburiy maydonlar toʻldirilishi kerak.');
+      return;
+    }
+
+    if (draftBeingEdited) {
+      setReportsList((prev) =>
+        prev.map((r) =>
+          r.id === draftBeingEdited.id ? { ...r, title: fillTitle.trim(), period: fillPeriod } : r
+        )
+      );
+    } else {
+      setReportsList((prev) => [
+        {
+          id: `d-${prev.length + 1}`,
+          code: `REP-2026-Q3-${String(prev.length + 40).padStart(3, '0')}`,
+          title: fillTitle.trim(),
+          organization: 'Boʻstonliq DЎX',
+          region: 'tashkent',
+          period: fillPeriod,
+          deadline: '15.10.2026',
+          submittedDate: '—',
+          author: 'Rahimov J.U.',
+          status: 'draft',
+          isOwn: true,
+        },
+        ...prev,
+      ]);
+    }
+    setIsFillModalOpen(false);
+  };
+
+  /** A draft leaves the author's hands and becomes an incoming report. */
+  const handleSubmitDraft = (id: string) => {
+    setReportsList((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? { ...r, status: 'submitted' as const, submittedDate: new Date().toLocaleDateString('ru-RU') }
+          : r
+      )
+    );
+  };
+
   // Actions
   const handleApproveReport = (id: string) => {
     setReportsList((prev) =>
@@ -163,6 +241,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
     if (activeTab === 'approved' && r.status !== 'approved') return false;
     if (activeTab === 'returned' && r.status !== 'returned') return false;
     if (activeTab === 'overdue' && r.status !== 'overdue') return false;
+    if (activeTab === 'draft' && r.status !== 'draft') return false;
+    // Drafts belong to their author until submitted, so they stay out of the other tabs.
+    if (activeTab !== 'draft' && r.status === 'draft' && !canFillReports) return false;
     if (selectedOrgFilter !== 'all' && r.region !== selectedOrgFilter) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -178,6 +259,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
 
   // Status counters
   const totalCount = reportsList.length;
+  const draftCount = reportsList.filter((r) => r.status === 'draft').length;
   const submittedCount = reportsList.filter((r) => r.status === 'submitted').length;
   const approvedCount = reportsList.filter((r) => r.status === 'approved').length;
   const returnedCount = reportsList.filter((r) => r.status === 'returned').length;
@@ -209,6 +291,18 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
           >
             Excelga eksport
           </Button>
+
+          {canFillReports && !canManageReports && (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => openFillForm()}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer shadow-xs"
+            >
+              Hisobot toʻldirish
+            </Button>
+          )}
 
           {canManageReports && (
             <Button
@@ -262,6 +356,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
               { id: 'approved', label: 'Qabul qilingan', count: approvedCount },
               { id: 'returned', label: 'Qaytarilgan', count: returnedCount },
               { id: 'overdue', label: 'Muddati oʻtgan', count: overdueCount },
+              ...(canFillReports ? [{ id: 'draft', label: 'Qoralamalar', count: draftCount }] : []),
             ]}
             activeTabId={activeTab}
             onChange={setActiveTab}
@@ -341,6 +436,11 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
                     {r.submittedDate}
                   </td>
                   <td className="py-3.5 px-4 whitespace-nowrap">
+                    {r.status === 'draft' && (
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F8F9FA] text-[#5A646D] border border-[#E4E7EA] inline-flex items-center gap-1">
+                        <FileSpreadsheet className="w-3 h-3" /> Qoralama
+                      </span>
+                    )}
                     {r.status === 'submitted' && (
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 inline-flex items-center gap-1">
                         <Send className="w-3 h-3" /> Kelib tushgan
@@ -371,6 +471,27 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
                     >
                       Koʻrish
                     </Button>
+
+                    {canEditOwnDraft && r.status === 'draft' && r.isOwn && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openFillForm(r)}
+                          className="border-[#767F87] text-[#1A1F24] font-bold hover:bg-[#F8F9FA]"
+                        >
+                          Tahrirlash
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleSubmitDraft(r.id)}
+                          className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold"
+                        >
+                          Topshirish
+                        </Button>
+                      </>
+                    )}
 
                     {canManageReports && r.status === 'submitted' && (
                       <>
@@ -473,7 +594,118 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
         </Modal>
       )}
 
-      {/* 7. New report form modal — TZ 4.2.6.1 and 4.2.6.5 */}
+      {/* 7. Fill in a report form — TZ 4.2.6.1 (create) and 4.2.6.2 (edit own draft) */}
+      <Modal
+        isOpen={isFillModalOpen}
+        onClose={() => setIsFillModalOpen(false)}
+        title={draftBeingEdited ? `Qoralamani tahrirlash — ${draftBeingEdited.code}` : 'Hisobotni toʻldirish'}
+        subtitle="Barcha majburiy maydonlar toʻldirilgach forma «Qoralama» holatida saqlanadi"
+        maxWidth="lg"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsFillModalOpen(false)}>
+              Bekor qilish
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSaveDraft}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold"
+            >
+              Qoralama sifatida saqlash
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 py-1 text-xs">
+          {fillError && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 font-semibold flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" /> {fillError}
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <label className="font-bold text-[#1A1F24]">Hisobot nomi:</label>
+            <Input
+              placeholder="Masalan: III kvartal yaylovlardan foydalanish hisoboti"
+              value={fillTitle}
+              onChange={(e) => { setFillTitle(e.target.value); setFillError(null); }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="font-bold text-[#1A1F24]">Hisobot davri:</label>
+              <select
+                value={fillPeriod}
+                onChange={(e) => setFillPeriod(e.target.value)}
+                className="w-full bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-sm p-3 text-[#1A1F24] focus:outline-none focus:border-[#2E7D4F]"
+              >
+                <option>2026 I-Kvartal</option>
+                <option>2026 II-Kvartal</option>
+                <option>2026 III-Kvartal</option>
+                <option>2026 IV-Kvartal</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="font-bold text-[#1A1F24]">Tashkilot:</label>
+              <Input value="Boʻstonliq DЎX" readOnly className="bg-[#F8F9FA]" />
+            </div>
+          </div>
+
+          <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl space-y-3">
+            <span className="font-bold text-[#1A1F24] block">Hisobot koʻrsatkichlari (majburiy):</span>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#5A646D]">Foydalanilgan maydon (ga):</label>
+                <Input
+                  placeholder="1 240"
+                  value={fillArea}
+                  onChange={(e) => { setFillArea(e.target.value); setFillError(null); }}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#5A646D]">Chorva bosh soni:</label>
+                <Input
+                  placeholder="860"
+                  value={fillLivestock}
+                  onChange={(e) => { setFillLivestock(e.target.value); setFillError(null); }}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#5A646D]">Tushum (soʻm):</label>
+                <Input
+                  placeholder="18 400 000"
+                  value={fillRevenue}
+                  onChange={(e) => { setFillRevenue(e.target.value); setFillError(null); }}
+                  className="font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="font-bold text-[#1A1F24]">Izoh (ixtiyoriy):</label>
+            <textarea
+              rows={3}
+              value={fillNote}
+              onChange={(e) => setFillNote(e.target.value)}
+              placeholder="Hisobot boʻyicha qoʻshimcha maʼlumot..."
+              className="w-full bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-xs p-3 text-[#1A1F24] focus:outline-none focus:border-[#2E7D4F]"
+            />
+          </div>
+
+          <div className="p-3 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl text-[11px] text-[#2E7D4F]">
+            Saqlangan forma <b>«Qoralama»</b> holatida qoladi va uni faqat siz tahrirlay olasiz.
+            «Topshirish» bosilgach forma markaziy apparatga yuboriladi va tahrirlash yopiladi.
+          </div>
+        </div>
+      </Modal>
+
+      {/* 8. New report form modal — TZ 4.2.6.1 and 4.2.6.5 */}
       {isAddFormModalOpen && (
         <Modal
           isOpen={isAddFormModalOpen}
