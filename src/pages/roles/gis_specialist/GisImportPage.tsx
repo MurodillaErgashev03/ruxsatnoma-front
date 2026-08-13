@@ -112,7 +112,7 @@ export const GisImportPage: React.FC<GisImportPageProps> = ({ onNavigate }) => {
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-[#F8F9FA] border-b border-[#E4E7EA]">
                 <tr>
-                  <th className="p-3 font-semibold text-[#5A646D]">Qator тДЦ</th>
+                  <th className="p-3 font-semibold text-[#5A646D]">Qator №</th>
                   <th className="p-3 font-semibold text-[#5A646D]">Feature ID</th>
                   <th className="p-3 font-semibold text-[#5A646D]">Xato Kodi</th>
                   <th className="p-3 font-semibold text-[#5A646D]">Batafsil Xabar</th>

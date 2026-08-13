@@ -170,7 +170,7 @@ export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRo
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC]">
-            {isCentralAdmin ? 'RESPUBLIKA REYESTRI (П. 4.2.10)' : 'Rasmiy Hujjatlar'}
+            {isCentralAdmin ? 'RESPUBLIKA RUXSATNOMALAR REYESTRI' : 'Rasmiy Hujjatlar'}
           </span>
           <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] mt-1.5">
             {isCentralAdmin ? 'Respublika Ruxsatnomalar Reyestri' : 'Mening Ruxsatnomalarim'}

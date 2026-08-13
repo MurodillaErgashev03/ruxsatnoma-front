@@ -44,7 +44,7 @@ export const LeskhozReviewPage: React.FC<LeskhozReviewPageProps> = ({ onNavigate
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-6">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold font-mono text-[#1A1F24]">Ariza тДЦRX-2026-0090</h1>
+              <h1 className="text-2xl font-bold font-mono text-[#1A1F24]">Ariza №RX-2026-0090</h1>
               <StatusBadge status="pending" size="md" />
             </div>
             <p className="text-xs text-[#5A646D] mt-1">Yuborilgan sana: 09.08.2026 10:15</p>
@@ -62,7 +62,7 @@ export const LeskhozReviewPage: React.FC<LeskhozReviewPageProps> = ({ onNavigate
               <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
               <span>GIS Topologik Avto-Tekshiruv: PASS (0% Kesishuv)</span>
             </div>
-            <p className="text-xs text-[#5A646D]">Kontur тДЦ42 (Burchmulla oʻrmon xoʻjaligi, 450 ga)</p>
+            <p className="text-xs text-[#5A646D]">Kontur №42 (Burchmulla oʻrmon xoʻjaligi, 450 ga)</p>
           </div>
 
           <div className="p-4 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl space-y-1">

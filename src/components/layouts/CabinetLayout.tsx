@@ -30,7 +30,11 @@ import {
   PlusCircle,
   Megaphone,
   ClipboardList,
+  AlertTriangle,
+  Archive,
 } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Modal } from '../ui/Overlay';
 
 export interface CabinetLayoutProps {
   children: React.ReactNode;
@@ -175,14 +179,31 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
   central_admin: [
     homeGroup('Bosh sahifa (analitika)', 'manager_decision'),
     {
+      // The one object the central apparatus may create and approve (TZ appendix 4).
+      group: 'Hisobotlar boshqaruvi',
+      items: [
+        { id: 'reports', label: 'Hisobot formalari va muddatlar', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+      ],
+    },
+    {
       group: 'Respublika monitoringi',
       items: [
         { id: 'applications', label: 'Arizalar reyestri', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
         { id: 'permits', label: 'Ruxsatnomalar reyestri', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
-        { id: 'reports', label: 'Hisobotlar boshqaruvi', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+        { id: 'payments', label: 'Toʻlovlar va taqsimot', page: 'accountant_reconciliation', icon: <CreditCard className={ICON} /> },
+        { id: 'inspections', label: 'Inspeksiya dalolatnomalari', page: 'inspection_acts', icon: <CheckSquare className={ICON} /> },
+        { id: 'normative', label: 'Meʼyor va tariflar', page: 'normative_norms', icon: <Calculator className={ICON} /> },
         { id: 'map', label: 'Uchastkalar xaritasi (GIS)', page: 'gis_editor', icon: <Map className={ICON} /> },
+      ],
+    },
+    {
+      group: 'Maʼlumotnomalar (faqat koʻrish)',
+      items: [
         { id: 'admin_orgs', label: 'Tashkilotlar ierarxiyasi', page: 'admin_orgs', icon: <Building2 className={ICON} />, count: 84 },
         { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
+        { id: 'admin_users', label: 'Foydalanuvchilar va rollar', page: 'admin_users', icon: <Users className={ICON} /> },
+        { id: 'admin_audit', label: 'Audit jurnali', page: 'admin_audit_logs', icon: <Shield className={ICON} /> },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
       ],
     },
     profileGroup(),
@@ -327,9 +348,23 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  /** Logging out is never immediate — both exits go through a confirmation first. */
+  const requestLogout = () => {
+    setIsUserMenuOpen(false);
+    setIsNotifOpen(false);
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsLogoutConfirmOpen(false);
+    if (onLogout) onLogout();
+    else onNavSelect?.('home');
+  };
 
   // Close popovers on outside click
   useEffect(() => {
@@ -517,15 +552,11 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                 {/* Logout Divider & Button */}
                 <div className="pt-2 border-t border-[#E4E7EA]">
                   <button
-                    onClick={() => {
-                      if (onLogout) onLogout();
-                      else onNavSelect?.('home');
-                      setIsUserMenuOpen(false);
-                    }}
+                    onClick={requestLogout}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors font-bold text-xs text-left"
                   >
                     <LogOut className="w-4 h-4 text-[#B91C1C]" />
-                    <span>Tizimdan Chiqish</span>
+                    <span>Tizimdan chiqish</span>
                   </button>
                 </div>
               </div>
@@ -543,10 +574,17 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
             isSidebarCollapsed ? 'w-16' : 'w-72'
           }`}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-4">
+          <div
+            className={`sidebar-scroll flex-1 min-h-0 overflow-y-auto py-3 ${
+              isSidebarCollapsed ? 'px-2 space-y-2' : 'px-3 space-y-4'
+            }`}
+          >
             {navItems.map((group, idx) => (
               <div key={idx}>
-                {!isSidebarCollapsed && (
+                {isSidebarCollapsed ? (
+                  // Collapsed rail has no room for a caption, so groups are split by a rule.
+                  idx > 0 && <div className="h-px bg-[#E4E7EA] mx-2 mb-2" />
+                ) : (
                   <div className="px-3 text-[11px] font-semibold uppercase tracking-wider text-[#9AA3AB] mb-1">
                     {group.group}
                   </div>
@@ -559,33 +597,50 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
                         key={item.id}
                         onClick={() => onNavSelect?.(item.page)}
                         title={item.label}
-                        className={`w-full flex items-center gap-3 h-10 px-3 rounded-md text-xs font-semibold transition-all ${
+                        className={`w-full flex items-center h-10 rounded-md text-xs font-semibold transition-colors relative ${
+                          isSidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
+                        } ${
                           isActive
-                            ? 'bg-[#F0F7F1] text-[#2E7D4F] font-bold border-l-4 border-[#2E7D4F]'
+                            ? 'bg-[#F0F7F1] text-[#2E7D4F] font-bold'
                             : 'text-[#1A1F24] hover:bg-[#F8F9FA]'
+                        } ${
+                          // The active marker is an inset bar so it never shifts the icon.
+                          isActive && !isSidebarCollapsed
+                            ? 'before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:rounded-r before:bg-[#2E7D4F]'
+                            : ''
                         }`}
                       >
-                        <span className={isActive ? 'text-[#2E7D4F]' : 'text-[#5A646D]'}>
+                        <span className={`shrink-0 ${isActive ? 'text-[#2E7D4F]' : 'text-[#5A646D]'}`}>
                           {item.icon}
                         </span>
-                        {!isSidebarCollapsed && (
-                          <>
-                            <span className="flex-1 text-left truncate leading-tight">{item.label}</span>
-                            {item.count !== undefined && (
+
+                        {isSidebarCollapsed
+                          ? // Only the unread marker survives the collapse; the number needs width.
+                            item.count !== undefined && (
                               <span
-                                className={`text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
-                                  item.isWarning
-                                    ? 'bg-[#B45309] text-white'
-                                    : isActive
-                                    ? 'bg-[#D9EBDC] text-[#123522]'
-                                    : 'bg-[#E4E7EA] text-[#5A646D]'
+                                className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${
+                                  item.isWarning ? 'bg-[#B45309]' : 'bg-[#2E7D4F]'
                                 }`}
-                              >
-                                {item.count}
-                              </span>
-                            )}
-                          </>
-                        )}
+                              />
+                            )
+                          : (
+                            <>
+                              <span className="flex-1 text-left truncate leading-tight">{item.label}</span>
+                              {item.count !== undefined && (
+                                <span
+                                  className={`text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                                    item.isWarning
+                                      ? 'bg-[#B45309] text-white'
+                                      : isActive
+                                      ? 'bg-[#D9EBDC] text-[#123522]'
+                                      : 'bg-[#E4E7EA] text-[#5A646D]'
+                                  }`}
+                                >
+                                  {item.count}
+                                </span>
+                              )}
+                            </>
+                          )}
                       </button>
                     );
                   })}
@@ -595,19 +650,25 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
           </div>
 
           {/* Sidebar Footer — stays pinned at the bottom while the nav above it scrolls */}
-          <div className="p-3 border-t border-[#E4E7EA] shrink-0 bg-white">
+          <div className={`py-3 border-t border-[#E4E7EA] shrink-0 bg-white ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="w-full flex items-center gap-3 h-10 px-3 rounded-md text-xs font-semibold text-[#5A646D] hover:bg-[#F8F9FA] transition-colors"
+              title={isSidebarCollapsed ? 'Menyuni yoyish' : 'Menyuni yigʻish'}
+              className={`w-full flex items-center h-10 rounded-md text-xs font-semibold text-[#5A646D] hover:bg-[#F8F9FA] transition-colors ${
+                isSidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
+              }`}
             >
-              <Menu className="w-4 h-4" />
+              <Menu className="w-4 h-4 shrink-0" />
               {!isSidebarCollapsed && <span>Menyuni yigʻish</span>}
             </button>
             <button
-              onClick={() => onNavSelect?.('home')}
-              className="w-full flex items-center gap-3 h-10 px-3 rounded-md text-xs font-semibold text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors mt-1"
+              onClick={requestLogout}
+              title="Tizimdan chiqish"
+              className={`w-full flex items-center h-10 rounded-md text-xs font-semibold text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors mt-1 ${
+                isSidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
+              }`}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 shrink-0" />
               {!isSidebarCollapsed && <span>Tizimdan chiqish</span>}
             </button>
           </div>
@@ -618,6 +679,45 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
           {children}
         </main>
       </div>
+
+      {/* Logout confirmation — reached from both the profile menu and the sidebar */}
+      <Modal
+        isOpen={isLogoutConfirmOpen}
+        onClose={() => setIsLogoutConfirmOpen(false)}
+        title="Tizimdan chiqishni tasdiqlang"
+        subtitle={userName}
+        maxWidth="sm"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsLogoutConfirmOpen(false)}>
+              Bekor qilish
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<LogOut className="w-4 h-4" />}
+              onClick={confirmLogout}
+              className="bg-[#B91C1C] hover:bg-[#991B1B] text-white font-bold"
+            >
+              Ha, chiqish
+            </Button>
+          </div>
+        }
+      >
+        <div className="py-1 space-y-3 text-xs">
+          <div className="flex items-start gap-3 p-3 bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl">
+            <AlertTriangle className="w-4 h-4 text-[#B91C1C] shrink-0 mt-0.5" />
+            <p className="text-[#991B1B] leading-relaxed">
+              Seans yakunlanadi va siz kirish sahifasiga qaytarilasiz.
+              Saqlanmagan maʼlumotlar yoʻqoladi.
+            </p>
+          </div>
+          <p className="text-[#5A646D] leading-relaxed">
+            Kabinetga qayta kirish uchun JSHSHIR/STIR va parolni yoki ERI kalitini
+            qaytadan kiritishingiz kerak boʻladi.
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 };

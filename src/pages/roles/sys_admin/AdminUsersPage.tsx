@@ -27,6 +27,7 @@ import { SYSTEM_FUNCTIONS, groupSystemFunctions } from './systemFunctions';
 
 export interface AdminUsersPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
 interface UserRecord {
@@ -112,7 +113,18 @@ const generateOneTimePassword = (seed: number) => {
   return `${result.slice(0, 10)}${special[seed % special.length]}`;
 };
 
-export const AdminUsersPage: React.FC<AdminUsersPageProps> = () => {
+export const AdminUsersPage: React.FC<AdminUsersPageProps> = ({ userRole = '' }) => {
+  /**
+   * TZ appendix 4: "Пользователи и роли" is К for the central apparatus — the
+   * registry is visible, but creating, editing, blocking and deleting accounts
+   * stay with the system administrator.
+   */
+  const isCentralAdmin =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('Центральный');
+  const canManage = !isCentralAdmin;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
@@ -484,15 +496,17 @@ export const AdminUsersPage: React.FC<AdminUsersPageProps> = () => {
           >
             Excelga eksport
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            leftIcon={<UserPlus className="w-4 h-4" />}
-            onClick={openAddModal}
-            className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shadow-sm"
-          >
-            Yangi foydalanuvchi
-          </Button>
+          {canManage && (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<UserPlus className="w-4 h-4" />}
+              onClick={openAddModal}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shadow-sm"
+            >
+              Yangi foydalanuvchi
+            </Button>
+          )}
         </div>
       </div>
 
@@ -663,6 +677,9 @@ export const AdminUsersPage: React.FC<AdminUsersPageProps> = () => {
                       )}
                     </td>
                     <td className="py-4 px-4 text-right">
+                      {!canManage ? (
+                        <span className="text-[11px] text-[#767F87]">Faqat koʻrish</span>
+                      ) : (
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => toggleUserStatus(u.id)}
@@ -713,6 +730,7 @@ export const AdminUsersPage: React.FC<AdminUsersPageProps> = () => {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
+                      )}
                     </td>
                   </tr>
                 ))

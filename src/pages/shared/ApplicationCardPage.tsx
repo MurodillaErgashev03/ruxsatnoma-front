@@ -18,7 +18,7 @@ export interface ApplicationCardPageProps {
 }
 
 export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
-  applicationId = '╨Р-00042',
+  applicationId = 'А-00042',
   onNavigate,
 }) => {
   const [activeTab, setActiveTab] = useState<string>('s-general');
@@ -48,7 +48,7 @@ export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
         <span className="font-semibold text-[#1A1F24]">Ariza kartochkasi ({applicationId})</span>
       </div>
 
-      {/* тФАтФА 1-HOLAT (MAIN VIEW): IN REVIEW CARD WITH ALL 6 PANELS & ACTION RAIL тФАтФА */}
+      {/* ── 1-HOLAT (MAIN VIEW): IN REVIEW CARD WITH ALL 6 PANELS & ACTION RAIL ── */}
       <div className="space-y-6">
         {/* Main Header Strip */}
         <ApplicationHeader id={String(applicationId)} />
@@ -77,24 +77,24 @@ export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
         </div>
       </div>
 
-      {/* тФАтФА 2-HOLAT (ENG PASTDA): UNCLAIMED / UNASSIGNED STATE MATCHING application-card.html тФАтФА */}
+      {/* ── 2-HOLAT (ENG PASTDA): UNCLAIMED / UNASSIGNED STATE MATCHING application-card.html ── */}
       <section className="pt-12 border-t-2 border-dashed border-[#767F87]/30 space-y-6">
         <div className="flex items-center gap-2 text-xs text-[#5A646D]">
           <span className="px-3 py-1 rounded-full bg-white border border-[#E4E7EA] font-bold text-[#1A1F24] uppercase text-[10px] shadow-2xs">
-            тЧ╗ EKRAN HOLATI (╨Ч╨Р╨п╨Т╨Ъ╨Р ╨Х╨й╨Б ╨Э╨Х ╨Я╨а╨Ш╨Э╨п╨в╨Р ╨Т ╨а╨Р╨С╨Ю╨в╨г)
+            ◻ EKRAN HOLATI (ЗАЯВКА ЕЩЁ НЕ ПРИНЯТА В РАБОТУ)
           </span>
           <span>Shtatdagi xodim arizani hali koʻrib chiqishga olmagan holat namoyishi.</span>
         </div>
 
         {/* Unclaimed Header Strip */}
         <ApplicationHeader
-          id="╨Р-00044"
-          activityName="Asalari uyalarini joylashtirish (╨а╨░╨╖╨╝╨╡╤Й╨╡╨╜╨╕╨╡ ╨┐╤З╨╡╨╗╨╕╨╜╤Л╤Е ╤Г╨╗╤М╨╡╨▓)"
+          id="А-00044"
+          activityName="Asalari uyalarini joylashtirish (Размещение пчелиных ульев)"
           applicantName="Dilshod Raximov"
           applicantType="Jismoniy shaxs"
           pinfl="32309981740326"
           submittedAt="06.08.2026, 16:31"
-          channel="my.gov.uz ┬╖ E-IMZO imzolangan"
+          channel="my.gov.uz · E-IMZO imzolangan"
           executorName="Dilnoza Abdullayeva"
           executorAssignedAt="Avtomatik tayinlangan, ishga olingan emas"
           totalAmount="480 000,00 UZS"

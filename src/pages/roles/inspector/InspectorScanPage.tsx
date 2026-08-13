@@ -84,7 +84,7 @@ export const InspectorScanPage: React.FC<InspectorScanPageProps> = ({ onNavigate
 
       {/* Manual Search Fallback */}
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs space-y-4">
-        <h3 className="text-xs font-bold text-[#767F87] uppercase">Kamera Ishlamasa тАФ Qoʻlda Qidirish</h3>
+        <h3 className="text-xs font-bold text-[#767F87] uppercase">Kamera Ishlamasa — Qoʻlda Qidirish</h3>
         <form onSubmit={handleManualSearch} className="space-y-3">
           <Input
             placeholder="Masalan: RX-2026-0089"

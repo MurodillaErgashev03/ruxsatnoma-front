@@ -3,6 +3,7 @@ import {
   Calculator,
   History,
   Plus,
+  Download,
   Search,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
@@ -11,6 +12,7 @@ import { DataTable, type Column } from '../../../components/ui/DataTable';
 
 export interface GeobotanicNormsPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
 export interface GeobotanicNormItem {
@@ -26,13 +28,31 @@ export interface GeobotanicNormItem {
   lastAuditDate: string;
 }
 
-export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
+export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = ({ userRole = '' }) => {
+  /**
+   * TZ appendix 4: entering and versioning a norm is Я+Ў for the GIS/normative
+   * specialist alone. The central apparatus and management read the calculation
+   * and export it; the norm itself is К for them.
+   */
+  const canEditNorms =
+    userRole.includes('gis_specialist') ||
+    userRole.includes('GIS') ||
+    userRole.includes('meʼyoriy');
+
+  const canExport =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('management') ||
+    userRole.includes('Rahbariyat') ||
+    userRole.includes('prosecutor') ||
+    userRole.includes('Prokuror');
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const mockNorms: GeobotanicNormItem[] = [
-    { id: 'NRM-001', contourNo: 'Kontur тДЦ42', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', geobotanicDoc: 'OʻzR Fanlar Akademiyasi Xulosasi тДЦ14/2025', yieldPerHa: '4.5 sentner/ga', rotationSeason: 'Bahor-Yoz (Aprel-Sentyabr)', maxSB: 500, ruleVersion: 'v2.4 (2026)', status: 'active', lastAuditDate: '10.01.2026' },
-    { id: 'NRM-002', contourNo: 'Kontur тДЦ15', leskhoz: 'Zomin davlat qoʻriqxonasi', geobotanicDoc: 'Ekologik Geobotanika Hujjati тДЦ89', yieldPerHa: '3.8 sentner/ga', rotationSeason: 'Kuz-Qish (Oktyabr-Mart)', maxSB: 200, ruleVersion: 'v2.1 (2025)', status: 'active', lastAuditDate: '15.12.2025' },
-    { id: 'NRM-003', contourNo: 'Kontur тДЦ88', leskhoz: 'Kitob baland togʻ boʻlimi', geobotanicDoc: 'NHA Qarori тДЦ402-2024', yieldPerHa: '5.1 sentner/ga', rotationSeason: 'Yoz (Iyun-Avgust)', maxSB: 350, ruleVersion: 'v1.8 (2024)', status: 'archived', lastAuditDate: '01.06.2024' },
+    { id: 'NRM-001', contourNo: 'Kontur №42', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', geobotanicDoc: 'OʻzR Fanlar Akademiyasi Xulosasi №14/2025', yieldPerHa: '4.5 sentner/ga', rotationSeason: 'Bahor-Yoz (Aprel-Sentyabr)', maxSB: 500, ruleVersion: 'v2.4 (2026)', status: 'active', lastAuditDate: '10.01.2026' },
+    { id: 'NRM-002', contourNo: 'Kontur №15', leskhoz: 'Zomin davlat qoʻriqxonasi', geobotanicDoc: 'Ekologik Geobotanika Hujjati №89', yieldPerHa: '3.8 sentner/ga', rotationSeason: 'Kuz-Qish (Oktyabr-Mart)', maxSB: 200, ruleVersion: 'v2.1 (2025)', status: 'active', lastAuditDate: '15.12.2025' },
+    { id: 'NRM-003', contourNo: 'Kontur №88', leskhoz: 'Kitob baland togʻ boʻlimi', geobotanicDoc: 'NHA Qarori №402-2024', yieldPerHa: '5.1 sentner/ga', rotationSeason: 'Yoz (Iyun-Avgust)', maxSB: 350, ruleVersion: 'v1.8 (2024)', status: 'archived', lastAuditDate: '01.06.2024' },
   ];
 
   const bhmAuditLogs = [
@@ -41,7 +61,7 @@ export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
   ];
 
   const columns: Column<GeobotanicNormItem>[] = [
-    { key: 'contourNo', header: 'Kontur тДЦ', sortable: true, width: '120px' },
+    { key: 'contourNo', header: 'Kontur №', sortable: true, width: '120px' },
     { key: 'leskhoz', header: 'Oʻrmon Xoʻjaligi', sortable: true },
     { key: 'geobotanicDoc', header: 'Geobotanik Hujjat Basis', sortable: true },
     { key: 'yieldPerHa', header: 'Hosildorlik', sortable: true, width: '130px' },
@@ -56,16 +76,27 @@ export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded">
-            Normativ Subtizimi (Phase 3)
+            {canEditNorms ? 'Meʼyoriy subtizim (4.2.10, 10.3)' : 'Meʼyor va tariflar (faqat koʻrish)'}
           </span>
-          <h1 className="text-2xl font-bold text-[#1A1F24] mt-1">Geobotanik Normalar va BHM Audit Reestri</h1>
+          <h1 className="text-2xl font-bold text-[#1A1F24] mt-1">Geobotanik Meʼyorlar va BHM Reyestri</h1>
           <p className="text-xs text-[#5A646D]">
             Har bir oʻrmon konturiga oid geobotanik hosildorlik, rotatsiya mavsumlari va MaxSB formulalari.
           </p>
         </div>
-        <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
-          Yangi Norma Biriktirish
-        </Button>
+        {canEditNorms ? (
+          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+            Yangi meʼyor biriktirish
+          </Button>
+        ) : canExport ? (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="w-4 h-4" />}
+            onClick={() => alert('Meʼyorlar va hisob-kitob reyestri Excel formatida tayyorlanmoqda.')}
+          >
+            Excelga eksport
+          </Button>
+        ) : null}
       </div>
 
       {/* Formula Calculation Logic Explanation Box */}
@@ -76,7 +107,7 @@ export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
         </div>
 
         <div className="p-4 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl font-mono text-xs text-[#123522] space-y-1">
-          <div className="font-bold">MaxSB = (Maydon (ga) ├Ч Hosildorlik (sentner/ga) ├Ч Qayta tiklanish koeffitsienti) / Chorva ehtiyoji</div>
+          <div className="font-bold">MaxSB = (Maydon (ga) × Hosildorlik (sentner/ga) × Qayta tiklanish koeffitsienti) / Chorva ehtiyoji</div>
           <div className="text-[11px] text-[#5A646D] font-sans pt-1">
             * Formulalar va har bir kontur uchun belgilangan `rule_version` parametrlari tizim tomonidan avtomatik audit qilinadi.
           </div>
@@ -104,7 +135,7 @@ export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2 text-xs font-bold text-[#767F87] uppercase">
           <History className="w-4 h-4 text-[#B45309]" />
-          <span>BHM (╨С╥▓╨Ь) Tarixi va Retroaktiv Audit Jurnali (Maker-Checker Nazorati)</span>
+          <span>BHM (БҲМ) Tarixi va Retroaktiv Audit Jurnali (Maker-Checker Nazorati)</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -112,8 +143,8 @@ export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = () => {
             <thead className="bg-[#F8F9FA] border-b border-[#E4E7EA]">
               <tr>
                 <th className="p-3 font-semibold text-[#5A646D]">Oʻzgarish Sanasi</th>
-                <th className="p-3 font-semibold text-[#5A646D]">Eski ╨С╥▓╨Ь</th>
-                <th className="p-3 font-semibold text-[#5A646D]">Yangi ╨С╥▓╨Ь</th>
+                <th className="p-3 font-semibold text-[#5A646D]">Eski БҲМ</th>
+                <th className="p-3 font-semibold text-[#5A646D]">Yangi БҲМ</th>
                 <th className="p-3 font-semibold text-[#5A646D]">Masʼul Shaxs</th>
                 <th className="p-3 font-semibold text-[#5A646D]">Maker-Checker Status</th>
               </tr>

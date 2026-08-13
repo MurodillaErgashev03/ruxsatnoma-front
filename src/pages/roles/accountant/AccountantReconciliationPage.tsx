@@ -1,11 +1,13 @@
 import React from 'react';
 import {
   Upload,
+  Download,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { DataTable, type Column } from '../../../components/ui/DataTable';
 
 export interface AccountantReconciliationPageProps {
+  userRole?: string;
   onNavigate?: (page: string, params?: any) => void;
 }
 
@@ -21,7 +23,19 @@ export interface BankTransactionItem {
   date: string;
 }
 
-export const AccountantReconciliationPage: React.FC<AccountantReconciliationPageProps> = () => {
+export const AccountantReconciliationPage: React.FC<AccountantReconciliationPageProps> = ({ userRole = '' }) => {
+  /**
+   * TZ appendix 4: payments and refunds are К+Э for the central apparatus,
+   * management and the prosecutor — they read and export, but only the accountant
+   * uploads statements and edits the ledger.
+   */
+  const isMonitoringOnly =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('management') ||
+    userRole.includes('Rahbariyat') ||
+    userRole.includes('prosecutor') ||
+    userRole.includes('Prokuror');
   const transactions: BankTransactionItem[] = [
     { id: 'TX-901', txHash: 'CLK-9081234', permitNo: 'RX-2026-0089', provider: 'Click', amount: '1,428,000 UZS', forestryFund50: '714,000 UZS', stateBudget50: '714,000 UZS', matchedStatus: 'matched', date: '10.08.2026 14:31' },
     { id: 'TX-902', txHash: 'PAY-4019284', permitNo: 'RX-2026-0090', provider: 'Payme', amount: '2,850,000 UZS', forestryFund50: '1,425,000 UZS', stateBudget50: '1,425,000 UZS', matchedStatus: 'matched', date: '09.08.2026 11:20' },
@@ -62,16 +76,31 @@ export const AccountantReconciliationPage: React.FC<AccountantReconciliationPage
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded">
-            Buxgalteriya Subtizimi (Phase 6)
+            {isMonitoringOnly ? 'Toʻlovlar monitoringi (faqat koʻrish)' : 'Moliya subtizimi (4.2.10)'}
           </span>
-          <h1 className="text-lg font-bold text-[#1A1F24] mt-1.5">Hisobotlar Boshqaruvi va 50/50 Taqsimot Sverkasi</h1>
+          <h1 className="text-lg font-bold text-[#1A1F24] mt-1.5">
+            {isMonitoringOnly ? 'Toʻlovlar va 50/50 Taqsimot Monitoringi' : 'Solishtirma va 50/50 Taqsimot'}
+          </h1>
           <p className="text-xs text-[#5A646D]">
-            Tushgan tushumlarni avtomatik solishtirish va Oʻrmon jamgʻarmasi hamda Byudjet oʻrtasida 50 ga 50 taqsimlash.
+            {isMonitoringOnly
+              ? 'Respublika boʻyicha tushumlar, solishtirma natijalari va Oʻrmon jamgʻarmasi hamda byudjet oʻrtasidagi taqsimot.'
+              : 'Tushgan tushumlarni avtomatik solishtirish va Oʻrmon jamgʻarmasi hamda byudjet oʻrtasida 50 ga 50 taqsimlash.'}
           </p>
         </div>
-        <Button variant="primary" size="sm" leftIcon={<Upload className="w-4 h-4" />}>
-          Bank Koʻchirmasi Yuklash (Extract)
-        </Button>
+        {isMonitoringOnly ? (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="w-4 h-4" />}
+            onClick={() => alert('Toʻlovlar solishtirmasi Excel formatida tayyorlanmoqda.')}
+          >
+            Excelga eksport
+          </Button>
+        ) : (
+          <Button variant="primary" size="sm" leftIcon={<Upload className="w-4 h-4" />}>
+            Bank koʻchirmasini yuklash
+          </Button>
+        )}
       </div>
 
       {/* Allocation Ledger Stats */}

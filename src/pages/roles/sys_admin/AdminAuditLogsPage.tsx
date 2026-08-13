@@ -23,6 +23,7 @@ import { Modal } from '../../../components/ui/Overlay';
 
 export interface AdminAuditLogsPageProps {
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
 /** The nine journal types required by TZ 4.2.4. */
@@ -62,7 +63,18 @@ interface AuditRecord {
   hash: string;
 }
 
-export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = () => {
+export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = ({ userRole = '' }) => {
+  /**
+   * TZ appendix 4: the audit journal is К for the administrator and the central
+   * apparatus, but only the prosecutor also holds Э. Export is therefore hidden
+   * from the central apparatus.
+   */
+  const isCentralAdmin =
+    userRole.includes('central_admin') ||
+    userRole.includes('Markaziy') ||
+    userRole.includes('Центральный');
+  const canExport = !isCentralAdmin;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJournal, setSelectedJournal] = useState('all');
   const [selectedSeverity, setSelectedSeverity] = useState('all');
@@ -271,14 +283,16 @@ export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = () => {
             Davr, jurnal turi va koʻrsatiladigan parametrlar boʻyicha filtr; yozuvlar SHA-256 xesh zanjiri bilan muhrlanadi
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<Download className="w-4 h-4" />}
-          onClick={() => setIsExportOpen(true)}
-        >
-          Jurnalni eksport qilish
-        </Button>
+        {canExport && (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="w-4 h-4" />}
+            onClick={() => setIsExportOpen(true)}
+          >
+            Jurnalni eksport qilish
+          </Button>
+        )}
       </div>
 
       {/* Immutability banner */}

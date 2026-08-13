@@ -32,14 +32,14 @@ export const PermitDocumentPage: React.FC<PermitDocumentPageProps> = ({
               <ArrowLeft className="w-3.5 h-3.5" /> Mening ruxsatnomalarim
             </button>
             <span>/</span>
-            <span className="text-[#1A1F24] font-bold">╨Р тДЦ 004182</span>
+            <span className="text-[#1A1F24] font-bold">А № 004182</span>
           </nav>
 
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#1A1F24] tracking-tight">
             Ruxsatnoma: Chorva mollarini boqish
           </h1>
           <p className="text-xs md:text-sm text-[#5A646D] mt-0.5">
-            ╨Р-00021 sonli ariza boʻyicha ┬╖ Toshkent viloyati davlat oʻrmon xoʻjaligi ┬╖ Shablon <span className="font-mono text-[#1A1F24]">PERMIT-GRAZ-2026.1</span>
+            А-00021 sonli ariza boʻyicha · Toshkent viloyati davlat oʻrmon xoʻjaligi · Shablon <span className="font-mono text-[#1A1F24]">PERMIT-GRAZ-2026.1</span>
           </p>
         </div>
 

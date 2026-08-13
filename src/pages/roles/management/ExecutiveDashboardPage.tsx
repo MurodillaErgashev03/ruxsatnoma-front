@@ -15,7 +15,7 @@ export interface ExecutiveDashboardPageProps {
   userRole?: string;
 }
 
-export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = ({ userRole = '' }) => {
+export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = ({ onNavigate, userRole = '' }) => {
   const isManagement =
     userRole.includes('management') ||
     userRole.includes('Rahbariyat') ||
@@ -90,10 +90,11 @@ export const ExecutiveDashboardPage: React.FC<ExecutiveDashboardPageProps> = ({ 
       <ChartsSection />
 
       {/* 5. Risk Indicator Metric Cards */}
-      <RiskIndicatorsGrid onRiskClick={(code: string) => alert(`${code} boʻyicha batafsil roʻyxat ochilmoqda...`)} />
+      {/* Drill-down opens the applications registry pre-filtered by the chosen cut. */}
+      <RiskIndicatorsGrid onRiskClick={(code: string) => onNavigate?.('leskhoz_inbox', { riskIndicator: code })} />
 
       {/* 6. Multi-level Territory Drill-Down Table */}
-      <DrillDownTable onDrillSelect={(region: string) => alert(`${region} tumanlari kesimi ochilmoqda...`)} />
+      <DrillDownTable onDrillSelect={(region: string) => onNavigate?.('leskhoz_inbox', { region })} />
 
       {/* 7. Detailed Regional Breakdown Table (Разрез: области) */}
       <RegionsBreakdownSection />

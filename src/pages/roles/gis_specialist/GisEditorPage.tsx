@@ -7,7 +7,6 @@ import {
   Upload,
   Plus,
   Compass,
-  Download,
   Printer,
   Maximize2,
 } from 'lucide-react';
@@ -36,7 +35,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
   const isCentralAdmin =
     userRole.includes('central_admin') ||
     userRole.includes('Markaziy') ||
-    userRole.includes('╨ж╨╡╨╜╤В╤А╨░╨╗╤М╨╜╤Л╨╣');
+    userRole.includes('Центральный');
 
   const [activeTool, setActiveTool] = useState<'select' | 'polygon' | 'measure' | 'vertex'>('select');
   const [selectedRegion, setSelectedRegion] = useState('all');
@@ -53,10 +52,10 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
   ];
 
   const contoursList: ContourItem[] = [
-    { id: 'K-042', name: 'Kontur тДЦ42 (Chorva boqish)', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', areaHa: 450, maxSB: 500, currentSB: 120, layer: 'Yaylov konturlari', status: 'published', lastUpdated: '10.08.2026' },
-    { id: 'K-015', name: 'Kontur тДЦ15 (Pichangoh)', leskhoz: 'Zomin davlat qoʻriqxonasi', areaHa: 180, maxSB: 200, currentSB: 180, layer: 'Pichan oʻrish maydonlari', status: 'published', lastUpdated: '08.08.2026' },
-    { id: 'K-088', name: 'Kontur тДЦ88 (Yangi chegara)', leskhoz: 'Kitob baland togʻ boʻlimi', areaHa: 320, maxSB: 350, currentSB: 0, layer: 'Yaylov konturlari', status: 'review', lastUpdated: '05.08.2026' },
-    { id: 'K-099', name: 'Kontur тДЦ99 (Qoralama)', leskhoz: 'Pop oʻrmon boʻlimi', areaHa: 95, maxSB: 100, currentSB: 0, layer: 'Yaylov konturlari', status: 'draft', lastUpdated: '01.08.2026' },
+    { id: 'K-042', name: 'Kontur №42 (Chorva boqish)', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', areaHa: 450, maxSB: 500, currentSB: 120, layer: 'Yaylov konturlari', status: 'published', lastUpdated: '10.08.2026' },
+    { id: 'K-015', name: 'Kontur №15 (Pichangoh)', leskhoz: 'Zomin davlat qoʻriqxonasi', areaHa: 180, maxSB: 200, currentSB: 180, layer: 'Pichan oʻrish maydonlari', status: 'published', lastUpdated: '08.08.2026' },
+    { id: 'K-088', name: 'Kontur №88 (Yangi chegara)', leskhoz: 'Kitob baland togʻ boʻlimi', areaHa: 320, maxSB: 350, currentSB: 0, layer: 'Yaylov konturlari', status: 'review', lastUpdated: '05.08.2026' },
+    { id: 'K-099', name: 'Kontur №99 (Qoralama)', leskhoz: 'Pop oʻrmon boʻlimi', areaHa: 95, maxSB: 100, currentSB: 0, layer: 'Yaylov konturlari', status: 'draft', lastUpdated: '01.08.2026' },
   ];
 
   const columns: Column<ContourItem>[] = [
@@ -102,7 +101,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC]">
-            {isCentralAdmin ? 'RESPUBLIKA GIS MONITORINGI (╨Я. 4.2.5)' : 'GIS Subtizimi (Phase 3)'}
+            {isCentralAdmin ? 'RESPUBLIKA GIS MONITORINGI' : 'GIS Subtizimi (Phase 3)'}
           </span>
           <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] mt-1.5">
             {isCentralAdmin ? 'Respublika GIS Monitoring Xaritasi' : 'GIS Xarita Muharriri va Konturlar Muhiti'}
@@ -123,31 +122,27 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
                 className="h-9 px-3 text-xs bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24] font-medium focus:ring-2 focus:ring-[#2E7D4F] focus:outline-none shrink-0"
               >
                 <option value="all">Respublika (14 viloyat)</option>
-                <option value="tashkent">Toshkent v. (Boʻstonliq D╨ОX)</option>
-                <option value="kashkadarya">Qashqadaryo v. (Kitob D╨ОX)</option>
-                <option value="jizzakh">Jizzax v. (Zomin D╨ОX)</option>
-                <option value="namangan">Namangan v. (Pop D╨ОX)</option>
-                <option value="samarkand">Samarqand v. (Oqdaryo D╨ОX)</option>
+                <option value="tashkent">Toshkent v. (Boʻstonliq DЎX)</option>
+                <option value="kashkadarya">Qashqadaryo v. (Kitob DЎX)</option>
+                <option value="jizzakh">Jizzax v. (Zomin DЎX)</option>
+                <option value="namangan">Namangan v. (Pop DЎX)</option>
+                <option value="samarkand">Samarqand v. (Oqdaryo DЎX)</option>
               </select>
 
-              <Button
-                variant="outline"
-                size="sm"
-                leftIcon={<Download className="w-4 h-4 text-[#15803D]" />}
-                onClick={() => alert('GIS Qatlamlari GeoJSON formatida yuklab olindi!')}
-                className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold text-xs h-9 cursor-pointer whitespace-nowrap shrink-0"
-              >
-                GeoJSON / KML
-              </Button>
-
+              {/*
+                TZ appendix 4: the GIS contour is К for the central apparatus and
+                management — К+Э belongs to the prosecutor alone, so layer export is
+                not offered here. Printing the visible map frame stays available,
+                since it produces no contour dataset.
+              */}
               <Button
                 variant="primary"
                 size="sm"
                 leftIcon={<Printer className="w-4 h-4" />}
-                onClick={() => alert('Xarita kadri PDF formatida chop etishga tayyorlandi!')}
+                onClick={() => alert('Xarita kadri PDF formatida chop etishga tayyorlandi.')}
                 className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer shadow-xs whitespace-nowrap shrink-0"
               >
-                PDF Xarita Kadr
+                Xarita kadrini chop etish
               </Button>
             </>
           ) : (
@@ -296,7 +291,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
           <div className="relative z-10 flex items-center justify-between gap-4 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-white/40 shadow-xs text-xs">
             <div className="flex items-center gap-2">
               <span className="px-2 py-1 rounded bg-[#2E7D4F] text-white font-bold text-[11px]">MODE: {activeTool.toUpperCase()}</span>
-              <span className="text-[#5A646D] hidden sm:inline">Markaz: 41.6028┬░ N, 70.0245┬░ E (Burchmulla)</span>
+              <span className="text-[#5A646D] hidden sm:inline">Markaz: 41.6028° N, 70.0245° E (Burchmulla)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[#15803D] font-bold bg-[#F0F7F1] px-2 py-1 rounded border border-[#D9EBDC]">
@@ -311,7 +306,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
             <div className="relative w-full max-w-lg h-72 border-2 border-dashed border-[#2E7D4F] bg-[#2E7D4F]/15 rounded-3xl p-6 flex flex-col justify-between shadow-inner animate-pulse">
               <div className="flex justify-between items-start">
                 <span className="bg-[#2E7D4F] text-white font-mono font-bold text-xs px-2 py-1 rounded shadow-xs">
-                  KONTUR тДЦ42 (450 ga)
+                  KONTUR №42 (450 ga)
                 </span>
                 <span className="bg-white text-[#123522] font-mono text-xs px-2 py-1 rounded border border-[#E4E7EA] font-semibold">
                   Yaylov Zonasi
@@ -325,8 +320,8 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
               </div>
 
               <div className="flex justify-between text-[11px] font-mono text-[#5A646D] bg-white/60 p-2 rounded-lg">
-                <span>N: 41.6028┬░</span>
-                <span>E: 70.0245┬░</span>
+                <span>N: 41.6028°</span>
+                <span>E: 70.0245°</span>
                 <span>Perimetr: 8.4 km</span>
               </div>
             </div>
@@ -345,7 +340,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-[#1A1F24]">Oʻrmon Konturlari Hayotiy Sikli Reestri</h2>
-            <p className="text-xs text-[#5A646D]">Draft тЖТ Review тЖТ Approved тЖТ Published тЖТ Archived statustagi konturlar</p>
+            <p className="text-xs text-[#5A646D]">Draft → Review → Approved → Published → Archived statustagi konturlar</p>
           </div>
         </div>
 

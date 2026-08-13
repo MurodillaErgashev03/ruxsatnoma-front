@@ -49,6 +49,13 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ 
     userRole.includes('central_admin') ||
     userRole.includes('Markaziy') ||
     userRole.includes('Центральный');
+
+  /**
+   * TZ appendix 4: the central apparatus only views the organisation registry.
+   * Creating, editing and archiving belong to the system administrator, so those
+   * controls are not rendered at all for a read-only viewer (TZ 4.1.7).
+   */
+  const canEdit = !isCentralAdmin;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [viewMode, setViewMode] = useState<'hierarchy' | 'table'>('hierarchy');
@@ -477,20 +484,22 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ 
 
                           <div className="pt-2 flex items-center justify-between text-xs text-[#767F87] border-t border-[#E4E7EA] gap-2">
                             <span className="flex items-center gap-1 min-w-0"><Phone className="w-3.5 h-3.5 text-[#2E7D4F] shrink-0" /> <span className="truncate">{leskhoz.phone}</span></span>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button
-                                onClick={() => setOrgToArchive(leskhoz)}
-                                className="text-[#B45309] font-bold hover:underline flex items-center gap-1"
-                              >
-                                Arxivlash <Archive className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => setOrgToEdit(leskhoz)}
-                                className="text-[#2E7D4F] font-bold hover:underline flex items-center gap-1"
-                              >
-                                Tahrirlash <Edit className="w-3 h-3" />
-                              </button>
-                            </div>
+                            {canEdit && (
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  onClick={() => setOrgToArchive(leskhoz)}
+                                  className="text-[#B45309] font-bold hover:underline flex items-center gap-1"
+                                >
+                                  Arxivlash <Archive className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={() => setOrgToEdit(leskhoz)}
+                                  className="text-[#2E7D4F] font-bold hover:underline flex items-center gap-1"
+                                >
+                                  Tahrirlash <Edit className="w-3 h-3" />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -538,20 +547,29 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ 
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      {canEdit ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setOrgToArchive(l)}
+                            className="p-1.5 text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors font-bold"
+                          >
+                            Arxivlash
+                          </button>
+                          <button
+                            onClick={() => setOrgToEdit(l)}
+                            className="p-1.5 text-[#2E7D4F] hover:bg-[#F0F7F1] rounded-lg transition-colors font-bold"
+                          >
+                            Tahrirlash
+                          </button>
+                        </div>
+                      ) : (
                         <button
-                          onClick={() => setOrgToArchive(l)}
-                          className="p-1.5 text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors font-bold"
-                        >
-                          Arxivlash
-                        </button>
-                        <button
-                          onClick={() => setOrgToEdit(l)}
+                          onClick={() => openStructure(l)}
                           className="p-1.5 text-[#2E7D4F] hover:bg-[#F0F7F1] rounded-lg transition-colors font-bold"
                         >
-                          Tahrirlash
+                          Tuzilmani koʻrish
                         </button>
-                      </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -719,7 +737,9 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ 
                         <button
                           onClick={() => handleRemoveForestry(forestry.id)}
                           title="Oʻrmonchilikni arxivlash"
-                          className="p-1.5 text-[#5A646D] hover:text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors shrink-0"
+                          className={`p-1.5 text-[#5A646D] hover:text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors shrink-0 ${
+                            canEdit ? '' : 'hidden'
+                          }`}
                         >
                           <Archive className="w-4 h-4" />
                         </button>
@@ -752,23 +772,25 @@ export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ 
                 })
               )}
 
-              <div className="p-3 flex items-center gap-2 bg-[#F8F9FA]">
-                <Input
-                  placeholder="Yangi oʻrmonchilik nomi..."
-                  value={newForestryName}
-                  onChange={(e) => setNewForestryName(e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={<Plus className="w-3.5 h-3.5" />}
-                  onClick={handleAddForestry}
-                  className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shrink-0"
-                >
-                  Qoʻshish
-                </Button>
-              </div>
+              {canEdit && (
+                <div className="p-3 flex items-center gap-2 bg-[#F8F9FA]">
+                  <Input
+                    placeholder="Yangi oʻrmonchilik nomi..."
+                    value={newForestryName}
+                    onChange={(e) => setNewForestryName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<Plus className="w-3.5 h-3.5" />}
+                    onClick={handleAddForestry}
+                    className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shrink-0"
+                  >
+                    Qoʻshish
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="p-3 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl text-[#2E7D4F] flex items-start gap-2">

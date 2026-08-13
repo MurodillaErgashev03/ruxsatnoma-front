@@ -231,6 +231,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
           <WorklistBulkActionBar
             selectedCount={selectedIds.length}
             onClearSelection={() => setSelectedIds([])}
+            isReadOnly={isCentralAdmin}
           />
 
           <WorklistApplicationsTable

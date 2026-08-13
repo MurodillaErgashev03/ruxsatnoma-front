@@ -10,6 +10,11 @@ export interface WorklistBulkActionBarProps {
   onRequestInfo?: () => void;
   onExportSelected?: () => void;
   onReturnSelected?: () => void;
+  /**
+   * Monitoring roles (central apparatus, management, prosecutor) hold К and Э on
+   * applications — they may export a selection but never act on it (TZ appendix 4).
+   */
+  isReadOnly?: boolean;
 }
 
 export const WorklistBulkActionBar: React.FC<WorklistBulkActionBarProps> = ({
@@ -20,6 +25,7 @@ export const WorklistBulkActionBar: React.FC<WorklistBulkActionBarProps> = ({
   onRequestInfo,
   onExportSelected,
   onReturnSelected,
+  isReadOnly = false,
 }) => {
   if (selectedCount === 0) return null;
 
@@ -40,34 +46,38 @@ export const WorklistBulkActionBar: React.FC<WorklistBulkActionBarProps> = ({
 
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={onAcceptSelected || (() => alert(`${selectedCount} ta ariza ishga qabul qilindi!`))}
-          className="bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold h-8"
-        >
-          Ishga qabul qilish
-        </Button>
+        {!isReadOnly && (
+          <>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onAcceptSelected || (() => alert(`${selectedCount} ta ariza ishga qabul qilindi!`))}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold h-8"
+            >
+              Ishga qabul qilish
+            </Button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<UserPlus className="w-3.5 h-3.5" />}
-          onClick={onAssignExecutor || (() => alert('Ijrochi tayinlash dialogi'))}
-          className="border-[#767F87] text-[#1A1F24] text-xs font-bold h-8 bg-white"
-        >
-          Ijrochi tayinlash
-        </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<UserPlus className="w-3.5 h-3.5" />}
+              onClick={onAssignExecutor || (() => alert('Ijrochi tayinlash dialogi'))}
+              className="border-[#767F87] text-[#1A1F24] text-xs font-bold h-8 bg-white"
+            >
+              Ijrochi tayinlash
+            </Button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<HelpCircle className="w-3.5 h-3.5" />}
-          onClick={onRequestInfo || (() => alert('Maʼlumot soʻrash yuborildi!'))}
-          className="border-[#767F87] text-[#1A1F24] text-xs font-bold h-8 bg-white"
-        >
-          Ma'lumot soʻrash
-        </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<HelpCircle className="w-3.5 h-3.5" />}
+              onClick={onRequestInfo || (() => alert('Maʼlumot soʻrash yuborildi!'))}
+              className="border-[#767F87] text-[#1A1F24] text-xs font-bold h-8 bg-white"
+            >
+              Maʼlumot soʻrash
+            </Button>
+          </>
+        )}
 
         <Button
           variant="outline"
@@ -79,15 +89,17 @@ export const WorklistBulkActionBar: React.FC<WorklistBulkActionBarProps> = ({
           XLSX
         </Button>
 
-        <Button
-          variant="danger"
-          size="sm"
-          leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-          onClick={onReturnSelected || (() => alert('Arizachiga qaytarildi!'))}
-          className="border-[#B91C1C] text-[#B91C1C] hover:bg-[#FEE2E2] text-xs font-bold h-8 bg-white"
-        >
-          Arizachiga qaytarish
-        </Button>
+        {!isReadOnly && (
+          <Button
+            variant="danger"
+            size="sm"
+            leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+            onClick={onReturnSelected || (() => alert('Arizachiga qaytarildi!'))}
+            className="border-[#B91C1C] text-[#B91C1C] hover:bg-[#FEE2E2] text-xs font-bold h-8 bg-white"
+          >
+            Arizachiga qaytarish
+          </Button>
+        )}
       </div>
     </div>
   );

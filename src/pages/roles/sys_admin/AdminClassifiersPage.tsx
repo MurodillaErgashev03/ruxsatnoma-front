@@ -47,6 +47,12 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ user
     userRole.includes('central_admin') ||
     userRole.includes('Markaziy') ||
     userRole.includes('Центральный');
+
+  /**
+   * TZ appendix 4: classifiers are К (view) for the central apparatus; only the
+   * system administrator gets Я and Ў. Write controls are therefore not rendered.
+   */
+  const canEdit = !isCentralAdmin;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
@@ -601,22 +607,26 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ user
             <div className="pt-3 border-t border-[#E4E7EA] flex items-center justify-between text-xs">
               <span className="text-[#767F87] font-mono text-[11px]">Sinxron: {c.lastSynced} ({c.version})</span>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => openEditModal(c)}
-                  className="px-2.5 py-1 rounded-lg font-semibold text-xs transition-colors border border-[#D9EBDC] bg-[#F0F7F1] text-[#2E7D4F] hover:bg-[#D9EBDC] inline-flex items-center gap-1"
-                >
-                  <Edit className="w-3.5 h-3.5" /> Tahrirlash
-                </button>
-                <button
-                  onClick={() => (c.status === 'active' ? setClassifierToArchive(c) : toggleArchiveStatus(c.id))}
-                  className={`px-2.5 py-1 rounded-lg font-semibold text-xs transition-colors border ${
-                    c.status === 'active'
-                      ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                  }`}
-                >
-                  {c.status === 'active' ? 'Arxivlash' : 'Qaytarish'}
-                </button>
+                {canEdit && (
+                  <>
+                    <button
+                      onClick={() => openEditModal(c)}
+                      className="px-2.5 py-1 rounded-lg font-semibold text-xs transition-colors border border-[#D9EBDC] bg-[#F0F7F1] text-[#2E7D4F] hover:bg-[#D9EBDC] inline-flex items-center gap-1"
+                    >
+                      <Edit className="w-3.5 h-3.5" /> Tahrirlash
+                    </button>
+                    <button
+                      onClick={() => (c.status === 'active' ? setClassifierToArchive(c) : toggleArchiveStatus(c.id))}
+                      className={`px-2.5 py-1 rounded-lg font-semibold text-xs transition-colors border ${
+                        c.status === 'active'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                      }`}
+                    >
+                      {c.status === 'active' ? 'Arxivlash' : 'Qaytarish'}
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => setDetailClassifier(c)}
                   className="text-[#2E7D4F] font-bold hover:underline inline-flex items-center gap-1"
@@ -746,22 +756,24 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ user
                             {detailClassifier.code}.{String(idx + 1).padStart(3, '0')}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => { setEditingElementIndex(idx); setEditingElementValue(item); }}
-                            title="Tahrirlash"
-                            className="p-1.5 text-[#5A646D] hover:text-[#2E7D4F] hover:bg-[#F0F7F1] rounded-lg transition-colors"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleArchiveElement(idx)}
-                            title="Elementni arxivlash"
-                            className="p-1.5 text-[#5A646D] hover:text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors"
-                          >
-                            <Archive className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {canEdit && (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => { setEditingElementIndex(idx); setEditingElementValue(item); }}
+                              title="Tahrirlash"
+                              className="p-1.5 text-[#5A646D] hover:text-[#2E7D4F] hover:bg-[#F0F7F1] rounded-lg transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleArchiveElement(idx)}
+                              title="Elementni arxivlash"
+                              className="p-1.5 text-[#5A646D] hover:text-[#B45309] hover:bg-[#FFFBEB] rounded-lg transition-colors"
+                            >
+                              <Archive className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -773,27 +785,31 @@ export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ user
                   </div>
                 )}
 
-                <div className="p-3 flex items-center gap-2 bg-[#F8F9FA]">
-                  <Input
-                    placeholder="Yangi element qiymatini kiriting..."
-                    value={newElementValue}
-                    onChange={(e) => setNewElementValue(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<Plus className="w-3.5 h-3.5" />}
-                    onClick={handleAddElement}
-                    className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shrink-0"
-                  >
-                    Qoʻshish
-                  </Button>
-                </div>
+                {canEdit && (
+                  <div className="p-3 flex items-center gap-2 bg-[#F8F9FA]">
+                    <Input
+                      placeholder="Yangi element qiymatini kiriting..."
+                      value={newElementValue}
+                      onChange={(e) => setNewElementValue(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      leftIcon={<Plus className="w-3.5 h-3.5" />}
+                      onClick={handleAddElement}
+                      className="bg-[#2E7D4F] hover:bg-[#23653F] font-bold shrink-0"
+                    >
+                      Qoʻshish
+                    </Button>
+                  </div>
+                )}
               </div>
-              <span className="text-[10px] text-[#767F87] block">
-                Amaldagi yozuvlarda ishlatilayotgan element oʻchirilmaydi — arxivga oʻtkaziladi.
-              </span>
+              {canEdit && (
+                <span className="text-[10px] text-[#767F87] block">
+                  Amaldagi yozuvlarda ishlatilayotgan element oʻchirilmaydi — arxivga oʻtkaziladi.
+                </span>
+              )}
             </div>
 
             {/* TZ 4.2.1.4: classifiers are versioned */}
