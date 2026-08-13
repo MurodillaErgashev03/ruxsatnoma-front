@@ -13,30 +13,66 @@ import {
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/FormControls';
 import { Tabs } from '../../components/ui/Navigation';
+import { MOCK_USERS, type MockUser } from '../../data/mockUsers';
 
 export interface UserProfileSettingsPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
   userName?: string;
+  user?: MockUser;
 }
 
 export const UserProfileSettingsPage: React.FC<UserProfileSettingsPageProps> = ({
   onNavigate,
-  userName = 'Karimov Jamshid Botirovich',
+  userRole,
+  userName,
+  user,
 }) => {
   const [activeTab, setActiveTab] = useState('personal');
   const [language, setLanguage] = useState<'uz' | 'ru'>('uz');
   const [smsNotify, setSmsNotify] = useState(true);
   const [telegramNotify, setTelegramNotify] = useState(true);
 
+  const activeUser: MockUser =
+    user ||
+    MOCK_USERS.find(
+      (u) =>
+        u.fullName === userName ||
+        u.role === userRole ||
+        u.roleNameUz === userRole
+    ) ||
+    MOCK_USERS[0];
+
+  const initials = activeUser.fullName
+    ? activeUser.fullName
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
+    : 'U';
+
+  const defaultEmails: Record<string, string> = {
+    'usr-001': 's.ergashov@uzmon.uz',
+    'usr-002': 'j.karimov@urmon.gov.uz',
+    'usr-003': 'n.tashpulatova@urmon.gov.uz',
+    'usr-004': 'j.rahimov@bostonliq-urmon.uz',
+    'usr-005': 'b.yusupov@urmonloyiha.uz',
+    'usr-006': 'd.mirzayev@bostonliq-urmon.uz',
+    'usr-007': 'a.abdullayev@urmon.gov.uz',
+    'usr-008': 'm.umarova@urmon.gov.uz',
+    'usr-009': 'o.saidov@burchmulla.uz',
+    'usr-010': 'u.xalilov@prokuratura.uz',
+  };
+
   const profileData = {
-    fullName: userName,
-    roleTitle: 'Markaziy apparat xodimi / Boʻlim boshligʻi',
-    organization: 'Oʻrmon xoʻjaligi agentligi (Markaziy apparat)',
-    pinfl: '22222222222222',
-    inn: '200891234',
-    phone: '+998 (71) 207-88-77',
-    email: 'j.karimov@urmon.gov.uz',
+    fullName: activeUser.fullName,
+    roleTitle: `${activeUser.roleNameUz} / ${activeUser.position}`,
+    organization: activeUser.organization,
+    pinfl: activeUser.jshshir,
+    inn: activeUser.id === 'usr-009' ? '304918234' : '200891234',
+    phone: `+998 (71) 207-88-${activeUser.id.replace('usr-0', '1')}`,
+    email: defaultEmails[activeUser.id] || `${activeUser.role}@urmon.gov.uz`,
     oneIdStatus: 'VERIFIED',
     eimzoStatus: 'ACTIVE',
     eimzoSerial: '1A2B3C4D5E6F7890',
@@ -53,8 +89,8 @@ export const UserProfileSettingsPage: React.FC<UserProfileSettingsPageProps> = (
       {/* 1. Header Card */}
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#2E7D4F] text-white flex items-center justify-center font-bold text-xl shadow-xs shrink-0">
-            KJ
+          <div className="w-14 h-14 rounded-2xl bg-[#2E7D4F] text-white flex items-center justify-center font-bold text-xl shadow-xs shrink-0 uppercase">
+            {initials}
           </div>
           <div>
             <div className="flex items-center gap-2">
