@@ -19,6 +19,7 @@ import {
   Check,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Modal } from '../../../components/ui/Overlay';
 
@@ -43,16 +44,12 @@ export interface AdminClassifiersPageProps {
 }
 
 export const AdminClassifiersPage: React.FC<AdminClassifiersPageProps> = ({ userRole = '' }) => {
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
-
   /**
-   * TZ appendix 4: classifiers are К (view) for the central apparatus; only the
-   * system administrator gets Я and Ў. Write controls are therefore not rendered.
+   * TZ appendix 4: classifiers are К for everyone except the system
+   * administrator, who alone holds Я and Ў.
    */
-  const canEdit = !isCentralAdmin;
+  const canEdit = hasRight(userRole, 'classifiers', 'edit');
+  const isCentralAdmin = !canEdit;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');

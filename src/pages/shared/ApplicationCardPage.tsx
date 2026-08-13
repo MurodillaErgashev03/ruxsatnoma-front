@@ -15,11 +15,13 @@ import { UnclaimedStatePanel } from './components/UnclaimedStatePanel';
 export interface ApplicationCardPageProps {
   applicationId?: string | number;
   onNavigate?: (page: string, params?: any) => void;
+  userRole?: string;
 }
 
 export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
   applicationId = 'А-00042',
   onNavigate,
+  userRole = '',
 }) => {
   const [activeTab, setActiveTab] = useState<string>('s-general');
 
@@ -70,6 +72,7 @@ export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
 
           {/* Right Action Rail (5 Blocks) */}
           <ActionRail
+            userRole={userRole}
             onApprove={() => alert('Ariza tasdiqlandi va toʻlov xabarnomasi yuborildi.')}
             onReturn={() => alert('Ariza arizachiga tuzatish uchun qaytarildi.')}
             onReject={() => alert('Ariza rad etildi va rasmiy bildirishnoma yuborildi.')}
@@ -105,6 +108,7 @@ export const ApplicationCardPage: React.FC<ApplicationCardPageProps> = ({
 
         {/* Unclaimed State Panel Grid */}
         <UnclaimedStatePanel
+          userRole={userRole}
           onTakeIntoWork={() => {
             alert('Ariza koʻrib chiqishga olindi va masʼul xodimga biriktirildi!');
             window.scrollTo({ top: 0, behavior: 'smooth' });

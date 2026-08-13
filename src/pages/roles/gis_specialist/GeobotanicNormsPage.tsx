@@ -7,6 +7,7 @@ import {
   Search,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { DataTable, type Column } from '../../../components/ui/DataTable';
 
@@ -31,21 +32,10 @@ export interface GeobotanicNormItem {
 export const GeobotanicNormsPage: React.FC<GeobotanicNormsPageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: entering and versioning a norm is Я+Ў for the GIS/normative
-   * specialist alone. The central apparatus and management read the calculation
-   * and export it; the norm itself is К for them.
+   * specialist alone. Monitoring roles read the calculation and export it.
    */
-  const canEditNorms =
-    userRole.includes('gis_specialist') ||
-    userRole.includes('GIS') ||
-    userRole.includes('meʼyoriy');
-
-  const canExport =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('management') ||
-    userRole.includes('Rahbariyat') ||
-    userRole.includes('prosecutor') ||
-    userRole.includes('Prokuror');
+  const canEditNorms = hasRight(userRole, 'usage_norm', 'edit');
+  const canExport = hasRight(userRole, 'calculation', 'export');
 
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -9,6 +9,7 @@ import {
   Trees,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Tabs } from '../../../components/ui/Navigation';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
@@ -37,10 +38,12 @@ export interface PermitCardItem {
 }
 
 export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRole = '' }) => {
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
+  /**
+   * TZ appendix 4: the permit registry is К+Э for every monitoring role. Only the
+   * applicant may start a new application from here; management previously fell
+   * through to the applicant view and got that button.
+   */
+  const isRegistryView = !hasRight(userRole, 'application', 'create');
 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,28 +173,28 @@ export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRo
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC]">
-            {isCentralAdmin ? 'RESPUBLIKA RUXSATNOMALAR REYESTRI' : 'Rasmiy Hujjatlar'}
+            {isRegistryView ? 'RESPUBLIKA RUXSATNOMALAR REYESTRI' : 'Rasmiy Hujjatlar'}
           </span>
           <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] mt-1.5">
-            {isCentralAdmin ? 'Respublika Ruxsatnomalar Reyestri' : 'Mening Ruxsatnomalarim'}
+            {isRegistryView ? 'Respublika Ruxsatnomalar Reyestri' : 'Mening Ruxsatnomalarim'}
           </h1>
           <p className="text-xs text-[#5A646D] mt-0.5">
-            {isCentralAdmin
+            {isRegistryView
               ? 'Oʻrmon fondi yerlarida faoliyat yuritish uchun berilgan 18 ta elektron ruxsatnoma va QR-kodli rasmiy hujjatlar reyestri'
               : 'Berilgan elektron ruxsatnomalarni yuklab olish va tekshirish'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          {isCentralAdmin ? (
+          {isRegistryView ? (
             <Button
               variant="outline"
               size="sm"
               leftIcon={<Download className="w-4 h-4 text-[#15803D]" />}
-              onClick={() => alert('Respublika ruxsatnomalar reyestri XLSX formatida yuklab olindi!')}
+              onClick={() => alert('Ruxsatnomalar reyestri Excel formatida tayyorlanmoqda.')}
               className="border-[#767F87] text-[#1A1F24] hover:bg-[#F8F9FA] font-bold text-xs h-9 cursor-pointer"
             >
-              Vigruzka XLSX
+              Excelga eksport
             </Button>
           ) : (
             <Button
@@ -220,7 +223,7 @@ export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRo
           />
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            {isCentralAdmin && (
+            {isRegistryView && (
               <select
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
@@ -248,7 +251,7 @@ export const MyPermitsPage: React.FC<MyPermitsPageProps> = ({ onNavigate, userRo
       </div>
 
       {/* Central Admin Republic Table View vs Applicant Card View */}
-      {isCentralAdmin ? (
+      {isRegistryView ? (
         <div className="bg-white border border-[#E4E7EA] rounded-2xl shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">

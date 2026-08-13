@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 import { CheckCircle2, PenTool, HelpCircle } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { resolveRole } from '../../../lib/permissions';
 
 export interface PermitDigitalSignaturesPanelProps {
   userRole?: string;
 }
 
-export const PermitDigitalSignaturesPanel: React.FC<PermitDigitalSignaturesPanelProps> = () => {
+export const PermitDigitalSignaturesPanel: React.FC<PermitDigitalSignaturesPanelProps> = ({
+  userRole = '',
+}) => {
+  /**
+   * The fourth signature is the applicant confirming receipt of their own permit.
+   * Every other role opens this document from a registry and only observes the
+   * signature chain, so the signing control is theirs alone.
+   */
+  const isApplicant = resolveRole(userRole) === 'applicant';
+
   const [isSignedByUser, setIsSignedByUser] = useState<boolean>(false);
 
   const handleSignPermit = () => {
@@ -155,18 +165,22 @@ export const PermitDigitalSignaturesPanel: React.FC<PermitDigitalSignaturesPanel
             </div>
 
             <div className="text-xs text-[#B45309]">
-              Foydalanuvchi E-IMZO kaliti bilan tasdiqlashi kutilmoqda.
+              {isApplicant
+                ? 'Siz E-IMZO kaliti bilan tasdiqlashingiz kutilmoqda.'
+                : 'Arizachi E-IMZO kaliti bilan tasdiqlashi kutilmoqda.'}
             </div>
 
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<PenTool className="w-4 h-4" />}
-              onClick={handleSignPermit}
-              className="w-full bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold h-9 text-xs cursor-pointer shadow-xs"
-            >
-              E-IMZO bilan tasdiqlash
-            </Button>
+            {isApplicant && (
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<PenTool className="w-4 h-4" />}
+                onClick={handleSignPermit}
+                className="w-full bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold h-9 text-xs cursor-pointer shadow-xs"
+              >
+                E-IMZO bilan tasdiqlash
+              </Button>
+            )}
           </div>
         )}
       </div>

@@ -210,15 +210,30 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     helpGroup('Yordam va savollar'),
   ],
 
+  // Monitoring and analysis only — the matrix grants management no write right
+  // on any object, so every entry below is a read (and mostly export) view.
   management: [
-    homeGroup('Bosh sahifa (qarorlar)', 'manager_decision'),
+    homeGroup('Bosh sahifa (analitika)', 'manager_decision'),
     {
       group: 'Respublika analitikasi',
       items: [
         { id: 'applications', label: 'Arizalar reyestri', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
         { id: 'permits', label: 'Ruxsatnomalar reyestri', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
-        { id: 'reports', label: 'Hisobotlar va analitika', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+        { id: 'payments', label: 'Toʻlovlar va taqsimot', page: 'accountant_reconciliation', icon: <CreditCard className={ICON} /> },
+        { id: 'inspections', label: 'Inspeksiya dalolatnomalari', page: 'inspection_acts', icon: <CheckSquare className={ICON} /> },
+        { id: 'reports', label: 'Yigʻma hisobotlar', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+        { id: 'normative', label: 'Meʼyor va tariflar', page: 'normative_norms', icon: <Calculator className={ICON} /> },
         { id: 'map', label: 'Uchastkalar xaritasi (GIS)', page: 'gis_editor', icon: <Map className={ICON} /> },
+      ],
+    },
+    {
+      group: 'Maʼlumotnomalar (faqat koʻrish)',
+      items: [
+        { id: 'admin_orgs', label: 'Tashkilotlar ierarxiyasi', page: 'admin_orgs', icon: <Building2 className={ICON} />, count: 84 },
+        { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
+        { id: 'admin_users', label: 'Foydalanuvchilar va rollar', page: 'admin_users', icon: <Users className={ICON} /> },
+        { id: 'admin_audit', label: 'Audit jurnali', page: 'admin_audit_logs', icon: <Shield className={ICON} /> },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
       ],
     },
     profileGroup(),

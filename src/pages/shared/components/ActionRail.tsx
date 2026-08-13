@@ -12,18 +12,27 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Modal } from '../../../components/ui/Overlay';
+import { hasRight } from '../../../lib/permissions';
 
 export interface ActionRailProps {
   onApprove?: () => void;
   onReturn?: () => void;
   onReject?: () => void;
+  userRole?: string;
 }
 
 export const ActionRail: React.FC<ActionRailProps> = ({
   onApprove,
   onReturn,
   onReject,
+  userRole = '',
 }) => {
+  /**
+   * TZ appendix 4: deciding an application is Т, held by the head of the
+   * executing organisation. Monitoring roles reach this card from their
+   * registries with К+Э only, so the decision block is not rendered for them.
+   */
+  const canDecide = hasRight(userRole, 'application', 'approve');
   const [activeModal, setActiveModal] = useState<'approve' | 'return' | 'reject' | 'reassign' | null>(null);
   const [noteText, setNoteText] = useState('');
   const [newExecutor, setNewExecutor] = useState('Karimov Otabek');
@@ -31,6 +40,7 @@ export const ActionRail: React.FC<ActionRailProps> = ({
   return (
     <div className="space-y-4 font-sans">
       {/* ── RAIL BLOCK 1: Primary Decision Actions & SLA ────────────────── */}
+      {canDecide ? (
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#5A646D] border-b border-[#E4E7EA] pb-2">
           Qaror qabul qilish va harakatlar
@@ -72,6 +82,17 @@ export const ActionRail: React.FC<ActionRailProps> = ({
           <strong>Izoh:</strong> Barcha qarorlar E-IMZO raqamli imzo bilan muhrlanadi va arizachining shaxsiy kabinetiga yuboriladi.
         </div>
       </div>
+      ) : (
+        <div className="bg-[#F8F9FA] border border-[#E4E7EA] rounded-2xl p-5 space-y-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-[#5A646D] border-b border-[#E4E7EA] pb-2">
+            Koʻrish rejimi
+          </h3>
+          <p className="text-xs text-[#5A646D] leading-relaxed">
+            Siz ariza kartasini monitoring uchun koʻrmoqdasiz. Ariza boʻyicha qaror qabul qilish
+            ijrochi tashkilot rahbari vakolatida.
+          </p>
+        </div>
+      )}
 
       {/* ── RAIL BLOCK 2: Key Numbers (Ключевые числа) ────────────────── */}
       <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs space-y-3">

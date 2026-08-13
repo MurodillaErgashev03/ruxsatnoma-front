@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Tabs } from '../../../components/ui/Navigation';
 import { Modal } from '../../../components/ui/Overlay';
@@ -42,10 +43,7 @@ export const AdminReportsPage: React.FC<AdminReportsPageProps> = ({ userRole = '
    * prosecutor — is view-and-export only, so the acting controls are not rendered at all
    * (TZ 4.1.7: a control the user has no right to must not be shown).
    */
-  const canManageReports =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy apparat') ||
-    userRole.includes('Центральный аппарат');
+  const canManageReports = hasRight(userRole, 'report', 'approve');
 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');

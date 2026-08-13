@@ -164,7 +164,7 @@ export function App() {
             <LeskhozReviewPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'application_card' && (
-            <ApplicationCardPage applicationId={pageParams?.id || 'А-00042'} onNavigate={handleNavigate} />
+            <ApplicationCardPage applicationId={pageParams?.id || 'А-00042'} onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {(currentPage === 'permit_detail' || currentPage === 'permit') && (
             <PermitDocumentPage onNavigate={handleNavigate} userRole={currentUser?.role} />

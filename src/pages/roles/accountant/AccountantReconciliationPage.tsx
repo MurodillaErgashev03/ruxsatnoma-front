@@ -4,6 +4,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { DataTable, type Column } from '../../../components/ui/DataTable';
 
 export interface AccountantReconciliationPageProps {
@@ -25,17 +26,10 @@ export interface BankTransactionItem {
 
 export const AccountantReconciliationPage: React.FC<AccountantReconciliationPageProps> = ({ userRole = '' }) => {
   /**
-   * TZ appendix 4: payments and refunds are К+Э for the central apparatus,
-   * management and the prosecutor — they read and export, but only the accountant
-   * uploads statements and edits the ledger.
+   * TZ appendix 4: only the accountant holds Я and Ў on payments; monitoring
+   * roles read and export.
    */
-  const isMonitoringOnly =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('management') ||
-    userRole.includes('Rahbariyat') ||
-    userRole.includes('prosecutor') ||
-    userRole.includes('Prokuror');
+  const isMonitoringOnly = !hasRight(userRole, 'payment', 'edit');
   const transactions: BankTransactionItem[] = [
     { id: 'TX-901', txHash: 'CLK-9081234', permitNo: 'RX-2026-0089', provider: 'Click', amount: '1,428,000 UZS', forestryFund50: '714,000 UZS', stateBudget50: '714,000 UZS', matchedStatus: 'matched', date: '10.08.2026 14:31' },
     { id: 'TX-902', txHash: 'PAY-4019284', permitNo: 'RX-2026-0090', provider: 'Payme', amount: '2,850,000 UZS', forestryFund50: '1,425,000 UZS', stateBudget50: '1,425,000 UZS', matchedStatus: 'matched', date: '09.08.2026 11:20' },

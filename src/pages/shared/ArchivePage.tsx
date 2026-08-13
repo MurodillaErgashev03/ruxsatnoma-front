@@ -16,6 +16,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
 import { Input } from '../../components/ui/FormControls';
 import { Modal } from '../../components/ui/Overlay';
 
@@ -156,20 +157,11 @@ const ARCHIVE_RECORDS: ArchiveRecord[] = [
 export const ArchivePage: React.FC<ArchivePageProps> = ({ userRole = '' }) => {
   /**
    * TZ appendix 4: the archive is К for every internal role and К+Э for the
-   * central apparatus, management and the prosecutor. Restoring a document from
-   * the archive stays with the system administrator.
+   * central apparatus, management and the prosecutor. Restoring a document
+   * stays with the system administrator, who administers the backups.
    */
-  const canExport =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('management') ||
-    userRole.includes('Rahbariyat') ||
-    userRole.includes('prosecutor') ||
-    userRole.includes('Prokuror') ||
-    userRole.includes('sys_admin') ||
-    userRole.includes('Tizim administrator');
-
-  const canRestore = userRole.includes('sys_admin') || userRole.includes('Tizim administrator');
+  const canExport = hasRight(userRole, 'archive', 'export');
+  const canRestore = hasRight(userRole, 'backups', 'edit');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');

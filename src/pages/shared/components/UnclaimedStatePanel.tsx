@@ -1,15 +1,24 @@
 import React from 'react';
 import { CheckCircle2, PauseCircle, Lock, ArrowRight, RotateCcw, Send, HelpCircle } from 'lucide-react';
+import { hasRight } from '../../../lib/permissions';
 
 export interface UnclaimedStatePanelProps {
   onTakeIntoWork?: () => void;
   onReturnToApplicant?: () => void;
+  userRole?: string;
 }
 
 export const UnclaimedStatePanel: React.FC<UnclaimedStatePanelProps> = ({
   onTakeIntoWork,
   onReturnToApplicant,
+  userRole = '',
 }) => {
+  /**
+   * Taking an application into work and returning it are Я and Ў, held by the
+   * staff of the executing organisation. Monitoring roles reach this card from a
+   * registry with К+Э and must not see the action block (TZ 4.1.7).
+   */
+  const canWork = hasRight(userRole, 'application', 'edit');
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-stretch font-sans">
       {/* Left Column: Locked Card Sections Notice (Equal Height) */}
@@ -96,10 +105,19 @@ export const UnclaimedStatePanel: React.FC<UnclaimedStatePanelProps> = ({
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#5A646D] block">
               Harakatlar — Status: SUBMITTED
             </span>
-            <h3 className="text-base font-bold text-[#1A1F24] mt-0.5">Ijroga qabul qilish</h3>
+            <h3 className="text-base font-bold text-[#1A1F24] mt-0.5">
+              {canWork ? 'Ijroga qabul qilish' : 'Koʻrish rejimi'}
+            </h3>
           </div>
 
-          <div className="space-y-3">
+          {!canWork && (
+            <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-xs text-[#5A646D] leading-relaxed">
+              Ariza hali ijroga olinmagan. Uni koʻrib chiqishga olish ijrochi tashkilot
+              xodimi vakolatida.
+            </div>
+          )}
+
+          <div className={`space-y-3 ${canWork ? '' : 'hidden'}`}>
             {/* Active 1: Take Into Work */}
             <button
               type="button"

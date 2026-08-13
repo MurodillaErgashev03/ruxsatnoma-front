@@ -11,6 +11,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Select } from '../../../components/ui/FormControls';
 import { DataTable, type Column } from '../../../components/ui/DataTable';
 
@@ -32,10 +33,13 @@ interface ContourItem {
 }
 
 export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRole = '' }) => {
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
+  /**
+   * Only the GIS/normative specialist may draw or import a contour (Я, Ў).
+   * Everyone else — including management, which previously fell through to the
+   * editor — gets the monitoring view.
+   */
+  const canEditContours = hasRight(userRole, 'gis_contour', 'edit');
+  const isMonitoringView = !canEditContours;
 
   const [activeTool, setActiveTool] = useState<'select' | 'polygon' | 'measure' | 'vertex'>('select');
   const [selectedRegion, setSelectedRegion] = useState('all');
@@ -101,20 +105,20 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC]">
-            {isCentralAdmin ? 'RESPUBLIKA GIS MONITORINGI' : 'GIS Subtizimi (Phase 3)'}
+            {isMonitoringView ? 'RESPUBLIKA GIS MONITORINGI' : 'GIS Subtizimi (Phase 3)'}
           </span>
           <h1 className="text-lg md:text-xl font-bold text-[#1A1F24] mt-1.5">
-            {isCentralAdmin ? 'Respublika GIS Monitoring Xaritasi' : 'GIS Xarita Muharriri va Konturlar Muhiti'}
+            {isMonitoringView ? 'Respublika GIS Monitoring Xaritasi' : 'GIS Xarita Muharriri va Konturlar Muhiti'}
           </h1>
           <p className="text-xs text-[#5A646D] mt-0.5">
-            {isCentralAdmin
+            {isMonitoringView
               ? 'Oʻrmon fondi konturlari bandligi (occupancy), 13 ta GIS qatlami va respublika boʻyicha yer uchastkalari monitoringi'
               : 'Oʻrmon zonasi poligonlarini chizish, 13 ta GIS qatlamini boshqarish va topologik konfliktlarni tahlil qilish'}
           </p>
         </div>
 
         <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 shrink-0">
-          {isCentralAdmin ? (
+          {isMonitoringView ? (
             <>
               <select
                 value={selectedRegion}
@@ -175,7 +179,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
           {/* Drawing & Navigation Tools */}
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[#767F87] block">
-              {isCentralAdmin ? 'Monitoring Asboblari (Read-Only)' : 'Xarita Asboblari'}
+              {isMonitoringView ? 'Monitoring Asboblari (Read-Only)' : 'Xarita Asboblari'}
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -202,7 +206,7 @@ export const GisEditorPage: React.FC<GisEditorPageProps> = ({ onNavigate, userRo
                 <Ruler className="w-4 h-4" /> Masofa
               </button>
 
-              {isCentralAdmin ? (
+              {isMonitoringView ? (
                 <>
                   <button
                     type="button"

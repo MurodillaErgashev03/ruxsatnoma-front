@@ -19,6 +19,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Modal } from '../../../components/ui/Overlay';
 
@@ -45,17 +46,13 @@ export interface AdminOrganizationsPageProps {
 }
 
 export const AdminOrganizationsPage: React.FC<AdminOrganizationsPageProps> = ({ userRole = '' }) => {
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
-
   /**
-   * TZ appendix 4: the central apparatus only views the organisation registry.
-   * Creating, editing and archiving belong to the system administrator, so those
-   * controls are not rendered at all for a read-only viewer (TZ 4.1.7).
+   * TZ appendix 4: organisations are administered together with users and roles.
+   * Only the system administrator creates, edits and archives them; every other
+   * role that reaches this page views it (TZ 4.1.7 — no unusable controls).
    */
-  const canEdit = !isCentralAdmin;
+  const canEdit = hasRight(userRole, 'users_roles', 'edit');
+  const isCentralAdmin = !canEdit;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [viewMode, setViewMode] = useState<'hierarchy' | 'table'>('hierarchy');

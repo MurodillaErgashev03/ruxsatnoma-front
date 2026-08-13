@@ -18,6 +18,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Modal } from '../../../components/ui/Overlay';
 
@@ -65,15 +66,10 @@ interface AuditRecord {
 
 export const AdminAuditLogsPage: React.FC<AdminAuditLogsPageProps> = ({ userRole = '' }) => {
   /**
-   * TZ appendix 4: the audit journal is К for the administrator and the central
-   * apparatus, but only the prosecutor also holds Э. Export is therefore hidden
-   * from the central apparatus.
+   * TZ appendix 4: the audit journal is К for the administrator, the central
+   * apparatus and management; only the prosecutor also holds Э.
    */
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
-  const canExport = !isCentralAdmin;
+  const canExport = hasRight(userRole, 'audit_log', 'export');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJournal, setSelectedJournal] = useState('all');

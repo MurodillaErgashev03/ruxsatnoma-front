@@ -21,6 +21,7 @@ import {
   Puzzle,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { hasRight } from '../../../lib/permissions';
 import { Input } from '../../../components/ui/FormControls';
 import { Modal } from '../../../components/ui/Overlay';
 import { SYSTEM_FUNCTIONS, groupSystemFunctions } from './systemFunctions';
@@ -115,15 +116,11 @@ const generateOneTimePassword = (seed: number) => {
 
 export const AdminUsersPage: React.FC<AdminUsersPageProps> = ({ userRole = '' }) => {
   /**
-   * TZ appendix 4: "Пользователи и роли" is К for the central apparatus — the
-   * registry is visible, but creating, editing, blocking and deleting accounts
-   * stay with the system administrator.
+   * TZ appendix 4: "Пользователи и роли" is К for the central apparatus and
+   * management — the registry is visible, but creating, editing, blocking and
+   * deleting accounts stay with the system administrator.
    */
-  const isCentralAdmin =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('Центральный');
-  const canManage = !isCentralAdmin;
+  const canManage = hasRight(userRole, 'users_roles', 'edit');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('all');

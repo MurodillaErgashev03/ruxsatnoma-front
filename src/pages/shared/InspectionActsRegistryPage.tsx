@@ -14,6 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { hasRight } from '../../lib/permissions';
 import { Input } from '../../components/ui/FormControls';
 import { Tabs } from '../../components/ui/Navigation';
 import { Modal } from '../../components/ui/Overlay';
@@ -150,15 +151,7 @@ export const InspectionActsRegistryPage: React.FC<InspectionActsRegistryPageProp
    * apparatus, management and the prosecutor. Drawing up and signing an act
    * belongs to the inspector, so this registry is read-and-export only.
    */
-  const canExport =
-    userRole.includes('central_admin') ||
-    userRole.includes('Markaziy') ||
-    userRole.includes('management') ||
-    userRole.includes('Rahbariyat') ||
-    userRole.includes('prosecutor') ||
-    userRole.includes('Prokuror') ||
-    userRole.includes('executor_head') ||
-    userRole.includes('Ijrochi tashkilot rahbari');
+  const canExport = hasRight(userRole, 'inspection_act', 'export');
 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
