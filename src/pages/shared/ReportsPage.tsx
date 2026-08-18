@@ -50,6 +50,8 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
   const canManageReports = hasRight(userRole, 'report', 'approve');
   const canFillReports = hasRight(userRole, 'report', 'create');
   const canEditOwnDraft = hasRight(userRole, 'report', 'edit');
+  /** Publishing a form and setting its deadline is Я — the central apparatus only. */
+  const canPublishForms = hasRight(userRole, 'report', 'create') && hasRight(userRole, 'report', 'approve');
 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -304,7 +306,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ userRole = '' }) => {
             </Button>
           )}
 
-          {canManageReports && (
+          {canPublishForms && (
             <Button
               variant="primary"
               size="sm"

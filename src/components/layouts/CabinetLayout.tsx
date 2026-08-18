@@ -240,14 +240,28 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     helpGroup('Yordam va savollar'),
   ],
 
+  // Decides applications, signs permits, approves reports, suspends and revokes.
   executor_head: [
     homeGroup('Bosh sahifa (qarorlar)', 'manager_decision'),
     {
-      group: 'Xoʻjalik boshqaruvi',
+      group: 'Qaror va tasdiqlash',
       items: [
-        { id: 'applications', label: 'Kelib tushgan arizalar', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
+        { id: 'applications', label: 'Qaror kutayotgan arizalar', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
         { id: 'permits', label: 'Ruxsatnomalar reyestri', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
+        { id: 'reports', label: 'Hisobotlarni tasdiqlash', page: 'reports', icon: <FileBarChart className={ICON} />, count: 5 },
+        { id: 'inspections', label: 'Inspeksiya dalolatnomalari', page: 'inspection_acts', icon: <CheckSquare className={ICON} /> },
+        { id: 'payments', label: 'Toʻlovlar va taqsimot', page: 'accountant_reconciliation', icon: <CreditCard className={ICON} /> },
+        { id: 'normative', label: 'Meʼyor va tariflar', page: 'normative_norms', icon: <Calculator className={ICON} /> },
         { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className={ICON} /> },
+      ],
+    },
+    {
+      group: 'Tashkilot boʻyicha (faqat koʻrish)',
+      items: [
+        { id: 'admin_users', label: 'Tashkilot xodimlari', page: 'admin_users', icon: <Users className={ICON} /> },
+        { id: 'admin_audit', label: 'Audit jurnali', page: 'admin_audit_logs', icon: <Shield className={ICON} /> },
+        { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
       ],
     },
     profileGroup(),

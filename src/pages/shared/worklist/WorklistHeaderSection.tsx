@@ -1,4 +1,5 @@
 import React from 'react';
+import { hasRight } from '../../../lib/permissions';
 import { Download, PlusCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 
@@ -38,6 +39,14 @@ export const WorklistHeaderSection: React.FC<WorklistHeaderSectionProps> = ({
     userRole.includes('Руководитель');
 
   const isNationwide = isManagement || isCentralAdmin;
+
+  /**
+   * Registering a paper application is Я and exporting the registry is Э
+   * (TZ appendix 4). Both were gated by hand and reached roles that hold
+   * neither right.
+   */
+  const canRegisterPaper = hasRight(userRole, 'application', 'create');
+  const canExportRegistry = hasRight(userRole, 'application', 'export');
 
   let pageTitle = "Mening arizalarim (Мои заявки)";
   let orgName = "Boʻstonliq davlat oʻrmon xoʻjaligi";
@@ -101,17 +110,19 @@ export const WorklistHeaderSection: React.FC<WorklistHeaderSectionProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
+          {canExportRegistry && (
           <Button
             variant="outline"
             size="sm"
             leftIcon={<Download className="w-4 h-4" />}
-            onClick={onExportXlsx || (() => alert('Arizalar roʻyxati XLSX fayliga yuklab olindi!'))}
+            onClick={onExportXlsx || (() => alert('Arizalar roʻyxati Excel formatida tayyorlanmoqda.'))}
             className="border-[#767F87] text-[#1A1F24] font-bold text-xs h-9 cursor-pointer"
           >
-            Vigruzka XLSX
+            Excelga eksport
           </Button>
+          )}
 
-          {!isNationwide && (
+          {canRegisterPaper && (
             <Button
               variant="primary"
               size="sm"

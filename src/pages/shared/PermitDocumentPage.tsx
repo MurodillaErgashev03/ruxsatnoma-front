@@ -5,6 +5,7 @@ import { PermitDocumentHeader } from './components/PermitDocumentHeader';
 import { PermitRequisitesPanel } from './components/PermitRequisitesPanel';
 import { PermitCalculationPanel } from './components/PermitCalculationPanel';
 import { PermitDigitalSignaturesPanel } from './components/PermitDigitalSignaturesPanel';
+import { PermitLifecyclePanel } from './components/PermitLifecyclePanel';
 import { PermitA4PrintView } from './components/PermitA4PrintView';
 
 export interface PermitDocumentPageProps {
@@ -97,6 +98,9 @@ export const PermitDocumentPage: React.FC<PermitDocumentPageProps> = ({
 
           {/* Digital Signatures Panel (Interactive E-IMZO sign for applicant) */}
           <PermitDigitalSignaturesPanel userRole={userRole} />
+
+          {/* Suspension and revocation — TZ duty of the head of the executing organisation */}
+          <PermitLifecyclePanel userRole={userRole} />
         </div>
       ) : (
         /* A4 Paper Print View */
