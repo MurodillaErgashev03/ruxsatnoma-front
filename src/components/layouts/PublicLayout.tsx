@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trees, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
-import landingBg from '../../assets/img/landingbackgraund2.png';
+import landingBg from '../../assets/img/newbg.png';
 
 export interface PublicLayoutProps {
   children?: React.ReactNode;
@@ -42,8 +42,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
       {/* ── Top Header ─────────────────────────────────────────── */}
       <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${
         activeNav === 'home'
-          ? 'bg-[#0A1C0E]/90 border-b border-white/10 text-white shadow-xl'
-          : 'bg-[#0A1C0E] border-b border-white/10 text-white shadow-md'
+          ? 'bg-[#17331B]/90 border-b border-white/15 text-white shadow-lg'
+          : 'bg-[#17331B] border-b border-white/15 text-white shadow-md'
       }`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -51,14 +51,14 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
             onClick={() => onNavigate?.('home')}
             className="flex items-center gap-3 text-left focus:outline-none shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#237443] text-white flex items-center justify-center font-bold shadow-md border border-white/20">
+            <div className="w-10 h-10 rounded-xl bg-[#2E7D4F] text-white flex items-center justify-center font-bold shadow-md border border-white/20">
               <Trees className="w-5.5 h-5.5" />
             </div>
             <div>
               <span className="block text-base font-bold text-white leading-tight tracking-tight">
                 ruxsatnoma-urmon.uz
               </span>
-              <span className="block text-[11px] text-gray-300">
+              <span className="block text-[11px] text-gray-200">
                 Oʻrmon xoʻjaligi davlat portali
               </span>
             </div>
@@ -74,8 +74,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
                   onClick={() => handleNavClick(link.page)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                     isActive
-                      ? 'text-white bg-[#284435] border border-white/20 shadow-sm'
-                      : 'text-gray-200 hover:bg-white/10 hover:text-white'
+                      ? 'text-white bg-[#237443] border border-white/30 shadow-sm'
+                      : 'text-gray-200 hover:bg-white/15 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -86,11 +86,11 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
 
           {/* Language Switcher & Auth Buttons */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="flex rounded-xl overflow-hidden text-xs p-1 bg-[#12271C] border border-white/20">
+            <div className="flex rounded-xl overflow-hidden text-xs p-1 bg-black/30 border border-white/20 backdrop-blur-sm">
               <button
                 onClick={() => setLang('uz')}
                 className={`px-3 py-1 font-bold rounded-lg transition-all ${
-                  lang === 'uz' ? 'bg-[#237443] text-white shadow-xs' : 'text-gray-300 hover:text-white'
+                  lang === 'uz' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-gray-300 hover:text-white'
                 }`}
               >
                 UZ
@@ -98,7 +98,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               <button
                 onClick={() => setLang('ru')}
                 className={`px-3 py-1 font-bold rounded-lg transition-all ${
-                  lang === 'ru' ? 'bg-[#237443] text-white shadow-xs' : 'text-gray-300 hover:text-white'
+                  lang === 'ru' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-gray-300 hover:text-white'
                 }`}
               >
                 RU
@@ -109,7 +109,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onNavigate?.('auth_login')}
-              className="bg-[#173022] border-white/25 text-white hover:bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2"
+              className="bg-black/30 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2"
             >
               Kirish (OneID)
             </Button>
@@ -117,7 +117,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               variant="success"
               size="sm"
               onClick={() => onNavigate?.('auth_login')}
-              className="bg-[#237443] hover:bg-[#1B5E36] text-white shadow-md font-bold rounded-xl px-4 py-2"
+              className="bg-[#2E7D4F] hover:bg-[#23653F] text-white shadow-md font-bold rounded-xl px-4 py-2"
             >
               Ariza topshirish
             </Button>
@@ -133,8 +133,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
             className="absolute -inset-y-16 inset-x-0 z-0 bg-cover bg-center transform scale-115" 
             style={{ backgroundImage: `url(${landingBg})` }}
           />
-          {/* Soft left gradient for text contrast matching header color #0A1C0E */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0A1C0E]/95 via-[#0A1C0E]/60 to-[#0A1C0E]/20" />
+          {/* Soft left gradient for text contrast */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0A1C0E]/70 via-[#0A1C0E]/35 to-transparent" />
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
             <div className="max-w-3xl space-y-6">

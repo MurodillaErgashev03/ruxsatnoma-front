@@ -11,30 +11,48 @@ import {
   Zap,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { MOCK_USERS, type MockUser } from '../../data/mockUsers';
 
 export interface EimzoProfilePageProps {
   onNavigate?: (page: string, params?: any) => void;
+  user?: MockUser;
+  userName?: string;
+  userRole?: string;
 }
 
-export const EimzoProfilePage: React.FC<EimzoProfilePageProps> = () => {
+export const EimzoProfilePage: React.FC<EimzoProfilePageProps> = ({
+  user,
+  userName,
+  userRole,
+}) => {
   const [isTestSigned, setIsTestSigned] = useState(false);
   const [testDocumentText, setTestDocumentText] = useState('Oʻrmon xoʻjaligi ruxsatnomasini tasdiqlash va E-IMZO bilan imzolash hujjati №RX-2026-0089');
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const activeUser: MockUser =
+    user ||
+    MOCK_USERS.find(
+      (u) =>
+        u.fullName === userName ||
+        u.role === userRole ||
+        u.roleNameUz === userRole
+    ) ||
+    MOCK_USERS[0];
+
   // E-IMZO Certificate Details (TZ Compliant)
   const activeCertificate = {
-    serialNumber: '1A2B3C4D5E6F7890',
-    ownerFio: 'Karimov Jamshid Botirovich',
-    pinfl: '22222222222222',
-    organization: 'Oʻrmon xoʻjaligi agentligi / Boʻlim boshligʻi',
-    inn: '200891234',
+    serialNumber: `1A2B3C4D5E6F78${activeUser.id.replace('usr-0', '10')}`,
+    ownerFio: activeUser.fullName,
+    pinfl: activeUser.jshshir,
+    organization: `${activeUser.organization} / ${activeUser.position}`,
+    inn: activeUser.id === 'usr-009' ? '304918234' : '200891234',
     validFrom: '2025-06-15',
     validTo: '2027-06-15',
     daysRemaining: 305,
     issuer: 'Soliq Qoʻmitasi Yagona E-IMZO Markazi (VMQ 679-son)',
     standard: "O'z DSt 1092:2009",
     status: 'ACTIVE',
-    crlStatus: 'VERIFIED (Ochirilmagan)',
+    crlStatus: 'VERIFIED (Oʻchirilmagan)',
   };
 
   const handleTestSign = () => {

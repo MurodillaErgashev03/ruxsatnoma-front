@@ -179,3 +179,28 @@
   color: var(--color-neutral-0);
   transition: all 0.15s ease-in-out;
 }
+
+/*
+ * Thin scrollbar for the cabinet sidebar. A default scrollbar takes about a
+ * quarter of the 64px collapsed rail, so it is narrowed and only tinted on hover.
+ */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.sidebar-scroll:hover {
+  scrollbar-color: #d4d9dd transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.sidebar-scroll:hover::-webkit-scrollbar-thumb {
+  background: #d4d9dd;
+}
