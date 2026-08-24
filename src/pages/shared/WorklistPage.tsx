@@ -13,8 +13,9 @@ export interface WorklistPageProps {
   userRole?: string;
 }
 
-export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole }) => {
-  const [activeTab, setActiveTab] = useState<string>('all');
+export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole = '' }) => {
+  const isGisSpecialist = userRole === 'gis_specialist';
+  const [activeTab, setActiveTab] = useState<string>(isGisSpecialist ? 'waiting_gis' : 'all');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   /**
    * Acting on an application is Я and Ў — staff of the executing organisation and
@@ -30,8 +31,9 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
     startDate: '2026-07-01',
     endDate: '2026-08-10',
     slaDeadline: 'all',
-    preset: 'all_assigned',
+    preset: isGisSpecialist ? 'waiting_gis' : 'all_assigned',
     region: 'all',
+    gisStatus: isGisSpecialist ? 'pending' : 'all',
   });
 
   const initialRows: WorklistApplicationRow[] = [
@@ -52,6 +54,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaSubtext: 'Muddati tugadi 06.08.2026',
       slaPercent: 100,
       riTag: 'RI-07',
+      gisConclusionStatus: 'pending',
     },
     {
       id: 'row-2',
@@ -70,6 +73,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaSubtext: 'Muddati tugadi 09.08.2026, 18:00',
       slaPercent: 100,
       riTag: 'RI-07',
+      gisConclusionStatus: 'pending',
     },
     {
       id: 'row-3',
@@ -87,6 +91,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaText: 'Bugun tugaydi',
       slaSubtext: '18:00 gacha, 8 soat 20 min qoldi',
       slaPercent: 97,
+      gisConclusionStatus: 'pending',
     },
     {
       id: 'row-4',
@@ -104,6 +109,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaText: 'Bugun tugaydi',
       slaSubtext: '18:00 gacha, 8 soat 20 min qoldi',
       slaPercent: 97,
+      gisConclusionStatus: 'pending',
     },
     {
       id: 'row-5',
@@ -121,6 +127,7 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaText: '5 kun qoldi',
       slaSubtext: 'Muddati: 15.08.2026',
       slaPercent: 30,
+      gisConclusionStatus: 'approved',
     },
     {
       id: 'row-6',
@@ -138,14 +145,19 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       slaText: '8 kun qoldi',
       slaSubtext: 'Muddati: 18.08.2026',
       slaPercent: 15,
+      gisConclusionStatus: 'approved',
     },
   ];
 
   // Filter logic
   const filteredRows = initialRows.filter((r) => {
+    if (activeTab === 'waiting_gis' && r.gisConclusionStatus !== 'pending') return false;
     if (activeTab === 'overdue' && r.slaState !== 'overdue') return false;
     if (activeTab === 'new' && r.appNo !== 'А-00045') return false;
     if (activeTab === 'waiting_info' && r.appNo !== 'А-00038') return false;
+    if (filters.gisStatus === 'pending' && r.gisConclusionStatus !== 'pending') return false;
+    if (filters.gisStatus === 'approved' && r.gisConclusionStatus !== 'approved') return false;
+    if (filters.gisStatus === 'none' && r.gisConclusionStatus !== 'none') return false;
     if (filters.slaDeadline === 'overdue' && r.slaState !== 'overdue') return false;
     if (filters.slaDeadline === 'due_today' && r.slaState !== 'due_today') return false;
     return true;
@@ -163,13 +175,18 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       endDate: '',
       slaDeadline: 'all',
       preset: 'all_assigned',
+      gisStatus: 'all',
     });
+    setActiveTab('all');
   };
 
   const handleSelectPreset = (presetId: string) => {
     setFilters((prev) => ({ ...prev, preset: presetId }));
     if (presetId === 'urgent_sla') {
       setActiveTab('overdue');
+    } else if (presetId === 'waiting_gis') {
+      setActiveTab('waiting_gis');
+      setFilters((prev) => ({ ...prev, gisStatus: 'pending' }));
     } else {
       setActiveTab('all');
     }
@@ -216,6 +233,15 @@ export const WorklistPage: React.FC<WorklistPageProps> = ({ onNavigate, userRole
       <WorklistTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        userRole={userRole}
+        counts={{
+          all: 24,
+          waitingGis: 4,
+          new: 5,
+          inProgress: 11,
+          waitingInfo: 3,
+          overdue: 2,
+        }}
       />
 
       {/* Filters Panel */}

@@ -9,20 +9,21 @@ import {
   Compass,
   Printer,
   Maximize2,
+  CheckCircle2,
+  History,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';
 import { Select } from '../../components/ui/FormControls';
 import { DataTable, type Column } from '../../components/ui/DataTable';
 import { Modal } from '../../components/ui/Overlay';
+import { ContourFormModal, type ContourFormData, type ContourStatus } from './components/ContourFormModal';
+import { ContourStatusModal } from './components/ContourStatusModal';
 
 export interface GisMapPageProps {
   onNavigate?: (page: string, params?: any) => void;
   userRole?: string;
 }
-
-/** Contour lifecycle of TZ module 10.2, in order. */
-type ContourStatus = 'draft' | 'review' | 'approved' | 'published' | 'archived';
 
 const STATUS_LABELS: Record<ContourStatus, string> = {
   draft: 'Qoralama',
@@ -44,6 +45,7 @@ interface ContourItem {
   id: string;
   name: string;
   leskhoz: string;
+  section?: string;
   areaHa: number;
   maxSB: number; // Maximum livestock capacity
   currentSB: number; // Currently used
@@ -57,6 +59,9 @@ interface ContourItem {
   effectiveFrom: string;
   effectiveTo: string;
   approvalDocId: string;
+  approvalDocName?: string;
+  coordinates?: string;
+  notes?: string;
 }
 
 export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '' }) => {
@@ -77,6 +82,17 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
   const [layerOpacity, setLayerOpacity] = useState(80);
   const [contourCard, setContourCard] = useState<ContourItem | null>(null);
 
+  // Contour Create/Edit Modal State
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
+  const [selectedContourForEdit, setSelectedContourForEdit] = useState<ContourFormData | null>(null);
+
+  // Contour Status Lifecycle Transition Modal State
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedContourForStatus, setSelectedContourForStatus] = useState<ContourItem | null>(null);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   /** The thirteen layers named in TZ module 10.2, in the order the TZ lists them. */
   const gisLayers = [
     { id: 'forest_fund', name: 'Oʻrmon fondi', count: 1204, visible: true, color: '#123522' },
@@ -94,12 +110,173 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
     { id: 'cattle_route', name: 'Mol yoʻllari', count: 22, visible: false, color: '#767F87' },
   ];
 
-  const contoursList: ContourItem[] = [
-    { id: 'K-042', name: 'Kontur №42 (Chorva boqish)', leskhoz: 'Burchmulla oʻrmon xoʻjaligi', areaHa: 450, maxSB: 500, currentSB: 120, layer: 'Yaylov konturlari', status: 'published', lastUpdated: '10.08.2026', source: 'Yerqurilish loyihasi 2024', accuracy: '±0.5 m', surveyDate: '12.03.2024', effectiveFrom: '01.01.2025', effectiveTo: '—', approvalDocId: 'TAS-2024-118' },
-    { id: 'K-015', name: 'Kontur №15 (Pichangoh)', leskhoz: 'Zomin davlat qoʻriqxonasi', areaHa: 180, maxSB: 200, currentSB: 180, layer: 'Pichan oʻrish maydonlari', status: 'published', lastUpdated: '08.08.2026', source: 'Aerofotosuratga asoslangan', accuracy: '±1.2 m', surveyDate: '05.06.2023', effectiveFrom: '01.09.2023', effectiveTo: '—', approvalDocId: 'TAS-2023-076' },
-    { id: 'K-088', name: 'Kontur №88 (Yangi chegara)', leskhoz: 'Kitob baland togʻ boʻlimi', areaHa: 320, maxSB: 350, currentSB: 0, layer: 'Yaylov konturlari', status: 'review', lastUpdated: '05.08.2026', source: 'Dala geodezik oʻlchovi', accuracy: '±0.3 m', surveyDate: '28.07.2026', effectiveFrom: '—', effectiveTo: '—', approvalDocId: '—' },
-    { id: 'K-099', name: 'Kontur №99 (Qoralama)', leskhoz: 'Pop oʻrmon boʻlimi', areaHa: 95, maxSB: 100, currentSB: 0, layer: 'Yaylov konturlari', status: 'draft', lastUpdated: '01.08.2026', source: 'Qoʻlda chizilgan qoralama', accuracy: 'aniqlanmagan', surveyDate: '—', effectiveFrom: '—', effectiveTo: '—', approvalDocId: '—' },
-  ];
+  const [contoursList, setContoursList] = useState<ContourItem[]>([
+    {
+      id: 'K-042',
+      name: 'Kontur №42 (Chorva boqish)',
+      leskhoz: 'Burchmulla davlat oʻrmon xoʻjaligi',
+      section: '14-kvartal, 2-ajratma',
+      areaHa: 450,
+      maxSB: 500,
+      currentSB: 120,
+      layer: 'Yaylov konturlari',
+      status: 'published',
+      lastUpdated: '10.08.2026',
+      source: 'Yerqurilish loyihasi 2024',
+      accuracy: '±0.5 m',
+      surveyDate: '12.03.2024',
+      effectiveFrom: '01.01.2025',
+      effectiveTo: '—',
+      approvalDocId: 'TAS-2024-118',
+      approvalDocName: 'TAS-2024-118_qaror.pdf',
+      coordinates: 'POLYGON((70.0245 41.6028, 70.0352 41.6054, 70.0401 41.5951, 70.0245 41.6028))',
+    },
+    {
+      id: 'K-015',
+      name: 'Kontur №15 (Pichangoh)',
+      leskhoz: 'Zomin davlat qoʻriqxonasi',
+      section: '8-kvartal, 1-ajratma',
+      areaHa: 180,
+      maxSB: 200,
+      currentSB: 180,
+      layer: 'Pichan oʻrish maydonlari',
+      status: 'published',
+      lastUpdated: '08.08.2026',
+      source: 'Aerofotosuratga asoslangan',
+      accuracy: '±1.2 m',
+      surveyDate: '05.06.2023',
+      effectiveFrom: '01.09.2023',
+      effectiveTo: '—',
+      approvalDocId: 'TAS-2023-076',
+      approvalDocName: 'TAS-2023-076_hujjat.pdf',
+      coordinates: 'POLYGON((68.5245 39.9028, 68.5352 39.9054, 68.5401 39.8951, 68.5245 39.9028))',
+    },
+    {
+      id: 'K-088',
+      name: 'Kontur №88 (Yangi chegara)',
+      leskhoz: 'Kitob davlat oʻrmon xoʻjaligi',
+      section: '3-kvartal, 4-ajratma',
+      areaHa: 320,
+      maxSB: 350,
+      currentSB: 0,
+      layer: 'Yaylov konturlari',
+      status: 'review',
+      lastUpdated: '05.08.2026',
+      source: 'Dala geodezik oʻlchovi',
+      accuracy: '±0.3 m',
+      surveyDate: '28.07.2026',
+      effectiveFrom: '—',
+      effectiveTo: '—',
+      approvalDocId: '—',
+      coordinates: 'POLYGON((66.9245 39.1028, 66.9352 39.1054, 66.9401 39.0951, 66.9245 39.1028))',
+    },
+    {
+      id: 'K-099',
+      name: 'Kontur №99 (Qoralama)',
+      leskhoz: 'Pop davlat oʻrmon xoʻjaligi',
+      section: '11-kvartal, 1-ajratma',
+      areaHa: 95,
+      maxSB: 100,
+      currentSB: 0,
+      layer: 'Yaylov konturlari',
+      status: 'draft',
+      lastUpdated: '01.08.2026',
+      source: 'Qoʻlda chizilgan qoralama',
+      accuracy: 'aniqlanmagan',
+      surveyDate: '—',
+      effectiveFrom: '—',
+      effectiveTo: '—',
+      approvalDocId: '—',
+      coordinates: 'POLYGON((71.1245 40.8028, 71.1352 40.8054, 71.1401 40.7951, 71.1245 40.8028))',
+    },
+  ]);
+
+  const handleOpenCreateModal = () => {
+    setSelectedContourForEdit(null);
+    setFormModalMode('create');
+    setIsFormModalOpen(true);
+  };
+
+  const handleOpenEditModal = (contour: ContourItem) => {
+    setSelectedContourForEdit({
+      id: contour.id,
+      name: contour.name,
+      leskhoz: contour.leskhoz,
+      section: contour.section || '14-kvartal, 2-ajratma',
+      layer: contour.layer,
+      areaHa: contour.areaHa,
+      maxSB: contour.maxSB,
+      currentSB: contour.currentSB,
+      status: contour.status,
+      source: contour.source,
+      accuracy: contour.accuracy,
+      surveyDate: contour.surveyDate !== '—' ? contour.surveyDate : new Date().toISOString().split('T')[0],
+      effectiveFrom: contour.effectiveFrom !== '—' ? contour.effectiveFrom : new Date().toISOString().split('T')[0],
+      effectiveTo: contour.effectiveTo,
+      approvalDocId: contour.approvalDocId !== '—' ? contour.approvalDocId : '',
+      approvalDocName: contour.approvalDocName,
+      coordinates: contour.coordinates || 'POLYGON((70.0245 41.6028, 70.0352 41.6054, 70.0401 41.5951, 70.0245 41.6028))',
+      notes: contour.notes,
+    });
+    setFormModalMode('edit');
+    setIsFormModalOpen(true);
+  };
+
+  const handleOpenStatusModal = (contour: ContourItem) => {
+    setSelectedContourForStatus(contour);
+    setIsStatusModalOpen(true);
+  };
+
+  const handleSaveContour = (savedData: ContourFormData) => {
+    if (formModalMode === 'create') {
+      const newContour: ContourItem = {
+        ...savedData,
+        lastUpdated: new Date().toLocaleDateString('ru-RU'),
+      };
+      setContoursList((prev) => [newContour, ...prev]);
+      setToastMessage(`Yangi GIS-kontur "${savedData.name}" muvaffaqiyatli saqlandi va reestrga qoʻshildi!`);
+    } else {
+      setContoursList((prev) =>
+        prev.map((c) =>
+          c.id === savedData.id
+            ? {
+                ...c,
+                ...savedData,
+                lastUpdated: new Date().toLocaleDateString('ru-RU'),
+              }
+            : c
+        )
+      );
+      setToastMessage(`"${savedData.id}" konturining barcha parametrlari va versiya maʼlumotlari yangilandi!`);
+    }
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleConfirmStatusChange = (
+    contourId: string,
+    newStatus: ContourStatus,
+    docId?: string,
+    docName?: string,
+    note?: string
+  ) => {
+    setContoursList((prev) =>
+      prev.map((c) =>
+        c.id === contourId
+          ? {
+              ...c,
+              status: newStatus,
+              approvalDocId: docId || c.approvalDocId,
+              approvalDocName: docName || c.approvalDocName,
+              notes: note || c.notes,
+              lastUpdated: new Date().toLocaleDateString('ru-RU'),
+            }
+          : c
+      )
+    );
+    const statusText = STATUS_LABELS[newStatus];
+    setToastMessage(`"${contourId}" konturining hayotiy sikl holati muvaffaqiyatli "${statusText}" ga oʻzgartirildi!`);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   const columns: Column<ContourItem>[] = [
     { key: 'id', header: 'Kontur ID', sortable: true, width: '100px' },
@@ -121,30 +298,72 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
       key: 'status',
       header: 'Holati',
       sortable: true,
-      width: '150px',
+      width: '160px',
       accessor: (row) => (
-        <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${STATUS_STYLES[row.status]}`}>
-          {STATUS_LABELS[row.status]}
-        </span>
+        <button
+          type="button"
+          onClick={() => canEditContours && handleOpenStatusModal(row)}
+          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all hover:scale-105 flex items-center gap-1.5 cursor-pointer ${STATUS_STYLES[row.status]}`}
+          title={canEditContours ? 'Hayotiy sikl holatini oʻzgartirish uchun bosing' : undefined}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          <span>{STATUS_LABELS[row.status]}</span>
+        </button>
       ),
     },
     {
       key: 'id',
-      header: 'Versiya',
-      width: '110px',
+      header: 'Amallar',
+      width: '210px',
       accessor: (row) => (
-        <button
-          onClick={() => setContourCard(row)}
-          className="text-[11px] font-bold text-[#2E7D4F] hover:underline"
-        >
-          Maʼlumotlari
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setContourCard(row)}
+            className="text-[11px] font-bold text-[#2E7D4F] hover:underline cursor-pointer"
+          >
+            Maʼlumot
+          </button>
+          {canEditContours && (
+            <>
+              <span className="text-gray-300">|</span>
+              <button
+                onClick={() => handleOpenEditModal(row)}
+                className="text-[11px] font-bold text-[#0369A1] hover:underline flex items-center gap-0.5 cursor-pointer"
+              >
+                <Edit3 className="w-3 h-3" /> Tahrir
+              </button>
+              <span className="text-gray-300">|</span>
+              <button
+                onClick={() => handleOpenStatusModal(row)}
+                className="text-[11px] font-bold text-[#B45309] hover:underline flex items-center gap-0.5 cursor-pointer"
+              >
+                <History className="w-3 h-3" /> Bosqich
+              </button>
+            </>
+          )}
+        </div>
       ),
     },
   ];
 
   return (
     <div className="space-y-6 font-sans pb-16">
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div className="p-4 bg-[#F0F7F1] border border-[#D9EBDC] text-[#2E7D4F] rounded-2xl shadow-sm flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-[#2E7D4F] shrink-0" />
+            <span className="text-xs sm:text-sm font-semibold">{toastMessage}</span>
+          </div>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-xs font-bold underline hover:opacity-75 cursor-pointer"
+          >
+            Yopish
+          </button>
+        </div>
+      )}
+
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-4">
         <div>
@@ -177,12 +396,6 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 <option value="samarkand">Samarqand v. (Oqdaryo DЎX)</option>
               </select>
 
-              {/*
-                TZ appendix 4: the GIS contour is К for the central apparatus and
-                management — К+Э belongs to the prosecutor alone, so layer export is
-                not offered here. Printing the visible map frame stays available,
-                since it produces no contour dataset.
-              */}
               <Button
                 variant="primary"
                 size="sm"
@@ -207,9 +420,10 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 variant="primary"
                 size="sm"
                 leftIcon={<Plus className="w-4 h-4" />}
-                onClick={() => setActiveTool('polygon')}
+                onClick={handleOpenCreateModal}
+                className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 shadow-xs cursor-pointer"
               >
-                Yangi Kontur Chizish
+                Yangi Kontur Kiritish
               </Button>
             </>
           )}
@@ -271,7 +485,10 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 <>
                   <button
                     type="button"
-                    onClick={() => setActiveTool('polygon')}
+                    onClick={() => {
+                      setActiveTool('polygon');
+                      handleOpenCreateModal();
+                    }}
                     className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
                       activeTool === 'polygon'
                         ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
@@ -282,7 +499,12 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveTool('vertex')}
+                    onClick={() => {
+                      setActiveTool('vertex');
+                      if (contoursList.length > 0) {
+                        handleOpenEditModal(contoursList[0]);
+                      }
+                    }}
                     className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
                       activeTool === 'vertex'
                         ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
@@ -395,7 +617,7 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
         {/* Right Canvas Map Simulation */}
         <div className="lg:col-span-9 relative bg-[#E5E9EC] flex flex-col justify-between p-6 overflow-hidden">
           {/* Top Canvas Controls Bar */}
-          <div className="relative z-10 flex items-center justify-between gap-4 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-white/40 shadow-xs text-xs">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-white/40 shadow-xs text-xs">
             <div className="flex items-center gap-2">
               <span className="px-2 py-1 rounded bg-[#2E7D4F] text-white font-bold text-[11px]">MODE: {activeTool.toUpperCase()}</span>
               <span className="text-[#5A646D] hidden sm:inline">Markaz: 41.6028° N, 70.0245° E (Burchmulla)</span>
@@ -404,6 +626,14 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
               <span className="text-[#15803D] font-bold bg-[#F0F7F1] px-2 py-1 rounded border border-[#D9EBDC]">
                 Topologiya: 0% Kesishuv (Valid)
               </span>
+              {canEditContours && (
+                <button
+                  onClick={handleOpenCreateModal}
+                  className="px-2.5 py-1 bg-[#2E7D4F] text-white rounded-lg font-bold hover:bg-[#23653F] transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Kontur Saqlash
+                </button>
+              )}
             </div>
           </div>
 
@@ -413,17 +643,19 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
             <div className="relative w-full max-w-lg h-72 border-2 border-dashed border-[#2E7D4F] bg-[#2E7D4F]/15 rounded-3xl p-6 flex flex-col justify-between shadow-inner animate-pulse">
               <div className="flex justify-between items-start">
                 <span className="bg-[#2E7D4F] text-white font-mono font-bold text-xs px-2 py-1 rounded shadow-xs">
-                  KONTUR №42 (450 ga)
+                  {contoursList[0]?.id || 'K-042'} ({contoursList[0]?.areaHa || 450} ga)
                 </span>
                 <span className="bg-white text-[#123522] font-mono text-xs px-2 py-1 rounded border border-[#E4E7EA] font-semibold">
-                  Yaylov Zonasi
+                  {contoursList[0]?.layer || 'Yaylov Zonasi'}
                 </span>
               </div>
 
               <div className="text-center space-y-1 bg-white/80 backdrop-blur-md p-3 rounded-xl border border-white/60 max-w-xs mx-auto">
                 <div className="text-xs font-bold text-[#1A1F24]">Geobotanik Normalar (MaxSB)</div>
-                <div className="text-sm font-mono font-bold text-[#2E7D4F]">500 Bosh Usta Birlik</div>
-                <div className="text-[11px] text-[#5A646D]">Erkin sigʻim qoldigʻi: 380 bosh</div>
+                <div className="text-sm font-mono font-bold text-[#2E7D4F]">{contoursList[0]?.maxSB || 500} Bosh Usta Birlik</div>
+                <div className="text-[11px] text-[#5A646D]">
+                  Erkin sigʻim qoldigʻi: {(contoursList[0]?.maxSB || 500) - (contoursList[0]?.currentSB || 120)} bosh
+                </div>
               </div>
 
               <div className="flex justify-between text-[11px] font-mono text-[#5A646D] bg-white/60 p-2 rounded-lg">
@@ -449,12 +681,23 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
             <h2 className="text-lg font-bold text-[#1A1F24]">Oʻrmon Konturlari Hayotiy Sikli Reestri</h2>
             <p className="text-xs text-[#5A646D]">Draft → Review → Approved → Published → Archived statustagi konturlar</p>
           </div>
+          {canEditContours && (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={handleOpenCreateModal}
+              className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer"
+            >
+              Yangi Kontur Kiritish
+            </Button>
+          )}
         </div>
 
         <DataTable columns={columns} data={contoursList} selectable />
       </div>
 
-      {/* Contour information card — TZ module 10.2 */}
+      {/* Contour Information Card Modal */}
       <Modal
         isOpen={!!contourCard}
         onClose={() => setContourCard(null)}
@@ -471,9 +714,40 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 </span>
               )}
             </span>
-            <Button variant="primary" size="sm" onClick={() => setContourCard(null)}>
-              Yopish
-            </Button>
+            <div className="flex items-center gap-2">
+              {canEditContours && contourCard && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    leftIcon={<History className="w-4 h-4" />}
+                    onClick={() => {
+                      const c = contourCard;
+                      setContourCard(null);
+                      handleOpenStatusModal(c);
+                    }}
+                    className="border-[#B45309] text-[#B45309] hover:bg-[#FFFBEB]"
+                  >
+                    Holatni Oʻzgartirish
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    leftIcon={<Edit3 className="w-4 h-4" />}
+                    onClick={() => {
+                      const c = contourCard;
+                      setContourCard(null);
+                      handleOpenEditModal(c);
+                    }}
+                  >
+                    Tahrirlash
+                  </Button>
+                </>
+              )}
+              <Button variant="primary" size="sm" onClick={() => setContourCard(null)}>
+                Yopish
+              </Button>
+            </div>
           </div>
         }
       >
@@ -481,9 +755,11 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
           <div className="space-y-4 py-1 text-xs">
             <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl grid grid-cols-2 gap-2 text-[#5A646D]">
               <div>Qatlam: <b className="text-[#1A1F24]">{contourCard.layer}</b></div>
+              <div>Boʻlim/Kvartal: <b className="text-[#1A1F24]">{contourCard.section || '14-kvartal'}</b></div>
               <div>Maydon: <b className="text-[#1A1F24] font-mono">{contourCard.areaHa} ga</b></div>
               <div>Sigʻim (MaxSB): <b className="text-[#1A1F24] font-mono">{contourCard.maxSB} bosh</b></div>
               <div>Band qilingan: <b className="text-[#2E7D4F] font-mono">{contourCard.currentSB} bosh</b></div>
+              <div>Erkin qoldiq: <b className="text-[#0369A1] font-mono">{contourCard.maxSB - contourCard.currentSB} bosh</b></div>
             </div>
 
             {/* Version attributes the TZ names explicitly */}
@@ -508,11 +784,28 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
 
             <div className="p-3 bg-[#F0F7F1] border border-[#D9EBDC] rounded-xl text-[#2E7D4F]">
               Kontur hayot sikli: Qoralama → Koʻrib chiqishda → Tasdiqlangan → Eʼlon qilingan → Arxivlangan.
-              Ariza faqat <b>eʼlon qilingan</b> konturga topshiriladi.
+              Ariza faqat <b>eʼlon qilingan (published)</b> konturga topshiriladi.
             </div>
           </div>
         )}
       </Modal>
+
+      {/* Contour Form Modal (Create / Edit) */}
+      <ContourFormModal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        onSave={handleSaveContour}
+        initialData={selectedContourForEdit}
+        mode={formModalMode}
+      />
+
+      {/* Contour Status Lifecycle Transition Modal */}
+      <ContourStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        onConfirm={handleConfirmStatusChange}
+        contour={selectedContourForStatus}
+      />
     </div>
   );
 };

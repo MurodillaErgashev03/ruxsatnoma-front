@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, RotateCcw, Plus, Check } from 'lucide-react';
+import { Filter, RotateCcw, Plus, Check, Compass } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 
 export interface WorklistFilterValues {
@@ -10,6 +10,7 @@ export interface WorklistFilterValues {
   slaDeadline: string;
   preset: string;
   region?: string;
+  gisStatus?: string;
 }
 
 export interface WorklistFiltersPanelProps {
@@ -30,6 +31,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
 }) => {
   const presets = [
     { id: 'all_assigned', label: 'Barcha biriktirilganlar', count: 24 },
+    { id: 'waiting_gis', label: 'GIS xulosasi kutilmoqda (Ekspertiza)', count: 4 },
     { id: 'urgent_sla', label: 'Muddati oʻtayotganlar (SLA)', count: 4 },
     { id: 'grazing_bostonliq', label: 'Chorva mollarini boqish (Yaylov)', count: 9 },
     { id: 'waiting_applicant', label: 'Arizachi javobi kutilmoqda', count: 3 },
@@ -59,8 +61,26 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
           </select>
         </div>
 
+        {/* GIS Conclusion Status Filter (Specialist filter) */}
+        <div className="space-y-1 min-w-[170px] flex-1">
+          <label className="text-xs font-bold text-[#0369A1] uppercase tracking-wider block truncate flex items-center gap-1">
+            <Compass className="w-3.5 h-3.5 text-[#0284C7]" />
+            GIS Ekspertizasi
+          </label>
+          <select
+            value={filters.gisStatus || 'all'}
+            onChange={(e) => onFilterChange('gisStatus', e.target.value)}
+            className="w-full h-10 px-3 text-xs bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg text-[#0369A1] font-semibold focus:ring-2 focus:ring-[#0284C7] focus:outline-none truncate"
+          >
+            <option value="all">Barcha arizalar</option>
+            <option value="pending">GIS xulosasi kutilmoqda (4 ta)</option>
+            <option value="approved">GIS ijobiy xulosa berilgan</option>
+            <option value="none">GIS xulosasi talab etilmaydi</option>
+          </select>
+        </div>
+
         {/* Activity Type Dropdown */}
-        <div className="space-y-1 min-w-[200px] flex-1">
+        <div className="space-y-1 min-w-[180px] flex-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Faoliyat turi (Вид деятельности)
           </label>
@@ -80,7 +100,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* Submission Period Dates */}
-        <div className="space-y-1 min-w-[280px] flex-1">
+        <div className="space-y-1 min-w-[240px] flex-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Qabul davri (Период подачи)
           </label>
@@ -102,7 +122,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* Region Filter for Central Admin / Republic View */}
-        <div className="space-y-1 min-w-[180px] flex-1">
+        <div className="space-y-1 min-w-[160px] flex-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Hudud (Вилоят / ДЎХ)
           </label>
@@ -126,7 +146,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* SLA Urgency Filter */}
-        <div className="space-y-1 min-w-[160px] flex-1">
+        <div className="space-y-1 min-w-[150px] flex-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             SLA muddati (Срок SLA)
           </label>
@@ -150,7 +170,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
             size="sm"
             onClick={onResetFilters}
             leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-            className="h-10 border-[#767F87] text-[#5A646D] hover:text-[#1A1F24] text-xs font-bold px-4"
+            className="h-10 border-[#767F87] text-[#5A646D] hover:text-[#1A1F24] text-xs font-bold px-4 cursor-pointer"
           >
             Tiklash
           </Button>
@@ -159,7 +179,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
             size="sm"
             onClick={onApplyFilters}
             leftIcon={<Filter className="w-3.5 h-3.5" />}
-            className="h-10 bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold px-5 shadow-xs"
+            className="h-10 bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold px-5 shadow-xs cursor-pointer"
           >
             Qoʻllash
           </Button>
@@ -182,14 +202,21 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
               className={`px-3 py-1 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                 isSelected
                   ? 'bg-[#2E7D4F] text-white border-[#2E7D4F] font-bold shadow-xs'
+                  : p.id === 'waiting_gis'
+                  ? 'bg-[#F0F9FF] text-[#0369A1] border-[#BAE6FD] hover:bg-[#E0F2FE]'
                   : 'bg-[#F8F9FA] text-[#1A1F24] border-[#767F87] hover:bg-[#E4E7EA]'
               }`}
             >
               {isSelected && <Check className="w-3 h-3 text-white" />}
+              {p.id === 'waiting_gis' && !isSelected && <Compass className="w-3 h-3 text-[#0284C7]" />}
               <span>{p.label}</span>
               <span
                 className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${
-                  isSelected ? 'bg-[#23653F] text-white' : 'bg-[#E4E7EA] text-[#5A646D]'
+                  isSelected
+                    ? 'bg-[#23653F] text-white'
+                    : p.id === 'waiting_gis'
+                    ? 'bg-[#BAE6FD] text-[#0369A1]'
+                    : 'bg-[#E4E7EA] text-[#5A646D]'
                 }`}
               >
                 {p.count}
