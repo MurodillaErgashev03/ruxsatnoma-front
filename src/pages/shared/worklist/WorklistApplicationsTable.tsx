@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Clock, ArrowUpDown, MoreHorizontal, FileText } from 'lucide-react';
+import { AlertTriangle, Clock, ArrowUpDown, MoreHorizontal, FileText, Compass, Check } from 'lucide-react';
 
 export interface WorklistApplicationRow {
   id: string;
@@ -18,6 +18,7 @@ export interface WorklistApplicationRow {
   slaSubtext: string;
   slaPercent: number;
   riTag?: string;
+  gisConclusionStatus?: 'pending' | 'approved' | 'rejected' | 'none';
 }
 
 export interface WorklistApplicationsTableProps {
@@ -72,7 +73,7 @@ export const WorklistApplicationsTable: React.FC<WorklistApplicationsTableProps>
                 Summa, soʻm <ArrowUpDown className="w-3 h-3" />
               </button>
             </th>
-            <th className="p-3">Status</th>
+            <th className="p-3">Status va GIS</th>
             <th className="p-3">
               <button className="flex items-center gap-1 font-bold hover:text-[#1A1F24] cursor-pointer">
                 SLA muddati <ArrowUpDown className="w-3 h-3" />
@@ -141,12 +142,26 @@ export const WorklistApplicationsTable: React.FC<WorklistApplicationsTableProps>
                   {r.sumAmount}
                 </td>
 
-                {/* Status Badge */}
-                <td className="p-3">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]">
+                {/* Status Badge & GIS Flag */}
+                <td className="p-3 space-y-1">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1]" />
                     <span>{r.statusText}</span>
                   </span>
+
+                  {r.gisConclusionStatus === 'pending' && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
+                      <Compass className="w-3 h-3 text-[#2563EB]" />
+                      <span>GIS xulosasi kutilmoqda</span>
+                    </div>
+                  )}
+
+                  {r.gisConclusionStatus === 'approved' && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0F7F1] text-[#2E7D4F] border border-[#D9EBDC]">
+                      <Check className="w-3 h-3 text-[#2E7D4F]" />
+                      <span>GIS tasdiqlangan</span>
+                    </div>
+                  )}
                 </td>
 
                 {/* SLA Urgency Indicator */}

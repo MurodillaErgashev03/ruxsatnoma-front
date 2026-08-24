@@ -36,7 +36,7 @@ export const ApplicantDashboard: React.FC<ApplicantDashboardProps> = ({
         <div className="bg-white border border-[#E4E7EA] rounded-3xl p-8 lg:p-12 shadow-xs space-y-10">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#1A1F24]">
-              Xush kelibsiz, {userName.split(' ')[1] || 'Dilshod'} Normatovich!
+              Xush kelibsiz, {userName}!
             </h2>
             <p className="text-sm text-[#5A646D] leading-relaxed">
               Bu yerda oʻrmon fondidan foydalanish ruxsatnomalari rasmiylashtiriladi: chorva boqish, pichan oʻrish, asalari uyalari, dam olish, oʻtin yigʻish va ilmiy tadqiqotlar. Hozircha sizda birorta ham ariza yoʻq — birinchisidan boshlaymiz.

@@ -298,11 +298,10 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
   // Enters and versions GIS contours, enters norm, limit and tariff, and issues
   // the GIS conclusion on an application.
   gis_specialist: [
-    homeGroup('Bosh sahifa (GIS modul)', 'gis_editor'),
+    homeGroup('Bosh sahifa (GIS xarita)', 'gis_editor'),
     {
       group: 'GIS va meʼyoriy modul',
       items: [
-        { id: 'map', label: 'Uchastkalar xaritasi (muharrir)', page: 'gis_editor', icon: <Map className={ICON} /> },
         { id: 'gis_import', label: 'Qatlamlarni import qilish', page: 'gis_import', icon: <Layers className={ICON} /> },
         { id: 'normative', label: 'Meʼyor, limit va tarif', page: 'normative_norms', icon: <Calculator className={ICON} /> },
         { id: 'applications', label: 'Arizalar — GIS xulosasi', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
@@ -311,8 +310,6 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     {
       group: 'Maʼlumot (faqat koʻrish)',
       items: [
-        { id: 'reports', label: 'Hisobotlar', page: 'reports', icon: <FileBarChart className={ICON} /> },
-        { id: 'admin_classifiers', label: 'Klassifikatorlar', page: 'admin_classifiers', icon: <Sliders className={ICON} />, count: 14 },
         { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
         { id: 'dashboard_view', label: 'Dashboard', page: 'executive_dashboard', icon: <Eye className={ICON} /> },
       ],
@@ -326,9 +323,10 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     {
       group: 'Inspeksiya va nazorat',
       items: [
-        { id: 'field_tasks', label: 'Dala topshiriqlari', page: 'field_tasks', icon: <CheckSquare className={ICON} />, count: 7 },
         { id: 'field_scan', label: 'QR skaner / tekshirish', page: 'field_scan', icon: <QrCode className={ICON} /> },
-        { id: 'field_inspection', label: 'Tekshiruv dalolatnomasi', page: 'field_inspection', icon: <FileText className={ICON} /> },
+        { id: 'field_inspection', label: 'Yangi dalolatnoma tuzish', page: 'field_inspection', icon: <FileText className={ICON} /> },
+        { id: 'inspections', label: 'Dalolatnomalar reyestri', page: 'inspection_acts', icon: <CheckSquare className={ICON} />, count: 12 },
+        { id: 'permits', label: 'Ruxsatnomalar (faqat koʻrish)', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
         { id: 'map', label: 'Uchastkalar xaritasi (GIS)', page: 'gis_editor', icon: <Map className={ICON} /> },
       ],
     },
@@ -337,13 +335,13 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
   ],
 
   accountant: [
-    homeGroup('Bosh sahifa (moliya)', 'accountant_reconciliation'),
+    homeGroup('Bosh sahifa (moliya va solishtirma)', 'accountant_reconciliation'),
     {
       group: 'Moliya va hisob-kitob',
       items: [
-        { id: 'accountant_reconciliation', label: 'Solishtirma dalolatnomalari', page: 'accountant_reconciliation', icon: <Calculator className={ICON} />, count: 12 },
         { id: 'permits', label: 'Ruxsatnomalar toʻlovlari', page: 'applicant_permits', icon: <CreditCard className={ICON} />, count: 18 },
         { id: 'reports', label: 'Moliya hisobotlari', page: 'reports', icon: <FileBarChart className={ICON} /> },
+        { id: 'archive', label: 'Arxiv', page: 'archive', icon: <Archive className={ICON} /> },
       ],
     },
     profileGroup(),
@@ -355,10 +353,11 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
     {
       group: 'Prokuratura nazorati (faqat oʻqish)',
       items: [
-        { id: 'prosecutor_portal', label: '«Raqamli nazorat» portali', page: 'prosecutor_portal', icon: <Eye className={ICON} /> },
-        { id: 'admin_audit', label: 'Audit jurnallari', page: 'admin_audit_logs', icon: <Shield className={ICON} />, count: 156 },
+        { id: 'admin_audit', label: 'Audit va xavf jurnallari', page: 'admin_audit_logs', icon: <Shield className={ICON} />, count: 156 },
         { id: 'applications', label: 'Arizalar reyestri', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
         { id: 'permits', label: 'Ruxsatnomalar reyestri', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 18 },
+        { id: 'inspections', label: 'Inspeksiya dalolatnomalari', page: 'inspection_acts', icon: <CheckSquare className={ICON} /> },
+        { id: 'payments', label: 'Toʻlovlar va 50/50 taqsimot', page: 'accountant_reconciliation', icon: <CreditCard className={ICON} /> },
         { id: 'reports', label: 'Hisobotlar va analitika', page: 'reports', icon: <FileBarChart className={ICON} /> },
         { id: 'map', label: 'Uchastkalar xaritasi (GIS)', page: 'gis_editor', icon: <Map className={ICON} /> },
       ],
@@ -368,15 +367,13 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
   ],
 
   applicant: [
-    homeGroup('Bosh sahifa', 'applicant_dashboard'),
+    homeGroup('Bosh sahifa (shaxsiy kabinet)', 'applicant_dashboard'),
     {
       group: 'Mening ishlarim',
       items: [
-        { id: 'applicant_dashboard', label: 'Mening arizalarim', page: 'applicant_dashboard', icon: <Mail className={ICON} />, count: 4 },
         { id: 'applicant_wizard', label: 'Yangi ariza berish', page: 'applicant_wizard', icon: <PlusCircle className={ICON} /> },
         { id: 'permits', label: 'Mening ruxsatnomalarim', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 2 },
-        { id: 'payments', label: 'Hisoblar va toʻlov', page: 'applicant_dashboard', icon: <CreditCard className={ICON} />, count: 1, isWarning: true },
-        { id: 'map', label: 'Uchastkalar xaritasi', page: 'gis_editor', icon: <Map className={ICON} /> },
+        { id: 'map', label: 'Boʻsh uchastkalar xaritasi', page: 'gis_editor', icon: <Map className={ICON} /> },
       ],
     },
     profileGroup([
