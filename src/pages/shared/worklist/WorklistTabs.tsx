@@ -21,9 +21,7 @@ export const WorklistTabs: React.FC<WorklistTabsProps> = ({
   activeTab,
   counts = { all: 24, new: 5, inProgress: 11, waitingInfo: 3, overdue: 2, waitingGis: 4 },
   onTabChange,
-  userRole = '',
 }) => {
-  const isGisRole = userRole === 'gis_specialist';
 
   const tabs = [
     { id: 'all', label: 'Barchasi (Все)', count: counts.all, isLate: false, isGis: false },

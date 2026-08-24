@@ -6,9 +6,6 @@ import {
   Download,
   Search,
   CheckCircle2,
-  Edit3,
-  Sparkles,
-  TrendingUp,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';

@@ -4,24 +4,15 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  Clock,
   KeyRound,
   ShieldCheck,
   Building2,
-  QrCode,
-  Download,
-  Eye,
-  Send,
-  RotateCcw,
   CheckSquare,
   FileBarChart,
   CreditCard,
-  Search,
   Compass,
   UserCheck,
-  Gavel,
   Sparkles,
-  Info,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Modal } from '../../../components/ui/Overlay';
@@ -37,7 +28,6 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
   const [selectedPermitForSign, setSelectedPermitForSign] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('RJ-05');
-  const [rejectComment, setRejectComment] = useState('');
   const [isSigning, setIsSigning] = useState(false);
 
   // Decision pending applications (reviewed by staff & GIS)
@@ -129,7 +119,7 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
   ]);
 
   // Inspection acts pending review
-  const [inspectionActs, setInspectionActs] = useState([
+  const [inspectionActs] = useState([
     {
       id: 'ACT-2026-0088',
       permitNo: 'RX-2026-0089',
@@ -161,7 +151,6 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
     setPendingApplications((prev) => prev.filter((a) => a.id !== app.id));
     setToastMessage(`Ariza "${app.id}" rasmiy rad etildi (${rejectReason}). Arizachiga asoslantirilgan xat joʻnatildi.`);
     setSelectedAppForDecision(null);
-    setRejectComment('');
     setTimeout(() => setToastMessage(null), 4500);
   };
 

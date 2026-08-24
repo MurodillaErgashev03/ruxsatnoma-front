@@ -4,20 +4,10 @@ import {
   FileCheck2,
   ArrowLeft,
   RotateCcw,
-  AlertTriangle,
   CheckCircle2,
-  AlertCircle,
-  FileSpreadsheet,
-  Layers,
-  Globe,
   Settings2,
   Download,
-  Filter,
-  Check,
-  X,
-  Sparkles,
   Info,
-  ExternalLink,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 
@@ -59,7 +49,7 @@ export const GisImportPage: React.FC<GisImportPageProps> = ({ onNavigate }) => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'error' | 'warning' | 'valid'>('all');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [reports, setReports] = useState<ImportErrorItem[]>([
+  const [reports] = useState<ImportErrorItem[]>([
     {
       lineNo: 1,
       featureId: 'FT-001',

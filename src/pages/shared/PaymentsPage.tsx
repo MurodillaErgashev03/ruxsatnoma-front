@@ -5,17 +5,7 @@ import {
   CreditCard,
   RotateCcw,
   CheckCircle2,
-  AlertTriangle,
-  FileText,
-  Calculator,
   Plus,
-  RefreshCw,
-  Search,
-  Building2,
-  ShieldAlert,
-  ArrowRight,
-  Sparkles,
-  Info,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';
@@ -77,7 +67,7 @@ export const PaymentsPage: React.FC<PaymentsPageProps> = ({ userRole = '' }) => 
   // Formula: Refund = Paid * unused_eligible_period / paid_period
   const calculatedRefund = Math.floor((paidAmount * unusedPeriodDays) / totalPeriodDays);
 
-  const [transactions, setTransactions] = useState<BankTransactionItem[]>([
+  const [transactions] = useState<BankTransactionItem[]>([
     {
       id: 'TX-901',
       txHash: 'MNS-9081234',

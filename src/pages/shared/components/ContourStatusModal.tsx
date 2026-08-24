@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  ArrowRight,
   CheckCircle2,
   AlertTriangle,
-  FileCheck2,
   UploadCloud,
   History,
-  ShieldCheck,
-  RotateCcw,
   Sparkles,
-  Info,
-  Archive,
-  Send,
   Check,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';

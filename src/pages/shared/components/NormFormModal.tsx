@@ -4,13 +4,8 @@ import {
   Calculator,
   FileText,
   UploadCloud,
-  CheckCircle2,
-  AlertTriangle,
   Sparkles,
-  Calendar,
-  Layers,
   Save,
-  HelpCircle,
   TrendingUp,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';

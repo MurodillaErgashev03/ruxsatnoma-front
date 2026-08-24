@@ -10,10 +10,7 @@ import {
   Printer,
   Maximize2,
   CheckCircle2,
-  AlertCircle,
-  FileSpreadsheet,
   History,
-  Sparkles,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';
