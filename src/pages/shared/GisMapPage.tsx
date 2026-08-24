@@ -11,6 +11,12 @@ import {
   Maximize2,
   CheckCircle2,
   History,
+  Download,
+  FileImage,
+  Clock,
+  GitBranch,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { hasRight } from '../../lib/permissions';
@@ -90,6 +96,34 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
   // Contour Status Lifecycle Transition Modal State
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedContourForStatus, setSelectedContourForStatus] = useState<ContourItem | null>(null);
+
+  // TZ module 10.2: PDF/PNG export modal
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'png'>('pdf');
+  const [exportRegionLabel, setExportRegionLabel] = useState('Toshkent viloyati — Boʻstonliq DЎX');
+  const [isExporting, setIsExporting] = useState(false);
+
+  // TZ module 10.2: measure tool result display
+  const [measureResult, setMeasureResult] = useState<{ distance: string; area: string } | null>(null);
+
+  // TZ C17.4: contour version history panel
+  const [versionHistoryContour, setVersionHistoryContour] = useState<ContourItem | null>(null);
+
+  // Static version history data (TZ C17.4: old versions go to archive, permits keep old version link)
+  const versionHistoryData: Record<string, Array<{ version: string; date: string; changedBy: string; changeType: string; status: ContourStatus; areaHa: number; approvalDoc: string; note: string }>> = {
+    'K-042': [
+      { version: 'v2.4 (Joriy)', date: '10.08.2026', changedBy: 'Yusupov B.M. (GIS mutaxassis)', changeType: 'Geometriya aniqlashtirildi (±0.5m)', status: 'published', areaHa: 450, approvalDoc: 'TAS-2024-118', note: 'Dala geodezik oʻlchovi asosida chegara aniqlantirildi' },
+      { version: 'v2.3 (Arxiv)', date: '12.03.2024', changedBy: 'Yusupov B.M. (GIS mutaxassis)', changeType: 'Boshlangʻich import (WFS)', status: 'archived', areaHa: 447, approvalDoc: 'TAS-2024-118', note: 'WFS orqali dastlabki import; maydon 447 ga edi. Bu versiyaga bogʻliq ruxsatnomalar: RX-2024-0021, RX-2024-0035' },
+      { version: 'v1.0 (Arxiv)', date: '05.01.2022', changedBy: 'Tizim administratori', changeType: 'Dastlabki kiritish (SHP import)', status: 'archived', areaHa: 440, approvalDoc: '—', note: 'Eski SHP fayl asosida. Bu versiyaga bogʻliq ruxsatnomalar: RX-2022-0004' },
+    ],
+    'K-015': [
+      { version: 'v2.1 (Joriy)', date: '08.08.2026', changedBy: 'Yusupov B.M. (GIS mutaxassis)', changeType: 'Geometriya yangilandi', status: 'published', areaHa: 180, approvalDoc: 'TAS-2023-076', note: 'Pichanzor chegarasi aniqlantirildi' },
+      { version: 'v1.0 (Arxiv)', date: '05.06.2023', changedBy: 'Tizim administratori', changeType: 'Dastlabki import', status: 'archived', areaHa: 178, approvalDoc: '—', note: 'Bu versiyaga bogʻliq ruxsatnomalar: RX-2023-0012' },
+    ],
+    'K-088': [
+      { version: 'v1.0 (Joriy)', date: '05.08.2026', changedBy: 'Yusupov B.M. (GIS mutaxassis)', changeType: 'Yangi kontur yaratildi', status: 'review', areaHa: 320, approvalDoc: '—', note: 'Koʻrib chiqilmoqda (Review)' },
+    ],
+  };
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -314,14 +348,22 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
     {
       key: 'id',
       header: 'Amallar',
-      width: '210px',
+      width: '260px',
       accessor: (row) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setContourCard(row)}
             className="text-[11px] font-bold text-[#2E7D4F] hover:underline cursor-pointer"
           >
             Maʼlumot
+          </button>
+          <span className="text-gray-300">|</span>
+          <button
+            onClick={() => setVersionHistoryContour(row)}
+            className="text-[11px] font-bold text-[#7C3AED] hover:underline flex items-center gap-0.5 cursor-pointer"
+            title="TZ C17.4: Kontur versiya tarixi (eski versiyalar arxivda, ruxsatnomalar eski versiyaga bog'liq)"
+          >
+            <GitBranch className="w-3 h-3" /> Versiyalar
           </button>
           {canEditContours && (
             <>
@@ -400,7 +442,7 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
                 variant="primary"
                 size="sm"
                 leftIcon={<Printer className="w-4 h-4" />}
-                onClick={() => alert('Xarita PDF va PNG formatlarida eksportga tayyorlandi.')}
+                onClick={() => setIsExportModalOpen(true)}
                 className="bg-[#2E7D4F] hover:bg-[#23653F] text-white font-bold text-xs h-9 cursor-pointer shadow-xs whitespace-nowrap shrink-0"
               >
                 Xaritani eksport (PDF/PNG)
@@ -408,6 +450,14 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
             </>
           ) : (
             <>
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Printer className="w-4 h-4" />}
+                onClick={() => setIsExportModalOpen(true)}
+              >
+                PDF/PNG eksport
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -454,7 +504,14 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
 
               <button
                 type="button"
-                onClick={() => setActiveTool('measure')}
+                onClick={() => {
+                  setActiveTool('measure');
+                  // TZ module 10.2: measurement tool shows distance and area result
+                  setMeasureResult({
+                    distance: '8.41 km (Perimetr)',
+                    area: '450.00 ga (4,500,000 m²)',
+                  });
+                }}
                 className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTool === 'measure'
                     ? 'bg-[#2E7D4F] text-white border-[#2E7D4F]'
@@ -806,6 +863,189 @@ export const GisMapPage: React.FC<GisMapPageProps> = ({ onNavigate, userRole = '
         onConfirm={handleConfirmStatusChange}
         contour={selectedContourForStatus}
       />
+
+      {/* TZ module 10.2: Measure Result Panel (distance + area) */}
+      {measureResult && activeTool === 'measure' && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-[#2E7D4F] shadow-xl rounded-2xl p-4 flex items-center gap-6 text-xs font-sans animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center gap-2">
+            <Ruler className="w-4 h-4 text-[#2E7D4F]" />
+            <span className="text-[#5A646D] font-semibold">Masofa:</span>
+            <span className="font-mono font-bold text-[#1A1F24]">{measureResult.distance}</span>
+          </div>
+          <div className="w-px h-6 bg-[#E4E7EA]" />
+          <div className="flex items-center gap-2">
+            <Square className="w-4 h-4 text-[#0369A1]" />
+            <span className="text-[#5A646D] font-semibold">Maydon:</span>
+            <span className="font-mono font-bold text-[#1A1F24]">{measureResult.area}</span>
+          </div>
+          <div className="w-px h-6 bg-[#E4E7EA]" />
+          <button
+            onClick={() => { setMeasureResult(null); setActiveTool('select'); }}
+            className="text-[#B91C1C] hover:opacity-75 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* TZ module 10.2: PDF/PNG Export Modal */}
+      {isExportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => !isExporting && setIsExportModalOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 font-sans text-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-[#1A1F24]">Xaritani eksport qilish</h3>
+                <p className="text-xs text-[#5A646D] mt-0.5">TZ 07-subsystems.md modul 10.2 — PDF/PNG formatlarida eksport</p>
+              </div>
+              <button onClick={() => setIsExportModalOpen(false)} className="text-[#767F87] hover:text-[#1A1F24] cursor-pointer"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-[#5A646D] block">Eksport formati:</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setExportFormat('pdf')}
+                  className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all cursor-pointer ${exportFormat === 'pdf' ? 'border-[#2E7D4F] bg-[#F0F7F1]' : 'border-[#E4E7EA] hover:border-[#7FB98A]'}`}
+                >
+                  <FileImage className={`w-7 h-7 ${exportFormat === 'pdf' ? 'text-[#2E7D4F]' : 'text-[#767F87]'}`} />
+                  <span className={`text-xs font-bold ${exportFormat === 'pdf' ? 'text-[#2E7D4F]' : 'text-[#767F87]'}`}>PDF/A-1b</span>
+                  <span className="text-[10px] text-[#767F87]">Rasmiy hujjat formati</span>
+                </button>
+                <button
+                  onClick={() => setExportFormat('png')}
+                  className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all cursor-pointer ${exportFormat === 'png' ? 'border-[#0369A1] bg-[#EFF6FF]' : 'border-[#E4E7EA] hover:border-[#93C5FD]'}`}
+                >
+                  <Download className={`w-7 h-7 ${exportFormat === 'png' ? 'text-[#0369A1]' : 'text-[#767F87]'}`} />
+                  <span className={`text-xs font-bold ${exportFormat === 'png' ? 'text-[#0369A1]' : 'text-[#767F87]'}`}>PNG (300 DPI)</span>
+                  <span className="text-[10px] text-[#767F87]">Rasm formati</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#5A646D] block">Eksport hududi:</label>
+              <select
+                value={exportRegionLabel}
+                onChange={(e) => setExportRegionLabel(e.target.value)}
+                className="w-full bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-xs font-semibold px-3 py-2.5 text-[#1A1F24] focus:outline-none focus:border-[#2E7D4F]"
+              >
+                <option>Toshkent viloyati — Boʻstonliq DЎX</option>
+                <option>Qashqadaryo viloyati — Kitob DЎX</option>
+                <option>Jizzax viloyati — Zomin DЎX</option>
+                <option>Namangan viloyati — Pop DЎX</option>
+                <option>Joriy xarita kadri (Joriy ko'rinish)</option>
+                <option>Barcha viloyatlar (Respublika)</option>
+              </select>
+            </div>
+
+            <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl text-xs text-[#5A646D] space-y-1">
+              <div className="flex justify-between"><span>Masshtab:</span><span className="font-mono font-bold text-[#1A1F24]">1 : 10,000</span></div>
+              <div className="flex justify-between"><span>Koordinata tizimi:</span><span className="font-mono font-bold text-[#1A1F24]">EPSG:{srid} — {srid === '4326' ? 'WGS 84' : srid === '3857' ? 'Web Mercator' : 'UTM'}</span></div>
+              <div className="flex justify-between"><span>Asosiy xarita:</span><span className="font-mono font-bold text-[#1A1F24]">{baseMap === 'osm' ? 'OpenStreetMap' : 'Sputnik (Satellite)'}</span></div>
+              <div className="flex justify-between"><span>GIS qatlamlar:</span><span className="font-mono font-bold text-[#1A1F24]">13 ta (faol ko'rinadiganlar)</span></div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <button onClick={() => setIsExportModalOpen(false)} className="px-4 py-2 text-xs font-bold text-[#5A646D] border border-[#E4E7EA] rounded-xl hover:bg-gray-50 cursor-pointer">Bekor qilish</button>
+              <button
+                onClick={() => {
+                  setIsExporting(true);
+                  setTimeout(() => {
+                    setIsExporting(false);
+                    setIsExportModalOpen(false);
+                    setToastMessage(`Xarita muvaffaqiyatli ${exportFormat.toUpperCase()} formatida eksport qilindi: ${exportRegionLabel}. Fayl yuklab olindi.`);
+                    setTimeout(() => setToastMessage(null), 4500);
+                  }, 1800);
+                }}
+                disabled={isExporting}
+                className="px-5 py-2 text-xs font-bold bg-[#2E7D4F] text-white rounded-xl hover:bg-[#23653F] transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isExporting ? (
+                  <><Clock className="w-3.5 h-3.5 animate-spin" /> Yuklanmoqda...</>
+                ) : (
+                  <><Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()} yuklab olish</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TZ C17.4: Contour Version History Panel */}
+      {versionHistoryContour && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setVersionHistoryContour(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-5 font-sans text-sm max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-[#7C3AED]" />
+                  <h3 className="text-base font-bold text-[#1A1F24]">Versiya tarixi — {versionHistoryContour.id}</h3>
+                </div>
+                <p className="text-xs text-[#5A646D] mt-0.5">
+                  TZ C17.4: Kontur oʻzgartirilganda eski versiya arxivga tushadi. Ruxsatnomalar eski versiyaga bogʻliq qoladi.
+                </p>
+              </div>
+              <button onClick={() => setVersionHistoryContour(null)} className="text-[#767F87] hover:text-[#1A1F24] cursor-pointer"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="space-y-3">
+              {(versionHistoryData[versionHistoryContour.id] || [
+                { version: 'v1.0 (Joriy)', date: new Date().toLocaleDateString('uz-UZ'), changedBy: 'Yusupov B.M. (GIS mutaxassis)', changeType: 'Yangi kontur yaratildi', status: versionHistoryContour.status, areaHa: versionHistoryContour.areaHa, approvalDoc: versionHistoryContour.approvalDocId, note: 'Versiya tarixi mavjud emas' }
+              ]).map((v, i) => (
+                <div
+                  key={i}
+                  className={`p-4 rounded-xl border space-y-3 ${v.status === 'archived' ? 'bg-gray-50 border-gray-200' : 'bg-[#F0F7F1] border-[#D9EBDC]'}`}
+                >
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded border ${v.status === 'archived' ? 'bg-gray-100 text-gray-600 border-gray-300' : 'bg-[#F0F7F1] text-[#2E7D4F] border-[#D9EBDC]'}`}>
+                        {v.version}
+                      </span>
+                      {i === 0 && <span className="text-[10px] font-bold text-white bg-[#2E7D4F] px-2 py-0.5 rounded">JORIY</span>}
+                      {v.status === 'archived' && (
+                        <span className="text-[10px] font-bold text-gray-600 bg-gray-200 px-2 py-0.5 rounded">ARXIV</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#5A646D]">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{v.date}</span>
+                      <span>•</span>
+                      <span>{v.changedBy}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2 bg-white rounded-lg border border-[#E4E7EA]">
+                      <span className="text-[#5A646D]">O'zgartirish turi:</span>
+                      <br />
+                      <span className="font-semibold text-[#1A1F24]">{v.changeType}</span>
+                    </div>
+                    <div className="p-2 bg-white rounded-lg border border-[#E4E7EA]">
+                      <span className="text-[#5A646D]">Maydon:</span>
+                      <br />
+                      <span className="font-mono font-bold text-[#1A1F24]">{v.areaHa} ga</span>
+                    </div>
+                    <div className="p-2 bg-white rounded-lg border border-[#E4E7EA]">
+                      <span className="text-[#5A646D]">Tasdiqlovchi hujjat:</span>
+                      <br />
+                      <span className="font-mono font-semibold text-[#0369A1]">{v.approvalDoc}</span>
+                    </div>
+                  </div>
+                  {v.note && (
+                    <div className={`p-2.5 rounded-lg text-[11px] flex items-start gap-2 ${v.status === 'archived' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-white text-[#5A646D] border border-[#E4E7EA]'}`}>
+                      {v.status === 'archived' && <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
+                      <span>{v.note}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end">
+              <button onClick={() => setVersionHistoryContour(null)} className="px-5 py-2 text-xs font-bold bg-[#1A1F24] text-white rounded-xl hover:bg-[#2D3748] transition-colors cursor-pointer">Yopish</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
