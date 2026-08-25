@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 export interface WizardStepperProps {
   currentStep?: number;
   onStepClick?: (stepNumber: number) => void;
+  maxReachedStep?: number;
 }
 
 interface StepItem {
@@ -13,9 +14,9 @@ interface StepItem {
 }
 
 const WIZARD_STEPS: StepItem[] = [
-  { id: 1, titleUz: 'Faoliyat turi', subUz: 'Chorva molini boqish · Oʻzgartirish' },
-  { id: 2, titleUz: 'Uchastka', subUz: 'Joriy bosqich (Xarita)' },
-  { id: 3, titleUz: 'Parametrlar', subUz: 'Mavsum va chorva bosh soni' },
+  { id: 1, titleUz: 'Faoliyat turi', subUz: 'Chorva boqish va hudud' },
+  { id: 2, titleUz: 'Uchastka', subUz: 'GIS xarita va me’yor' },
+  { id: 3, titleUz: 'Parametrlar', subUz: 'Mavsum va chorva soni' },
   { id: 4, titleUz: 'Hujjatlar', subUz: 'Ilova fayllarini yuklash' },
   { id: 5, titleUz: 'Tekshiruvlar', subUz: 'Avto-check va Soliq/Kadastr' },
   { id: 6, titleUz: 'Imzolash', subUz: 'E-IMZO bilan muhrlash' },
@@ -24,6 +25,7 @@ const WIZARD_STEPS: StepItem[] = [
 export const WizardStepper: React.FC<WizardStepperProps> = ({
   currentStep = 2,
   onStepClick,
+  maxReachedStep = 2,
 }) => {
   return (
     <div className="bg-white border border-[#E4E7EA] rounded-2xl p-4 shadow-2xs overflow-x-auto font-sans">
@@ -31,19 +33,19 @@ export const WizardStepper: React.FC<WizardStepperProps> = ({
         {WIZARD_STEPS.map((step) => {
           const isDone = step.id < currentStep;
           const isCurrent = step.id === currentStep;
-          const isTodo = step.id > currentStep;
+          const isAccessible = step.id <= Math.max(currentStep, maxReachedStep);
 
           return (
             <button
               key={step.id}
-              disabled={isTodo}
-              onClick={() => isDone && onStepClick?.(step.id)}
+              disabled={!isAccessible}
+              onClick={() => isAccessible && onStepClick?.(step.id)}
               className={`flex-1 flex flex-col gap-2 p-2 rounded-xl text-left transition-all relative ${
-                isDone
+                isCurrent
+                  ? 'bg-[#F0F7F1]/60 cursor-default'
+                  : isAccessible
                   ? 'cursor-pointer hover:bg-[#F0F7F1]'
-                  : isCurrent
-                  ? 'cursor-default'
-                  : 'cursor-not-allowed opacity-60'
+                  : 'cursor-not-allowed opacity-50'
               }`}
             >
               {/* Step Bar Line */}
@@ -80,11 +82,11 @@ export const WizardStepper: React.FC<WizardStepperProps> = ({
                       isCurrent
                         ? 'text-[#2E7D4F] font-bold'
                         : isDone
-                        ? 'text-[#2563EB]'
+                        ? 'text-[#15803D]'
                         : 'text-[#9AA3AB]'
                     }`}
                   >
-                    {step.subUz}
+                    {isCurrent ? 'Joriy bosqich' : step.subUz}
                   </div>
                 </div>
               </div>
