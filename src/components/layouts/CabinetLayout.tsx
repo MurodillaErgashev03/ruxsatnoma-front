@@ -373,6 +373,8 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
       items: [
         { id: 'applicant_wizard', label: 'Yangi ariza berish', page: 'applicant_wizard', icon: <PlusCircle className={ICON} /> },
         { id: 'permits', label: 'Mening ruxsatnomalarim', page: 'applicant_permits', icon: <FileText className={ICON} />, count: 2 },
+        /* TZ C9, C14 — Ariza beruvchi: Платёж (К, свои) + Refund (К, Я) */
+        { id: 'applicant_billing', label: "Mening to'lovlarim", page: 'applicant_billing', icon: <CreditCard className={ICON} />, count: 1 },
         { id: 'map', label: 'Boʻsh uchastkalar xaritasi', page: 'gis_editor', icon: <Map className={ICON} /> },
       ],
     },
