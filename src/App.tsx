@@ -20,6 +20,7 @@ import { LeskhozReviewPage } from './pages/roles/executor_staff';
 import { GisImportPage } from './pages/roles/gis_specialist';
 import { InspectorTasksPage, InspectorScanPage, InspectorInspectionPage } from './pages/roles/inspector';
 import { ApplicantDashboard, PermitWizardPage, ApplicationDetailPage, ApplicantHelpPage } from './pages/roles/applicant';
+import { ApplicantBillingPage } from './pages/roles/applicant/ApplicantBillingPage';
 import { ProsecutorPortalPage } from './pages/roles/prosecutor';
 
 // Profile pages
@@ -184,6 +185,10 @@ export function App() {
           )}
           {currentPage === 'applicant_help' && (
             <ApplicantHelpPage onNavigate={handleNavigate} />
+          )}
+          {/* TZ C9, C14 — Mening to'lovlarim va invoyslarim */}
+          {currentPage === 'applicant_billing' && (
+            <ApplicantBillingPage onNavigate={handleNavigate} userName={currentUser?.fullName} />
           )}
 
           {/* gis specialist */}
