@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { CabinetLayout } from '../layouts/CabinetLayout';
-import { PublicLayout } from '../layouts/PublicLayout';
+import { AuthLayout } from '../layouts/AuthLayout';
 import { StatusBadge } from '../ui/StatusBadge';
 import { Button } from '../ui/button';
 import { FileText, Download, CheckCircle, Clock } from 'lucide-react';
 
 export const LayoutsShowcase: React.FC = () => {
-  const [activeLayout, setActiveLayout] = useState<'cabinet' | 'public'>('cabinet');
+  const [activeLayout, setActiveLayout] = useState<'cabinet' | 'auth'>('cabinet');
 
   return (
     <div className="space-y-6">
       {/* Switcher Header */}
       <div className="bg-white border border-[#E4E7EA] p-4 rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-[#1A1F24]">Karkaslar (Layout Shells - `cabinet.html` & `public.html`)</h2>
+          <h2 className="text-base font-bold text-[#1A1F24]">Karkaslar (Layout Shells - `cabinet.html` & `auth.html`)</h2>
           <p className="text-xs text-[#5A646D]">Tizim interfeyslarining asosiy maket karkaslari</p>
         </div>
         <div className="flex bg-[#F8F9FA] p-1 border border-[#767F87] rounded-lg">
@@ -26,12 +26,12 @@ export const LayoutsShowcase: React.FC = () => {
             Kabinet Karkasi (Cabinet Shell)
           </button>
           <button
-            onClick={() => setActiveLayout('public')}
+            onClick={() => setActiveLayout('auth')}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-              activeLayout === 'public' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-[#5A646D] hover:text-[#1A1F24]'
+              activeLayout === 'auth' ? 'bg-[#2E7D4F] text-white shadow-xs' : 'text-[#5A646D] hover:text-[#1A1F24]'
             }`}
           >
-            Ommaviy Portal (Public Shell)
+            Avtorizatsiya Karkasi (Auth Shell)
           </button>
         </div>
       </div>
@@ -91,35 +91,17 @@ export const LayoutsShowcase: React.FC = () => {
             </div>
           </CabinetLayout>
         ) : (
-          <PublicLayout onCheckPermit={(no) => alert(`Ruxsatnoma №${no} tekshirildi!`)}>
-            <div className="space-y-8">
-              <div className="text-center max-w-2xl mx-auto space-y-2">
-                <h2 className="text-2xl font-bold text-[#1A1F24]">Davlat xizmatlari va imkoniyatlar</h2>
-                <p className="text-sm text-[#5A646D]">Oʻrmon xoʻjaligidan ruxsatnoma olish boʻyicha qulay imkoniyatlar</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="border border-[#E4E7EA] p-6 rounded-xl bg-white space-y-2">
-                  <h3 className="font-bold text-base text-[#1A1F24]">1. Onlayn Ariza</h3>
-                  <p className="text-xs text-[#5A646D] leading-relaxed">
-                    Arizalarni uyda oʻtirgan holda E-IMZO elektron kaliti orqali qulay topshirish.
-                  </p>
-                </div>
-                <div className="border border-[#E4E7EA] p-6 rounded-xl bg-white space-y-2">
-                  <h3 className="font-bold text-base text-[#1A1F24]">2. Avtomatik Tekshiruv</h3>
-                  <p className="text-xs text-[#5A646D] leading-relaxed">
-                    QR-kod orqali berilgan ruxsatnoma haqiqiyligini istalgan joyda tekshirish.
-                  </p>
-                </div>
-                <div className="border border-[#E4E7EA] p-6 rounded-xl bg-white space-y-2">
-                  <h3 className="font-bold text-base text-[#1A1F24]">3. SMS Ogohlantirish</h3>
-                  <p className="text-xs text-[#5A646D] leading-relaxed">
-                    Ruxsatnoma muddati tugashidan 7 kun oldin avtomatik SMS xabarnoma yuboriladi.
-                  </p>
-                </div>
-              </div>
+          <AuthLayout>
+            <div className="space-y-6 text-center bg-white p-6 rounded-2xl border border-[#E4E7EA] shadow-xs">
+              <h3 className="text-lg font-bold text-[#1A1F24]">Tizimga kirish namunasi</h3>
+              <p className="text-xs text-[#5A646D]">
+                Davlat xodimlari va arizachilar uchun yagona kirish karkasi.
+              </p>
+              <Button variant="primary" fullWidth size="lg">
+                Kirish tugmasi
+              </Button>
             </div>
-          </PublicLayout>
+          </AuthLayout>
         )}
       </div>
     </div>
