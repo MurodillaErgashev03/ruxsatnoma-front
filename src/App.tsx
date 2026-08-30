@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { PublicLayout } from './components/layouts/PublicLayout';
 import { CabinetLayout } from './components/layouts/CabinetLayout';
+import { AuthLayout } from './components/layouts/AuthLayout';
 
-// Public & Auth Pages (Landing)
-import { HomePage, VerifyPage, TariffsPage, ServicesPage, DocumentsPage, OpenDataPage, FaqPage } from './pages/web';
+// Auth Pages
 import { LoginPage, RegisterPage } from './pages/auth';
 
 // 10 Role Specific Pages
@@ -55,18 +54,15 @@ export function App() {
       try {
         return JSON.parse(savedUser);
       } catch {
-        // Stored value is not valid JSON — fall through to the checks below.
+        // Fall through
       }
     }
-    // If a cabinet route was saved, restore applicant user as fallback
+    // Default fallback to Admin for convenient development or restore saved page
     const savedPage = localStorage.getItem('active_page');
-    if (
-      savedPage &&
-      !['home', 'services', 'tariffs', 'documents', 'opendata', 'faq', 'verify', 'auth_login', 'auth_register', 'uikit'].includes(savedPage)
-    ) {
-      const defaultApplicant = MOCK_USERS.find((u) => u.role === 'applicant') || MOCK_USERS[8];
-      localStorage.setItem('auth_user', JSON.stringify(defaultApplicant));
-      return defaultApplicant;
+    if (savedPage && !['auth_login', 'auth_register', 'uikit'].includes(savedPage)) {
+      const defaultAdmin = MOCK_USERS.find((u) => u.role === 'sys_admin') || MOCK_USERS[0];
+      localStorage.setItem('auth_user', JSON.stringify(defaultAdmin));
+      return defaultAdmin;
     }
     return null;
   });
@@ -78,12 +74,12 @@ export function App() {
     if (savedUser) {
       try {
         const u = JSON.parse(savedUser);
-        return u.defaultPage || 'applicant_dashboard';
+        return u.defaultPage || 'admin_settings';
       } catch {
-        return 'home';
+        return 'auth_login';
       }
     }
-    return 'home';
+    return 'auth_login';
   });
 
   const [pageParams, setPageParams] = useState<any>({});
@@ -99,7 +95,7 @@ export function App() {
     setCurrentUser(null);
     localStorage.removeItem('auth_user');
     localStorage.removeItem('active_page');
-    handleNavigate('home');
+    handleNavigate('auth_login');
   };
 
   const isCabinetRoute =
@@ -123,98 +119,26 @@ export function App() {
       currentPage === 'inspection_acts' ||
       currentPage.startsWith('profile_') ||
       currentPage.startsWith('user_profile') ||
-      currentPage.startsWith('prosecutor_'));
+      currentPage.startsWith('prosecutor_') ||
+      currentPage === 'worklist');
 
   return (
     <div className="relative min-h-screen bg-[#F8F9FA] text-[#1A1F24]">
-      {/* Render Selected View */}
       {isCabinetRoute ? (
         <CabinetLayout
-          userName={currentUser?.fullName || 'Alisher Abdullayev'}
-          userRole={currentUser?.roleNameUz || 'Tuman inspektori'}
+          userName={currentUser?.fullName || 'Ergashov Sardor'}
+          userRole={currentUser?.roleNameUz || 'Tizim administrator'}
           userRoleCode={currentUser?.role}
           onNavSelect={(page) => handleNavigate(page)}
           onLogout={handleLogout}
           activeNavId={currentPage}
         >
-          {currentPage === 'applicant_dashboard' && (
-            <ApplicantDashboard
-              userName={currentUser?.fullName}
-              userOrg={currentUser?.organization}
-              onNavigate={handleNavigate}
-            />
-          )}
-          {currentPage === 'applicant_wizard' && (
-            <PermitWizardPage onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'applicant_application_detail' && (
-            <ApplicationDetailPage applicationId={pageParams?.id || 1} onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'applicant_permits' && (
-            <PermitsRegistryPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-          )}
-          {currentPage === 'applicant_help' && (
-            <ApplicantHelpPage onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'gis_editor' && (
-            <GisMapPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-          )}
-          {currentPage === 'gis_import' && (
-            <GisImportPage onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'normative_norms' && (
-            <NormsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
-          {currentPage === 'leskhoz_inbox' && (
-            <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-          )}
-          {(currentPage === 'worklist' || currentPage === 'leskhoz_worklist') && (
-            <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-          )}
-          {currentPage === 'leskhoz_review' && (
-            <LeskhozReviewPage onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'application_card' && (
-            <ApplicationCardPage applicationId={pageParams?.id || 'А-00042'} onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
-          {(currentPage === 'permit_detail' || currentPage === 'permit') && (
-            <PermitDocumentPage onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
-          {(currentPage === 'manager_decision' || currentPage === 'dashboard' || currentPage === 'executive_dashboard') && (
-            currentUser?.role === 'central_admin' ? (
-              <CentralAdminDashboardPage onNavigate={handleNavigate} />
-            ) : currentUser?.role === 'executor_head' ? (
-              <ExecutorHeadDashboardPage onNavigate={handleNavigate} />
-            ) : (
-              <DashboardPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-            )
-          )}
-          {currentPage === 'field_tasks' && (
-            <InspectorTasksPage onNavigate={handleNavigate} />
-          )}
-          {currentPage === 'field_scan' && (
-            <InspectorScanPage onNavigate={handleNavigate} />
-          )}
-          {(currentPage === 'field_inspection' || currentPage === 'inspection_act') && (
-            <InspectorInspectionPage permitNo={pageParams?.permitNo || 'RX-2026-0089'} onNavigate={handleNavigate} />
-          )}
-          {(currentPage === 'reports' || currentPage === 'reports_management') && (
-            <ReportsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
-          )}
-          {currentPage === 'accountant_reconciliation' && (
-            <PaymentsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
+          {/* sys_admin pages */}
           {currentPage === 'admin_settings' && (
             <AdminSettingsPage onNavigate={handleNavigate} />
           )}
           {currentPage === 'admin_users' && (
             <UsersPage onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
-          {currentPage === 'archive' && (
-            <ArchivePage onNavigate={handleNavigate} userRole={currentUser?.role} />
-          )}
-          {currentPage === 'inspection_acts' && (
-            <InspectionActsRegistryPage onNavigate={handleNavigate} userRole={currentUser?.role} />
           )}
           {currentPage === 'admin_roles' && (
             <AdminRolesPage onNavigate={handleNavigate} />
@@ -237,6 +161,91 @@ export function App() {
           {currentPage === 'admin_backups' && (
             <AdminBackupsPage onNavigate={handleNavigate} />
           )}
+          {currentPage === 'admin_help' && (
+            <AdminHelpPage onNavigate={handleNavigate} />
+          )}
+
+          {/* applicant pages */}
+          {currentPage === 'applicant_dashboard' && (
+            <ApplicantDashboard
+              userName={currentUser?.fullName}
+              userOrg={currentUser?.organization}
+              onNavigate={handleNavigate}
+            />
+          )}
+          {currentPage === 'applicant_wizard' && (
+            <PermitWizardPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'applicant_application_detail' && (
+            <ApplicationDetailPage applicationId={pageParams?.id || 1} onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'applicant_permits' && (
+            <PermitsRegistryPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+          )}
+          {currentPage === 'applicant_help' && (
+            <ApplicantHelpPage onNavigate={handleNavigate} />
+          )}
+
+          {/* gis specialist */}
+          {currentPage === 'gis_editor' && (
+            <GisMapPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+          )}
+          {currentPage === 'gis_import' && (
+            <GisImportPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'normative_norms' && (
+            <NormsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+
+          {/* executor staff / head */}
+          {(currentPage === 'leskhoz_inbox' || currentPage === 'worklist' || currentPage === 'leskhoz_worklist') && (
+            <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+          )}
+          {currentPage === 'leskhoz_review' && (
+            <LeskhozReviewPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'application_card' && (
+            <ApplicationCardPage applicationId={pageParams?.id || 'А-00042'} onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+          {(currentPage === 'permit_detail' || currentPage === 'permit') && (
+            <PermitDocumentPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+          {(currentPage === 'manager_decision' || currentPage === 'dashboard' || currentPage === 'executive_dashboard') && (
+            currentUser?.role === 'central_admin' ? (
+              <CentralAdminDashboardPage onNavigate={handleNavigate} />
+            ) : currentUser?.role === 'executor_head' ? (
+              <ExecutorHeadDashboardPage onNavigate={handleNavigate} />
+            ) : (
+              <DashboardPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+            )
+          )}
+
+          {/* inspector */}
+          {currentPage === 'field_tasks' && (
+            <InspectorTasksPage onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'field_scan' && (
+            <InspectorScanPage onNavigate={handleNavigate} />
+          )}
+          {(currentPage === 'field_inspection' || currentPage === 'inspection_act') && (
+            <InspectorInspectionPage permitNo={pageParams?.permitNo || 'RX-2026-0089'} onNavigate={handleNavigate} />
+          )}
+          {currentPage === 'inspection_acts' && (
+            <InspectionActsRegistryPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+
+          {/* accountant & reports & archive */}
+          {(currentPage === 'reports' || currentPage === 'reports_management') && (
+            <ReportsPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
+          )}
+          {currentPage === 'accountant_reconciliation' && (
+            <PaymentsPage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+          {currentPage === 'archive' && (
+            <ArchivePage onNavigate={handleNavigate} userRole={currentUser?.role} />
+          )}
+
+          {/* profile */}
           {(currentPage === 'user_profile' || currentPage === 'profile_settings') && (
             <UserProfileSettingsPage onNavigate={handleNavigate} user={currentUser || undefined} userName={currentUser?.fullName} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
@@ -246,9 +255,8 @@ export function App() {
           {currentPage === 'profile_notifications' && (
             <AdminNotificationsPage onNavigate={handleNavigate} />
           )}
-          {(currentPage === 'admin_help' || currentPage === 'applicant_help') && (
-            <AdminHelpPage onNavigate={handleNavigate} />
-          )}
+
+          {/* prosecutor */}
           {currentPage === 'prosecutor_portal' && (
             <ProsecutorPortalPage onNavigate={handleNavigate} />
           )}
@@ -258,49 +266,23 @@ export function App() {
           {currentPage === 'uikit' ? (
             <UIKitShowcase />
           ) : (
-            <PublicLayout
-              onNavigate={handleNavigate}
-              activeNav={currentPage}
-              onCheckPermit={(no) => handleNavigate('verify', { query: no })}
-            >
-              {currentPage === 'home' && (
-                <HomePage onNavigate={handleNavigate} />
-              )}
-              {currentPage === 'services' && (
-                <ServicesPage onNavigate={handleNavigate} />
-              )}
-              {currentPage === 'tariffs' && (
-                <TariffsPage />
-              )}
-              {currentPage === 'documents' && (
-                <DocumentsPage onNavigate={handleNavigate} />
-              )}
-              {currentPage === 'opendata' && (
-                <OpenDataPage onNavigate={handleNavigate} />
-              )}
-              {currentPage === 'faq' && (
-                <FaqPage onNavigate={handleNavigate} />
-              )}
-              {currentPage === 'verify' && (
-                <VerifyPage initialQuery={pageParams?.query || 'RX-2026-0089'} />
-              )}
-              {currentPage === 'auth_login' && (
-                <LoginPage
-                  onSuccessLogin={(user) => {
-                    setCurrentUser(user);
-                    localStorage.setItem('auth_user', JSON.stringify(user));
-                    handleNavigate(user.defaultPage || 'applicant_dashboard');
-                  }}
-                  onNavigate={handleNavigate}
-                />
-              )}
-              {currentPage === 'auth_register' && (
+            <AuthLayout>
+              {currentPage === 'auth_register' ? (
                 <RegisterPage
                   onSuccessRegister={() => handleNavigate('auth_login')}
                   onNavigate={handleNavigate}
                 />
+              ) : (
+                <LoginPage
+                  onSuccessLogin={(user) => {
+                    setCurrentUser(user);
+                    localStorage.setItem('auth_user', JSON.stringify(user));
+                    handleNavigate(user.defaultPage || 'admin_settings');
+                  }}
+                  onNavigate={handleNavigate}
+                />
               )}
-            </PublicLayout>
+            </AuthLayout>
           )}
         </>
       )}
