@@ -204,3 +204,12 @@
 .sidebar-scroll:hover::-webkit-scrollbar-thumb {
   background: #d4d9dd;
 }
+
+/* Hide scrollbar for Chrome, Safari, Opera and IE, Edge, Firefox */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -122,8 +122,8 @@ const ROLE_HOME: Record<RoleCode, string> = {
   central_admin: 'manager_decision',
   management: 'manager_decision',
   executor_head: 'manager_decision',
-  executor_staff: 'leskhoz_inbox',
-  gis_specialist: 'gis_editor',
+  executor_staff: 'leskhoz_dashboard',
+  gis_specialist: 'gis_dashboard',
   inspector: 'field_tasks',
   accountant: 'accountant_reconciliation',
   prosecutor: 'prosecutor_portal',
@@ -270,7 +270,7 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
 
   // Receives and reviews applications, draws up documents and fills in reports.
   executor_staff: [
-    homeGroup('Bosh sahifa (ish navbati)', 'leskhoz_inbox'),
+    homeGroup('Bosh sahifa (monitoring)', 'leskhoz_dashboard'),
     {
       group: 'Hujjatlar va amallar',
       items: [
@@ -298,10 +298,11 @@ const NAV_BY_ROLE: Record<RoleCode, NavGroup[]> = {
   // Enters and versions GIS contours, enters norm, limit and tariff, and issues
   // the GIS conclusion on an application.
   gis_specialist: [
-    homeGroup('Bosh sahifa (GIS xarita)', 'gis_editor'),
+    homeGroup('Bosh sahifa (monitoring)', 'gis_dashboard'),
     {
       group: 'GIS va meʼyoriy modul',
       items: [
+        { id: 'gis_editor', label: 'GIS Xarita muharriri', page: 'gis_editor', icon: <Map className={ICON} /> },
         { id: 'gis_import', label: 'Qatlamlarni import qilish', page: 'gis_import', icon: <Layers className={ICON} /> },
         { id: 'normative', label: 'Meʼyor, limit va tarif', page: 'normative_norms', icon: <Calculator className={ICON} /> },
         { id: 'applications', label: 'Arizalar — GIS xulosasi', page: 'leskhoz_inbox', icon: <Mail className={ICON} />, count: 24 },
@@ -618,7 +619,7 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
       </header>
 
       {/* Shell Body: Sidebar + Main Content */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-w-0">
         {/* Left Sidebar */}
         {/* Pinned under the 4rem header so the nav scrolls on its own, not with the page */}
         <aside
@@ -727,7 +728,7 @@ export const CabinetLayout: React.FC<CabinetLayoutProps> = ({
         </aside>
 
         {/* Main Application Area */}
-        <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full min-w-0">
           {children}
         </main>
       </div>

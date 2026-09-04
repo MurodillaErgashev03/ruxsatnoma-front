@@ -13,7 +13,27 @@ import {
   Compass,
   UserCheck,
   Sparkles,
+  TrendingUp,
+  PieChart as PieIcon,
+  BarChart3,
+  RefreshCw,
+  Clock,
+  Landmark,
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Button } from '../../../components/ui/button';
 import { Modal } from '../../../components/ui/Overlay';
 
@@ -29,6 +49,54 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('RJ-05');
   const [isSigning, setIsSigning] = useState(false);
+  const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Timeline data for Decisions & E-IMZO signatures
+  const decisionTimelineData = {
+    week: [
+      { day: 'Dush', approved: 6, signed: 5, rejected: 1 },
+      { day: 'Sesh', approved: 9, signed: 7, rejected: 1 },
+      { day: 'Chor', approved: 8, signed: 8, rejected: 2 },
+      { day: 'Pay', approved: 12, signed: 10, rejected: 1 },
+      { day: 'Jum', approved: 11, signed: 9, rejected: 2 },
+      { day: 'Shan', approved: 4, signed: 4, rejected: 0 },
+      { day: 'Yak', approved: 2, signed: 2, rejected: 0 },
+    ],
+    month: [
+      { day: '1-7 avg', approved: 28, signed: 24, rejected: 4 },
+      { day: '8-14 avg', approved: 36, signed: 31, rejected: 5 },
+      { day: '15-21 avg', approved: 32, signed: 28, rejected: 3 },
+      { day: '22-28 avg', approved: 41, signed: 37, rejected: 4 },
+      { day: '29-31 avg', approved: 18, signed: 16, rejected: 2 },
+    ],
+  };
+
+  // Application decision status distribution
+  const decisionDistributionData = [
+    { name: 'Ijobiy qaror (Toʻlovga)', count: 88, pct: 63, color: '#2E7D4F' },
+    { name: 'E-IMZO bilan berilgan', count: 31, pct: 22, color: '#0284C7' },
+    { name: 'Rad etilgan (Rad qarori)', count: 14, pct: 10, color: '#EF4444' },
+    { name: 'Qayta koʻrib chiqishga', count: 7, pct: 5, color: '#F59E0B' },
+  ];
+
+  // Forestry sectors revenue and allocated quota
+  const forestrySectorsData = [
+    { sector: 'Chimyon', allocatedHa: 240, revenueMln: 38.5, quotaPct: 82 },
+    { sector: 'Burchmulla', allocatedHa: 195, revenueMln: 32.8, quotaPct: 76 },
+    { sector: 'Chorbogʻ', allocatedHa: 145, revenueMln: 26.4, quotaPct: 68 },
+    { sector: 'Piskom', allocatedHa: 110, revenueMln: 18.2, quotaPct: 54 },
+    { sector: 'Sijjak', allocatedHa: 85, revenueMln: 12.5, quotaPct: 48 },
+  ];
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setToastMessage('Barcha qarorlar, imzolash navbatlari va tushum statistikasi yangilandi');
+      setTimeout(() => setToastMessage(null), 3000);
+    }, 600);
+  };
 
   // Decision pending applications (reviewed by staff & GIS)
   const [pendingApplications, setPendingApplications] = useState([
@@ -204,7 +272,36 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="bg-[#F8F9FA] border border-[#E4E7EA] p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
+            <button
+              onClick={() => setTimeRange('week')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                timeRange === 'week' ? 'bg-[#2E7D4F] text-white shadow-xs font-bold' : 'text-[#5A646D] hover:text-[#1A1F24]'
+              }`}
+            >
+              Haftalik
+            </button>
+            <button
+              onClick={() => setTimeRange('month')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                timeRange === 'month' ? 'bg-[#2E7D4F] text-white shadow-xs font-bold' : 'text-[#5A646D] hover:text-[#1A1F24]'
+              }`}
+            >
+              Oylik
+            </button>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#2E7D4F]' : ''}`} />}
+            className="text-xs font-semibold"
+          >
+            Yangilash
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
@@ -289,6 +386,328 @@ export const ExecutorHeadDashboardPage: React.FC<ExecutorHeadDashboardPageProps>
           </div>
           <div className="text-2xl font-bold font-mono text-[#2E7D4F] mt-2">128.4 mln</div>
           <p className="text-[11px] text-[#5A646D] mt-1">DЎX hisobidagi ulush: 64.2 mln UZS</p>
+        </div>
+      </div>
+
+      {/* 1. EXECUTIVE DIAGRAMMATIC STATISTICS & CHARTS */}
+      <div className="space-y-6">
+        {/* ROW 1: Decisions & E-IMZO Dynamics (AreaChart) + Decision Status Breakdown (Donut) */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.75fr_1.25fr] gap-6">
+          {/* Chart 1: Decision Dynamics */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E7EA] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-[#2E7D4F]" />
+                  <h2 className="text-base font-bold text-[#1A1F24]">
+                    Qarorlar va E-IMZO Imzolash Dinamikasi
+                  </h2>
+                </div>
+                <p className="text-xs text-[#5A646D] mt-0.5">
+                  Maʼqullangan arizalar, E-IMZO bilan imzolangan ruxsatnomalar va rad etilgan qarorlar oqimi
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded-lg border border-[#D9EBDC] flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" /> SLA Intizomi: 98.4%
+              </span>
+            </div>
+
+            <div className="w-full h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={decisionTimelineData[timeRange]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="headApprovedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2E7D4F" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#2E7D4F" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="headSignedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0284C7" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#0284C7" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="headRejectedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EA" vertical={false} />
+                  <XAxis dataKey="day" stroke="#767F87" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#767F87" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-[#1A1F24] text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 font-sans">
+                            <div className="font-bold text-[#7FB98A] border-b border-white/10 pb-1">{label}</div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-emerald-300">Maʼqullangan (Toʻlovga):</span>
+                              <span className="font-mono font-bold">{payload[0]?.value} ta</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-sky-300">E-IMZO imzolangan:</span>
+                              <span className="font-mono font-bold">{payload[1]?.value} ta</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-rose-300">Rad etilgan:</span>
+                              <span className="font-mono font-bold">{payload[2]?.value} ta</span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="approved"
+                    name="Maʼqullangan"
+                    stroke="#2E7D4F"
+                    strokeWidth={2.5}
+                    fill="url(#headApprovedGrad)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="signed"
+                    name="E-IMZO imzolangan"
+                    stroke="#0284C7"
+                    strokeWidth={2}
+                    fill="url(#headSignedGrad)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="rejected"
+                    name="Rad etilgan"
+                    stroke="#EF4444"
+                    strokeWidth={1.5}
+                    fill="url(#headRejectedGrad)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#E4E7EA] bg-[#F8F9FA] p-3 rounded-xl text-center text-xs">
+              <div>
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">Jami koʻrib chiqilgan</span>
+                <span className="text-sm font-extrabold text-[#1A1F24] font-mono">140 ta / davr</span>
+              </div>
+              <div className="border-x border-[#E4E7EA]">
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">Oʻrtacha qaror muddati</span>
+                <span className="text-sm font-extrabold text-[#2E7D4F] font-mono">1.2 kun</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">E-IMZO imzolash tezligi</span>
+                <span className="text-sm font-extrabold text-[#0284C7] font-mono">4.8 soat</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Chart 2: Decision Status Donut */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#E4E7EA] pb-3">
+                <div>
+                  <h2 className="text-base font-bold text-[#1A1F24] flex items-center gap-2">
+                    <PieIcon className="w-5 h-5 text-[#2E7D4F]" /> Qarorlar Taqsimoti
+                  </h2>
+                  <p className="text-xs text-[#5A646D] mt-0.5">
+                    140 ta arizaning yakuniy huquqiy natijalari
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded-lg border border-[#D9EBDC]">
+                  85% ijobiy
+                </span>
+              </div>
+
+              <div className="relative w-full h-[180px] flex items-center justify-center my-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-[#1A1F24] text-white p-2.5 rounded-xl shadow-lg text-xs space-y-0.5">
+                              <div className="font-bold text-[#7FB98A]">{d.name}</div>
+                              <div className="flex justify-between gap-3 font-mono">
+                                <span>Arizalar:</span>
+                                <span className="font-bold text-white">{d.count} ta ({d.pct}%)</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Pie
+                      data={decisionDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={48}
+                      outerRadius={72}
+                      paddingAngle={3}
+                      dataKey="count"
+                    >
+                      {decisionDistributionData.map((entry, idx) => (
+                        <Cell key={`cell-${idx}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xl font-black text-[#1A1F24] font-mono leading-none">140</span>
+                  <span className="text-[10px] font-bold uppercase text-[#767F87] tracking-wider mt-0.5">Arizalar</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-2 border-t border-[#E4E7EA]">
+              {decisionDistributionData.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs py-0.5">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-[#5A646D] truncate">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="font-bold text-[#1A1F24] font-mono">{item.count} ta</span>
+                    <span className="text-[11px] font-bold text-[#767F87] font-mono w-9 text-right">{item.pct}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ROW 2: Forestry Sectors Quota & Revenue (BarChart) + 50/50 Revenue Split */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.85fr_1.15fr] gap-6">
+          {/* Forestry Sectors BarChart */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E7EA] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[#2E7D4F]" />
+                  <h2 className="text-base font-bold text-[#1A1F24]">
+                    Oʻrmon Boʻlimlari Kesimida Maydon va Tushum
+                  </h2>
+                </div>
+                <p className="text-xs text-[#5A646D] mt-0.5">
+                  Boʻstonliq DЎX boʻlimlari boʻyicha ajratilgan gektar va tushgan mablagʻ (mln UZS)
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-[#5A646D]">
+                  <span className="w-3 h-3 rounded bg-[#3B82F6]" /> Maydon (ga)
+                </span>
+                <span className="flex items-center gap-1.5 text-[#5A646D]">
+                  <span className="w-3 h-3 rounded bg-[#2E7D4F]" /> Tushum (mln UZS)
+                </span>
+              </div>
+            </div>
+
+            <div className="w-full h-[230px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={forestrySectorsData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EA" vertical={false} />
+                  <XAxis dataKey="sector" stroke="#767F87" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#767F87" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        const d = payload[0].payload;
+                        return (
+                          <div className="bg-[#1A1F24] text-white p-3 rounded-xl shadow-lg text-xs space-y-1 font-sans">
+                            <div className="font-bold text-[#7FB98A] border-b border-white/10 pb-1">{label} boʻlimi</div>
+                            <div className="flex justify-between gap-4 pt-1">
+                              <span className="text-sky-300">Ajratilgan maydon:</span>
+                              <span className="font-mono font-bold">{d.allocatedHa} ga</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-emerald-300">Tushgan toʻlov:</span>
+                              <span className="font-mono font-bold">{d.revenueMln} mln UZS</span>
+                            </div>
+                            <div className="flex justify-between gap-4 border-t border-white/10 pt-1 text-[11px]">
+                              <span className="text-amber-300">Kvota bandligi:</span>
+                              <span className="font-mono font-bold text-amber-300">{d.quotaPct}%</span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="allocatedHa" name="Maydon (ga)" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="revenueMln" name="Tushum (mln)" fill="#2E7D4F" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-[#E4E7EA] text-center text-xs">
+              {forestrySectorsData.map((sec, idx) => (
+                <div key={idx} className="bg-[#F8F9FA] p-2 rounded-xl">
+                  <span className="text-[11px] font-bold text-[#1A1F24] block">{sec.sector}</span>
+                  <span className="text-[10px] text-[#5A646D]">{sec.allocatedHa} ga</span>
+                  <div className="text-[11px] font-mono font-bold text-[#2E7D4F] mt-0.5">{sec.revenueMln} mln</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 50/50 Revenue Split Executive Card */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#E4E7EA] pb-3">
+                <div className="flex items-center gap-2">
+                  <Landmark className="w-5 h-5 text-[#2E7D4F]" />
+                  <h2 className="text-base font-bold text-[#1A1F24]">50/50 Mablagʻ Taqsimoti</h2>
+                </div>
+                <span className="text-[11px] font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2 py-0.5 rounded border border-[#D9EBDC]">
+                  TZ F-03
+                </span>
+              </div>
+              <p className="text-xs text-[#5A646D] mt-2">
+                Qonunchilikka asosan ruxsatnomalar toʻlovining 50% qismi davlat byudjetiga, 50% qismi oʻrmon xoʻjaligi rivojlantirish jamgʻarmasiga yoʻnaltiriladi.
+              </p>
+
+              <div className="mt-4 p-4 bg-[#F0F7F1] border border-[#D9EBDC] rounded-2xl space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#2E7D4F]">Jami Tushum (Oylik)</span>
+                <div className="text-3xl font-black font-mono text-[#123522]">128 400 000 UZS</div>
+                <div className="text-[11px] text-[#2E7D4F]/80 flex items-center gap-1 font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Munis billing integratsiyasi orqali avtomatlashtirilgan
+                </div>
+              </div>
+
+              <div className="space-y-3 mt-4">
+                <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-[#1A1F24]">Davlat Byudjeti (Gʻaznachilik)</span>
+                    <span className="font-mono font-bold text-[#1A1F24]">64.2 mln UZS (50%)</span>
+                  </div>
+                  <div className="w-full bg-[#E4E7EA] h-2 rounded-full overflow-hidden">
+                    <div className="bg-[#0284C7] h-full rounded-full" style={{ width: '50%' }} />
+                  </div>
+                  <div className="text-[10px] text-[#767F87]">Hisob raqam: 23402000300100001010</div>
+                </div>
+
+                <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-[#1A1F24]">Boʻstonliq DЎX Jamgʻarmasi</span>
+                    <span className="font-mono font-bold text-[#2E7D4F]">64.2 mln UZS (50%)</span>
+                  </div>
+                  <div className="w-full bg-[#E4E7EA] h-2 rounded-full overflow-hidden">
+                    <div className="bg-[#2E7D4F] h-full rounded-full" style={{ width: '50%' }} />
+                  </div>
+                  <div className="text-[10px] text-[#767F87]">DЎX maxsus hisob raqami: 20210000800540112001</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-[#E4E7EA] flex items-center justify-between text-xs">
+              <span className="text-[#5A646D] font-medium">Buxgalteriya aktlari mosligi:</span>
+              <span className="font-bold text-[#2E7D4F] font-mono flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" /> 100% Mos keladi
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

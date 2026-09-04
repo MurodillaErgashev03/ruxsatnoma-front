@@ -58,7 +58,7 @@ export const MOCK_USERS: MockUser[] = [
     fullName: 'Rahimov Jasur Umidovich',
     organization: 'Boʻstonliq davlat oʻrmon xoʻjaligi',
     position: 'Katta mutaxassis',
-    defaultPage: 'leskhoz_inbox',
+    defaultPage: 'leskhoz_dashboard',
   },
   {
     id: 'usr-005',
@@ -70,7 +70,7 @@ export const MOCK_USERS: MockUser[] = [
     fullName: 'Yusupov Bobur Maratovich',
     organization: 'Oʻrmon loyiha instituti',
     position: 'GIS mutaxassisi',
-    defaultPage: 'gis_editor',
+    defaultPage: 'gis_dashboard',
   },
   {
     id: 'usr-006',

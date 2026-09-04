@@ -16,8 +16,8 @@ import {
 } from './pages/roles/sys_admin';
 import { CentralAdminDashboardPage } from './pages/roles/central_admin';
 import { ExecutorHeadDashboardPage } from './pages/roles/executor_head';
-import { LeskhozReviewPage } from './pages/roles/executor_staff';
-import { GisImportPage } from './pages/roles/gis_specialist';
+import { LeskhozReviewPage, ExecutorStaffDashboardPage } from './pages/roles/executor_staff';
+import { GisImportPage, GisSpecialistDashboardPage } from './pages/roles/gis_specialist';
 import { InspectorTasksPage, InspectorScanPage, InspectorInspectionPage } from './pages/roles/inspector';
 import { ApplicantDashboard, PermitWizardPage, ApplicationDetailPage, ApplicantHelpPage } from './pages/roles/applicant';
 import { ApplicantBillingPage } from './pages/roles/applicant/ApplicantBillingPage';
@@ -192,6 +192,9 @@ export function App() {
           )}
 
           {/* gis specialist */}
+          {currentPage === 'gis_dashboard' && (
+            <GisSpecialistDashboardPage onNavigate={handleNavigate} />
+          )}
           {currentPage === 'gis_editor' && (
             <GisMapPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}
@@ -203,6 +206,9 @@ export function App() {
           )}
 
           {/* executor staff / head */}
+          {currentPage === 'leskhoz_dashboard' && (
+            <ExecutorStaffDashboardPage onNavigate={handleNavigate} />
+          )}
           {(currentPage === 'leskhoz_inbox' || currentPage === 'worklist' || currentPage === 'leskhoz_worklist') && (
             <WorklistPage onNavigate={handleNavigate} userRole={currentUser?.roleNameUz || currentUser?.role} />
           )}

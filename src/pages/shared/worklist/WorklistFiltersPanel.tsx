@@ -39,10 +39,10 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
 
   return (
     <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 shadow-xs font-sans space-y-4">
-      {/* Primary Filter Row */}
-      <div className="flex flex-wrap gap-4 items-end justify-between">
+      {/* Primary Filter Grid - 6 columns on xl, 3 on md, 2 on sm */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         {/* Status Dropdown */}
-        <div className="space-y-1 min-w-[160px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Status (Статус)
           </label>
@@ -57,12 +57,12 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
             <option value="info_requested">Ma'lumot soʻralgan (Запрошены сведения)</option>
             <option value="contract_prep">Shartnoma tayyorlanmoqda</option>
             <option value="returned">Qaytarilgan (Возвращена)</option>
-            <option value="approved">Tasdiqlangan (Одобрена)</option>
+            <option value="approved">Tasdiqlangan (Одобrena)</option>
           </select>
         </div>
 
         {/* GIS Conclusion Status Filter (Specialist filter) */}
-        <div className="space-y-1 min-w-[170px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#0369A1] uppercase tracking-wider block truncate flex items-center gap-1">
             <Compass className="w-3.5 h-3.5 text-[#0284C7]" />
             GIS Ekspertizasi
@@ -80,7 +80,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* Activity Type Dropdown */}
-        <div className="space-y-1 min-w-[180px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Faoliyat turi (Вид деятельности)
           </label>
@@ -100,29 +100,29 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* Submission Period Dates */}
-        <div className="space-y-1 min-w-[240px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Qabul davri (Период подачи)
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <input
               type="date"
               value={filters.startDate}
               onChange={(e) => onFilterChange('startDate', e.target.value)}
-              className="flex-1 min-w-0 h-10 px-2 text-[11px] font-mono bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24]"
+              className="w-1/2 h-10 px-1.5 text-[11px] font-mono bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24]"
             />
             <span className="text-[#5A646D] text-xs shrink-0">—</span>
             <input
               type="date"
               value={filters.endDate}
               onChange={(e) => onFilterChange('endDate', e.target.value)}
-              className="flex-1 min-w-0 h-10 px-2 text-[11px] font-mono bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24]"
+              className="w-1/2 h-10 px-1.5 text-[11px] font-mono bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24]"
             />
           </div>
         </div>
 
         {/* Region Filter for Central Admin / Republic View */}
-        <div className="space-y-1 min-w-[160px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             Hudud (Вилоят / ДЎХ)
           </label>
@@ -132,7 +132,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
             className="w-full h-10 px-3 text-xs bg-[#F8F9FA] border border-[#767F87] rounded-lg text-[#1A1F24] focus:ring-2 focus:ring-[#2E7D4F] focus:outline-none truncate font-medium"
           >
             <option value="all">Respublika — barcha 14 viloyat</option>
-            <option value="tashkent">Toshkent viloyati (Boʻstonliq DЎX)</option>
+            <option value="tashkent">Toshkent v. (Boʻstonliq)</option>
             <option value="samarkand">Samarqand viloyati</option>
             <option value="fergana">Fargʻona viloyati</option>
             <option value="namangan">Namangan viloyati</option>
@@ -146,7 +146,7 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
         </div>
 
         {/* SLA Urgency Filter */}
-        <div className="space-y-1 min-w-[150px] flex-1">
+        <div className="space-y-1">
           <label className="text-xs font-bold text-[#5A646D] uppercase tracking-wider block truncate">
             SLA muddati (Срок SLA)
           </label>
@@ -157,33 +157,33 @@ export const WorklistFiltersPanel: React.FC<WorklistFiltersPanelProps> = ({
           >
             <option value="all">Barchasi (Любой)</option>
             <option value="overdue">Muddati oʻtgan (Просрочено)</option>
-            <option value="due_today">Bugun tugaydi (Истекает сегодня)</option>
-            <option value="within_3days">3 kundan kam vaqt qoldi</option>
+            <option value="due_today">Bugun tugaydi</option>
+            <option value="within_3days">3 kundan kam</option>
             <option value="paused">Timer toʻxtatilgan</option>
           </select>
         </div>
+      </div>
 
-        {/* Filter Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0 ml-auto pt-2 sm:pt-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onResetFilters}
-            leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-            className="h-10 border-[#767F87] text-[#5A646D] hover:text-[#1A1F24] text-xs font-bold px-4 cursor-pointer"
-          >
-            Tiklash
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={onApplyFilters}
-            leftIcon={<Filter className="w-3.5 h-3.5" />}
-            className="h-10 bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold px-5 shadow-xs cursor-pointer"
-          >
-            Qoʻllash
-          </Button>
-        </div>
+      {/* Filter Action Buttons Row */}
+      <div className="flex items-center justify-end gap-2 pt-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onResetFilters}
+          leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+          className="h-9 border-[#767F87] text-[#5A646D] hover:text-[#1A1F24] text-xs font-bold px-4 cursor-pointer"
+        >
+          Tiklash
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={onApplyFilters}
+          leftIcon={<Filter className="w-3.5 h-3.5" />}
+          className="h-9 bg-[#2E7D4F] hover:bg-[#23653F] text-white text-xs font-bold px-5 shadow-xs cursor-pointer"
+        >
+          Qoʻllash
+        </Button>
       </div>
 
       {/* Saved Filter Profile Chips */}
