@@ -33,7 +33,7 @@ export const WorklistTabs: React.FC<WorklistTabsProps> = ({
   ];
 
   return (
-    <div className="border-b border-[#E4E7EA] overflow-x-auto font-sans">
+    <div className="border-b border-[#E4E7EA] overflow-x-auto no-scrollbar font-sans">
       <div className="flex gap-2 min-w-max pb-px">
         {tabs.map((t) => {
           const isSelected = activeTab === t.id;

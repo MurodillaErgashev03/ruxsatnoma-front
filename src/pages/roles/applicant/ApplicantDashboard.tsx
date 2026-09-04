@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Plus,
   CreditCard,
@@ -8,7 +8,29 @@ import {
   MapPin,
   RotateCcw,
   AlertCircle,
+  TrendingUp,
+  PieChart as PieIcon,
+  BarChart3,
+  CheckCircle2,
+  ShieldCheck,
+  Layers,
+  RefreshCw,
+  FileText,
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Button } from '../../../components/ui/button';
 
 export interface ApplicantDashboardProps {
@@ -22,9 +44,513 @@ export const ApplicantDashboard: React.FC<ApplicantDashboardProps> = ({
   userOrg = '«Chorvador-Sardor» fermer xoʻjaligi',
   onNavigate,
 }) => {
+  const [timeRange, setTimeRange] = useState<'week' | 'month'>('month');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const applicantTimelineData = {
+    week: [
+      { day: 'Dush', applications: 1, permits: 1, payments: 0.45 },
+      { day: 'Sesh', applications: 1, permits: 1, payments: 1.2 },
+      { day: 'Chor', applications: 0, permits: 0, payments: 0 },
+      { day: 'Pay', applications: 2, permits: 1, payments: 2.1 },
+      { day: 'Jum', applications: 1, permits: 1, payments: 0.8 },
+      { day: 'Shan', applications: 0, permits: 0, payments: 0 },
+      { day: 'Yak', applications: 0, permits: 0, payments: 0 },
+    ],
+    month: [
+      { day: 'Apr', applications: 1, permits: 1, payments: 1.2 },
+      { day: 'May', applications: 2, permits: 2, payments: 2.8 },
+      { day: 'Iyun', applications: 3, permits: 2, payments: 3.4 },
+      { day: 'Iyul', applications: 2, permits: 2, payments: 2.1 },
+      { day: 'Avg', applications: 3, permits: 2, payments: 3.7 },
+      { day: 'Sen', applications: 2, permits: 1, payments: 1.8 },
+    ],
+  };
+
+  const activityLandData = [
+    { name: 'Chorva molini boqish', areaHa: 42.6, pct: 70, color: '#2E7D4F' },
+    { name: 'Pichan oʻrish', areaHa: 18.4, pct: 30, color: '#0284C7' },
+  ];
+
+  const plotsOverviewData = [
+    { plot: 'Zangiota 14-kv', areaHa: 42.6, daysLeft: 82, livestock: 198 },
+    { plot: 'Ohangaron 22-kv', areaHa: 18.4, daysLeft: 21, livestock: 0 },
+    { plot: 'Pskent 7-kv', areaHa: 12.0, daysLeft: 60, livestock: 0 },
+  ];
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setToastMessage('Arizalar holati, ruxsatnomalar muddati va toʻlovlar statistikasi yangilandi');
+      setTimeout(() => setToastMessage(null), 3000);
+    }, 600);
+  };
   return (
     <div className="space-y-10 font-sans pb-12">
-      {/* ── 1. Onboarding Section at the Very Top (applicant-cabinet.html onboarding design) ── */}
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div className="p-4 bg-[#F0F7F1] border border-[#D9EBDC] text-[#2E7D4F] rounded-2xl shadow-sm flex items-center justify-between gap-3 animate-in fade-in duration-300">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-[#2E7D4F] shrink-0" />
+            <span className="text-xs sm:text-sm font-semibold">{toastMessage}</span>
+          </div>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-xs font-bold underline hover:opacity-75 cursor-pointer"
+          >
+            Yopish
+          </button>
+        </div>
+      )}
+
+      {/* ── 1. Hero Section at the Top ── */}
+      <div className="bg-gradient-to-r from-[#1D5434] via-[#23653F] to-[#2E7D4F] text-white rounded-3xl p-8 lg:p-10 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 border border-[#39935E]/40 relative overflow-hidden">
+        {/* Subtle background decorative element */}
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="space-y-3 max-w-2xl z-10">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+            Assalomu alaykum, {userName}
+          </h1>
+          <p className="text-sm md:text-base text-emerald-50/90 leading-relaxed font-normal">
+            {userOrg}. Sizda 2 ta amaldagi ruxsatnoma va 1 ta toʻlov kutilayotgan ariza bor. Qolgan ishlar reja boʻyicha ketmoqda — biror narsa kerak boʻlganda xabar beramiz.
+          </p>
+        </div>
+
+        <div className="shrink-0 text-center lg:text-right w-full lg:w-auto z-10 flex flex-col items-center lg:items-end">
+          <button
+            onClick={() => onNavigate?.('applicant_wizard')}
+            className="w-full sm:w-auto h-16 px-8 rounded-2xl bg-white text-[#123522] hover:bg-[#F0F7F1] text-lg font-extrabold shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-3 border-2 border-white/90 group transform hover:scale-[1.03] active:scale-[0.98] cursor-pointer ring-4 ring-white/20"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[#F0F7F1] border border-[#2E7D4F]/20 flex items-center justify-center text-[#2E7D4F] group-hover:bg-[#2E7D4F] group-hover:text-white transition-colors">
+              <Plus className="w-6 h-6 stroke-[2.5]" />
+            </div>
+            <span className="tracking-tight text-[#123522]">Ariza topshirish</span>
+          </button>
+          <small className="block mt-3 text-xs text-emerald-100/80 leading-snug max-w-[280px] text-center lg:text-right font-medium">
+            Olti bosqich, taxminan 15 daqiqa. Istalgan vaqtda toʻxtatishingiz mumkin — qoralama saqlanadi.
+          </small>
+        </div>
+      </div>
+
+      {/* ── 2.1 APPLICANT STATISTICAL DASHBOARD & CHARTS ── */}
+      <section className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E4E7EA] pb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded border border-[#D9EBDC] flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" /> Shaxsiy Kabinet Koʻrsatkichlari
+              </span>
+            </div>
+            <h2 className="text-xl font-bold text-[#1A1F24] mt-1">
+              Mening Statistikam va Foydalanish Tahlili
+            </h2>
+            <p className="text-xs text-[#5A646D] mt-0.5">
+              Ruxsatnomalar, arizalar oqimi, biriktirilgan yer maydonlari va toʻlovlar dinamikasi
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="bg-[#F8F9FA] border border-[#E4E7EA] p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
+              <button
+                onClick={() => setTimeRange('week')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  timeRange === 'week' ? 'bg-[#2E7D4F] text-white shadow-xs font-bold' : 'text-[#5A646D] hover:text-[#1A1F24]'
+                }`}
+              >
+                Haftalik
+              </button>
+              <button
+                onClick={() => setTimeRange('month')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  timeRange === 'month' ? 'bg-[#2E7D4F] text-white shadow-xs font-bold' : 'text-[#5A646D] hover:text-[#1A1F24]'
+                }`}
+              >
+                Oylik
+              </button>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#2E7D4F]' : ''}`} />}
+              className="text-xs font-semibold"
+            >
+              Yangilash
+            </Button>
+          </div>
+        </div>
+
+        {/* 4 Top KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white border border-[#E4E7EA] hover:border-[#7FB98A] p-5 rounded-2xl shadow-xs transition-all space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase text-[#5A646D]">Amaldagi Ruxsatnomalar</span>
+              <span className="w-8 h-8 rounded-xl bg-[#D9EBDC] text-[#2E7D4F] flex items-center justify-center font-bold">
+                2
+              </span>
+            </div>
+            <div className="text-2xl font-black font-mono text-[#1A1F24]">2 ta ruxsatnoma</div>
+            <p className="text-[11px] text-[#2E7D4F] font-semibold flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5" /> 61.0 ga maydon biriktirilgan
+            </p>
+          </div>
+
+          <div className="bg-white border border-[#E4E7EA] hover:border-[#7FB98A] p-5 rounded-2xl shadow-xs transition-all space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase text-[#5A646D]">Jarayondagi Arizalar</span>
+              <span className="w-8 h-8 rounded-xl bg-[#DBEAFE] text-[#1D4ED8] flex items-center justify-center font-bold">
+                3
+              </span>
+            </div>
+            <div className="text-2xl font-black font-mono text-[#1D4ED8]">3 ta ariza</div>
+            <p className="text-[11px] text-[#5A646D] flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-[#B45309]" /> 1 ta toʻlov kutilmoqda
+            </p>
+          </div>
+
+          <div className="bg-white border border-[#E4E7EA] hover:border-[#7FB98A] p-5 rounded-2xl shadow-xs transition-all space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase text-[#5A646D]">Mavsumiy Toʻlovlar</span>
+              <CreditCard className="w-5 h-5 text-[#2E7D4F]" />
+            </div>
+            <div className="text-2xl font-black font-mono text-[#123522]">3.68 mln UZS</div>
+            <p className="text-[11px] text-[#15803D] font-semibold flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> 100% kvitansiya tasdiqlangan
+            </p>
+          </div>
+
+          <div className="bg-white border border-[#E4E7EA] hover:border-[#7FB98A] p-5 rounded-2xl shadow-xs transition-all space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase text-[#5A646D]">Foydalanish Intizomi</span>
+              <ShieldCheck className="w-5 h-5 text-[#2E7D4F]" />
+            </div>
+            <div className="text-2xl font-black font-mono text-[#2E7D4F]">100%</div>
+            <p className="text-[11px] text-[#5A646D]">GPS geofencing ichida, qoidabuzarliksiz</p>
+          </div>
+        </div>
+
+        {/* Charts Row 1: AreaChart + Donut */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.75fr_1.25fr] gap-6">
+          {/* Chart 1: Applications & Permits Flow */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E7EA] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-[#2E7D4F]" />
+                  <h3 className="text-base font-bold text-[#1A1F24]">
+                    Arizalar va Ruxsatnomalar Dinamikasi
+                  </h3>
+                </div>
+                <p className="text-xs text-[#5A646D] mt-0.5">
+                  Topshirilgan arizalar, tasdiqlangan ruxsatnomalar va toʻlovlar oqimi
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded-lg border border-[#D9EBDC] flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" /> Oʻrtacha koʻrib chiqish: 9 kun
+              </span>
+            </div>
+
+            <div className="w-full h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={applicantTimelineData[timeRange]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="appPermitGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2E7D4F" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#2E7D4F" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="appAppGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0284C7" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#0284C7" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EA" vertical={false} />
+                  <XAxis dataKey="day" stroke="#767F87" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#767F87" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-[#1A1F24] text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 font-sans">
+                            <div className="font-bold text-[#7FB98A] border-b border-white/10 pb-1">{label}</div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-sky-300">Topshirilgan arizalar:</span>
+                              <span className="font-mono font-bold">{payload[0]?.value} ta</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-emerald-300">Berilgan ruxsatnomalar:</span>
+                              <span className="font-mono font-bold">{payload[1]?.value} ta</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-amber-300">Toʻlangan summa:</span>
+                              <span className="font-mono font-bold">{payload[2]?.value} mln UZS</span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="applications"
+                    name="Arizalar"
+                    stroke="#0284C7"
+                    strokeWidth={2}
+                    fill="url(#appAppGrad)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="permits"
+                    name="Ruxsatnomalar"
+                    stroke="#2E7D4F"
+                    strokeWidth={2.5}
+                    fill="url(#appPermitGrad)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="payments"
+                    name="Toʻlov (mln)"
+                    stroke="#F59E0B"
+                    strokeWidth={1.5}
+                    fill="none"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#E4E7EA] bg-[#F8F9FA] p-3 rounded-xl text-center text-xs">
+              <div>
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">Jami Arizalar Tarixi</span>
+                <span className="text-sm font-extrabold text-[#1A1F24] font-mono">13 ta (2024-2026)</span>
+              </div>
+              <div className="border-x border-[#E4E7EA]">
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">SLA Bajarilishi</span>
+                <span className="text-sm font-extrabold text-[#2E7D4F] font-mono">100% oʻz vaqtida</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase text-[#767F87] block">Muvaffaqiyatli Chiqish</span>
+                <span className="text-sm font-extrabold text-[#0284C7] font-mono">85% tasdiqlangan</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Chart 2: Land Distribution Donut */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#E4E7EA] pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-[#1A1F24] flex items-center gap-2">
+                    <PieIcon className="w-5 h-5 text-[#2E7D4F]" /> Foydalanilayotgan Maydonlar
+                  </h3>
+                  <p className="text-xs text-[#5A646D] mt-0.5">
+                    Faoliyat turlari boʻyicha ajratilgan 61.0 ga yer taqsimoti
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2.5 py-1 rounded-lg border border-[#D9EBDC]">
+                  61.0 ga
+                </span>
+              </div>
+
+              <div className="relative w-full h-[180px] flex items-center justify-center my-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-[#1A1F24] text-white p-2.5 rounded-xl shadow-lg text-xs space-y-0.5">
+                              <div className="font-bold text-[#7FB98A]">{d.name}</div>
+                              <div className="flex justify-between gap-3 font-mono">
+                                <span>Ajratilgan maydon:</span>
+                                <span className="font-bold text-white">{d.areaHa} ga ({d.pct}%)</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Pie
+                      data={activityLandData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={48}
+                      outerRadius={72}
+                      paddingAngle={4}
+                      dataKey="areaHa"
+                    >
+                      {activityLandData.map((entry, idx) => (
+                        <Cell key={`cell-${idx}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xl font-black text-[#1A1F24] font-mono leading-none">61.0</span>
+                  <span className="text-[10px] font-bold uppercase text-[#767F87] tracking-wider mt-0.5">Gektar</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-2 border-t border-[#E4E7EA]">
+              {activityLandData.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs py-0.5">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-[#5A646D] truncate">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="font-bold text-[#1A1F24] font-mono">{item.areaHa} ga</span>
+                    <span className="text-[11px] font-bold text-[#767F87] font-mono w-9 text-right">{item.pct}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row 2: BarChart + Geofencing / Status Card */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.85fr_1.15fr] gap-6">
+          {/* Plots Overview BarChart */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E7EA] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[#2E7D4F]" />
+                  <h3 className="text-base font-bold text-[#1A1F24]">
+                    Biriktirilgan Konturlar va Amal Qilish Muddatlari
+                  </h3>
+                </div>
+                <p className="text-xs text-[#5A646D] mt-0.5">
+                  Oʻrmonchiliklar kesimida ajratilgan yer maydonlari (ga) va ruxsatnomadan qolgan kunlar
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-[#5A646D]">
+                  <span className="w-3 h-3 rounded bg-[#3B82F6]" /> Maydon (ga)
+                </span>
+                <span className="flex items-center gap-1.5 text-[#5A646D]">
+                  <span className="w-3 h-3 rounded bg-[#2E7D4F]" /> Qolgan kunlar
+                </span>
+              </div>
+            </div>
+
+            <div className="w-full h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={plotsOverviewData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EA" vertical={false} />
+                  <XAxis dataKey="plot" stroke="#767F87" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#767F87" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        const d = payload[0].payload;
+                        return (
+                          <div className="bg-[#1A1F24] text-white p-3 rounded-xl shadow-lg text-xs space-y-1 font-sans">
+                            <div className="font-bold text-[#7FB98A] border-b border-white/10 pb-1">{label}</div>
+                            <div className="flex justify-between gap-4 pt-1">
+                              <span className="text-sky-300">Maydon:</span>
+                              <span className="font-mono font-bold">{d.areaHa} ga</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-emerald-300">Amal qilish muddati qoldi:</span>
+                              <span className="font-mono font-bold">{d.daysLeft} kun</span>
+                            </div>
+                            {d.livestock > 0 && (
+                              <div className="flex justify-between gap-4 border-t border-white/10 pt-1 text-[11px]">
+                                <span className="text-amber-300">Chorva limiti:</span>
+                                <span className="font-mono font-bold text-amber-300">{d.livestock} bosh</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="areaHa" name="Maydon (ga)" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="daysLeft" name="Qolgan kunlar" fill="#2E7D4F" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#E4E7EA] text-center text-xs">
+              {plotsOverviewData.map((p, idx) => (
+                <div key={idx} className="bg-[#F8F9FA] p-2 rounded-xl">
+                  <span className="text-[11px] font-bold text-[#1A1F24] block truncate">{p.plot}</span>
+                  <span className="text-[10px] text-[#5A646D]">{p.areaHa} ga · {p.daysLeft} kun qoldi</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal Status & Geofencing Card */}
+          <div className="bg-white border border-[#E4E7EA] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E4E7EA] pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[#2E7D4F]" />
+                  <h3 className="text-base font-bold text-[#1A1F24]">Huquqiy Maqom va Xavfsizlik</h3>
+                </div>
+                <span className="text-[11px] font-bold text-[#2E7D4F] bg-[#F0F7F1] px-2 py-0.5 rounded border border-[#D9EBDC]">
+                  QR / E-IMZO
+                </span>
+              </div>
+              <p className="text-xs text-[#5A646D]">
+                Barcha ruxsatnomalaringiz davlat oʻrmon xoʻjaligi direktori tomonidan E-IMZO bilan tasdiqlangan va QR-kod orqali qonuniy kuchga ega.
+              </p>
+
+              <div className="space-y-2">
+                <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#2E7D4F]" />
+                    <span className="text-[#5A646D]">Elektron ruxsatnoma QR-kodi:</span>
+                  </div>
+                  <b className="text-[#2E7D4F] font-bold">Faol va himoyalangan</b>
+                </div>
+
+                <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#0284C7]" />
+                    <span className="text-[#5A646D]">GPS chegaralari va geofence:</span>
+                  </div>
+                  <b className="text-[#0284C7] font-mono">100% muvofiq</b>
+                </div>
+
+                <div className="p-3 bg-[#F8F9FA] border border-[#E4E7EA] rounded-xl flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#1A1F24]" />
+                    <span className="text-[#5A646D]">Dala tekshiruvi xulosalari:</span>
+                  </div>
+                  <b className="text-[#2E7D4F] font-bold">Qoidabuzarlik yoʻq</b>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#E4E7EA]">
+              <Button
+                variant="outline"
+                size="sm"
+                fullWidth
+                leftIcon={<Layers className="w-4 h-4 text-[#0284C7]" />}
+                onClick={() => onNavigate?.('vacant_plots')}
+                className="text-xs font-semibold"
+              >
+                Boʻsh Uchastkalar Xaritasi (GIS)
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2.2 Onboarding Section (applicant-cabinet.html onboarding design) ── */}
       <section className="space-y-4">
         <div className="flex items-center gap-2 text-xs text-[#5A646D]">
           <span className="px-2.5 py-1 rounded-full bg-white border border-[#E4E7EA] font-semibold text-[#1A1F24] uppercase text-[10px] shadow-2xs">
@@ -127,36 +653,6 @@ export const ApplicantDashboard: React.FC<ApplicantDashboardProps> = ({
           </div>
         </div>
       </section>
-
-      {/* ── 2. Hero Section (applicant-cabinet.html design) ───────────────── */}
-      <div className="bg-gradient-to-r from-[#1D5434] via-[#23653F] to-[#2E7D4F] text-white rounded-3xl p-8 lg:p-10 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 border border-[#39935E]/40 relative overflow-hidden">
-        {/* Subtle background decorative element */}
-        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="space-y-3 max-w-2xl z-10">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
-            Assalomu alaykum, {userName}
-          </h1>
-          <p className="text-sm md:text-base text-emerald-50/90 leading-relaxed font-normal">
-            {userOrg}. Sizda 2 ta amaldagi ruxsatnoma va 1 ta toʻlov kutilayotgan ariza bor. Qolgan ishlar reja boʻyicha ketmoqda — biror narsa kerak boʻlganda xabar beramiz.
-          </p>
-        </div>
-
-        <div className="shrink-0 text-center lg:text-right w-full lg:w-auto z-10 flex flex-col items-center lg:items-end">
-          <button
-            onClick={() => onNavigate?.('applicant_wizard')}
-            className="w-full sm:w-auto h-16 px-8 rounded-2xl bg-white text-[#123522] hover:bg-[#F0F7F1] text-lg font-extrabold shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-3 border-2 border-white/90 group transform hover:scale-[1.03] active:scale-[0.98] cursor-pointer ring-4 ring-white/20"
-          >
-            <div className="w-9 h-9 rounded-xl bg-[#F0F7F1] border border-[#2E7D4F]/20 flex items-center justify-center text-[#2E7D4F] group-hover:bg-[#2E7D4F] group-hover:text-white transition-colors">
-              <Plus className="w-6 h-6 stroke-[2.5]" />
-            </div>
-            <span className="tracking-tight text-[#123522]">Ariza topshirish</span>
-          </button>
-          <small className="block mt-3 text-xs text-emerald-100/80 leading-snug max-w-[280px] text-center lg:text-right font-medium">
-            Olti bosqich, taxminan 15 daqiqa. Istalgan vaqtda toʻxtatishingiz mumkin — qoralama saqlanadi.
-          </small>
-        </div>
-      </div>
 
       {/* ── 3. Pending Payment Banner (applicant-cabinet.html pay design) ──── */}
       <div className="bg-[#FFFBEB] border-2 border-[#B45309] rounded-2xl p-6 shadow-sm space-y-4">
